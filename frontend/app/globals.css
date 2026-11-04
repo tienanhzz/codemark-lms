@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+input[type="datetime-local"],
+input[type="date"],
+input[type="time"] {
+  min-height: 2.5rem;
+}
+
+.prose-lesson {
+  white-space: pre-wrap;
+  line-height: 1.65;
+}
+
+.workspace .dashboard-welcome > div {
+  margin-bottom: 0;
+}
+
+.workspace .dashboard-welcome h1 {
+  color: #fff;
+}
+
+.workspace .dashboard-welcome h1 i {
+  color: #99f6e4;
+}
+
+.workspace .dashboard-welcome p {
+  color: #cbd5e1;
+}
+
+.workspace table thead {
+  background: #f8fafc;
+}
+
+.workspace table th {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.workspace table tbody tr:hover {
+  background-color: #f0fdfa;
+}
+
+.workspace input[type="checkbox"],
+.workspace input[type="radio"] {
+  accent-color: #115e59;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .workspace-content {
+    animation: login-enter 280ms ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace *,
+  .workspace *::before,
+  .workspace *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Login only: short, one-time entrances; no animation loop or JS timers. */
+@keyframes login-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .login-scene .login-enter {
+    animation: login-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .login-scene .login-enter-intro {
+    animation-delay: 60ms;
+  }
+
+  .login-scene .login-enter-form {
+    animation-delay: 100ms;
+  }
+
+  .login-scene .login-enter-footer {
+    animation-delay: 140ms;
+  }
+
+  .login-scene .login-submit,
+  .login-scene .login-feature > i {
+    transition: transform 160ms ease-out, background-color 160ms ease-out;
+  }
+
+  .login-scene input {
+    transition: border-color 160ms ease-out, box-shadow 160ms ease-out;
+  }
+
+  .login-scene .login-submit:active:not(:disabled) {
+    transform: translateY(0) scale(0.99);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .login-scene .login-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .login-scene .login-feature:hover > i {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-scene input,
+  .login-scene .login-submit {
+    transition: none;
+  }
+}
