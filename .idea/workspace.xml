@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7d8a461a-6a4c-43a5-871b-2c83c9713ce9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/account/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/account/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/audit/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/admin/audit/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/ip-blacklist/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/admin/ip-blacklist/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/admin/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/sessions/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/admin/sessions/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/users/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/admin/users/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/assessments/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/assessments/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/attempts/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/attempts/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/attendance/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/attendance/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/courses/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/courses/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/courses/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/courses/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/dashboard/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/monitor/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/monitor/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/schedule/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/(app)/schedule/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/login/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/AppShell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/AppShell.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/AuthProvider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/AuthProvider.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Providers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Providers.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/course/AnnouncementsTab.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/course/AnnouncementsTab.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/course/AssessmentsTab.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/course/AssessmentsTab.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/course/AttendanceTab.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/course/AttendanceTab.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/course/CourseOverview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/course/CourseOverview.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/course/DiscussionsTab.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/course/DiscussionsTab.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/course/GradebookTab.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/course/GradebookTab.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/course/LeaveTab.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/course/LeaveTab.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/course/LessonsTab.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/course/LessonsTab.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/course/RosterTab.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/course/RosterTab.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/course/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/course/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/ui.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/format.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/format.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/realtime.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/realtime.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/next-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/next-env.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/next.config.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postcss.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/postcss.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/branding/favicon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/branding/favicon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/branding/logo-dark.svg" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/branding/logo-dark.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/branding/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/branding/logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tailwind.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tailwind.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="module" />
+      <option value="repository" />
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "truongng-max"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/tienanhzz/codemark-lms.git",
+    "accountId": "276aed20-9052-434a-9eef-4f39351cbf84"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5,
+  "fromUser": false
+}]]></component>
+  <component name="ProjectId" id="3LdOUSG6dIfdaKvc8R2yhYMXr8a" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "2401040169__NguyenDucTruong",
+    "git.auto.fetch.suggestion.counter": "1",
+    "js.debugger.nextJs.config.created.client": "true",
+    "js.debugger.nextJs.config.created.server": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="npm.Next.js: server-side">
+    <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
+      <method v="2" />
+    </configuration>
+    <configuration name="Next.js: server-side" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-a203e0a19954-intellij.indexing.shared.core-IU-262.10315.125" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.10315.125" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7d8a461a-6a4c-43a5-871b-2c83c9713ce9" name="Changes" comment="" />
+      <created>1793780493980</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1793780493980</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
