@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "seed": "node scripts/seed.mjs",
+    "test:backend": "node scripts/maven.mjs test",
+    "build:backend": "node scripts/maven.mjs package"
+  },
+  "workspaces": ["frontend"]
+}
