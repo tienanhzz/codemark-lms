@@ -1,0 +1,456 @@
+[
+  {
+    "code": "DEMO101",
+    "title": "Lập trình Python cơ bản",
+    "quiz": "Demo MCQ quiz",
+    "questions": [
+      {
+        "prompt": "What is 2 + 2?",
+        "options": [
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "answer": "1",
+        "points": 2
+      },
+      {
+        "prompt": "Which keyword defines a function?",
+        "options": [
+          "def",
+          "func",
+          "function",
+          "fn"
+        ],
+        "answer": "0",
+        "points": 3
+      },
+      {
+        "prompt": "What is len('hello')?",
+        "options": [
+          "4",
+          "5",
+          "6",
+          "0"
+        ],
+        "answer": "1"
+      },
+      {
+        "prompt": "Which type is mutable?",
+        "options": [
+          "tuple",
+          "str",
+          "list",
+          "int"
+        ],
+        "answer": "2"
+      },
+      {
+        "prompt": "What is 7 // 2?",
+        "options": [
+          "3",
+          "3.5",
+          "4",
+          "2"
+        ],
+        "answer": "0"
+      },
+      {
+        "prompt": "Which keyword starts a loop over a list?",
+        "options": [
+          "if",
+          "class",
+          "return",
+          "for"
+        ],
+        "answer": "3"
+      },
+      {
+        "prompt": "Which value represents absence?",
+        "options": [
+          "False",
+          "None",
+          "0",
+          "''"
+        ],
+        "answer": "1"
+      },
+      {
+        "prompt": "Which operator tests equality?",
+        "options": [
+          "=",
+          "==",
+          "!=",
+          ":="
+        ],
+        "answer": "1"
+      },
+      {
+        "prompt": "What is list(range(3))?",
+        "options": [
+          "[1, 2, 3]",
+          "[0, 1, 2, 3]",
+          "[0, 1, 2]",
+          "[3]"
+        ],
+        "answer": "2"
+      },
+      {
+        "prompt": "Which block handles an exception?",
+        "options": [
+          "except",
+          "with",
+          "else",
+          "def"
+        ],
+        "answer": "0"
+      }
+    ],
+    "meeting": {
+      "weekday": 0,
+      "start": "09:00",
+      "end": "10:30",
+      "location": "Room A1"
+    }
+  },
+  {
+    "code": "WEB101",
+    "title": "Phát triển ứng dụng Web",
+    "quiz": "Web fundamentals quiz",
+    "questions": [
+      {
+        "prompt": "What does HTML describe?",
+        "options": [
+          "Page structure",
+          "Database indexes",
+          "Network routes",
+          "Encryption keys"
+        ],
+        "answer": "0"
+      },
+      {
+        "prompt": "Which language styles web pages?",
+        "options": [
+          "SQL",
+          "CSS",
+          "C",
+          "Bash"
+        ],
+        "answer": "1"
+      },
+      {
+        "prompt": "Which HTML element creates a link?",
+        "options": [
+          "<p>",
+          "<div>",
+          "<a>",
+          "<span>"
+        ],
+        "answer": "2"
+      },
+      {
+        "prompt": "Which HTTP method normally retrieves a resource?",
+        "options": [
+          "POST",
+          "DELETE",
+          "PATCH",
+          "GET"
+        ],
+        "answer": "3"
+      },
+      {
+        "prompt": "What does HTTP 404 mean?",
+        "options": [
+          "Not found",
+          "Success",
+          "Forbidden",
+          "Redirect"
+        ],
+        "answer": "0"
+      },
+      {
+        "prompt": "Which format uses objects and arrays for data exchange?",
+        "options": [
+          "JPEG",
+          "JSON",
+          "MP3",
+          "CSS"
+        ],
+        "answer": "1"
+      },
+      {
+        "prompt": "Which JavaScript keyword declares a block-scoped variable?",
+        "options": [
+          "print",
+          "select",
+          "let",
+          "def"
+        ],
+        "answer": "2"
+      },
+      {
+        "prompt": "Which input type hides typed characters?",
+        "options": [
+          "text",
+          "email",
+          "number",
+          "password"
+        ],
+        "answer": "3"
+      },
+      {
+        "prompt": "What does DOM stand for?",
+        "options": [
+          "Document Object Model",
+          "Data Output Method",
+          "Disk Object Map",
+          "Domain Order Mode"
+        ],
+        "answer": "0"
+      },
+      {
+        "prompt": "Which CSS property controls text color?",
+        "options": [
+          "display",
+          "color",
+          "margin",
+          "width"
+        ],
+        "answer": "1"
+      }
+    ],
+    "meeting": {
+      "weekday": 1,
+      "start": "09:00",
+      "end": "10:30",
+      "location": "Room A1"
+    }
+  },
+  {
+    "code": "DB101",
+    "title": "Cơ sở dữ liệu quan hệ",
+    "quiz": "SQL fundamentals quiz",
+    "questions": [
+      {
+        "prompt": "Which SQL command reads rows?",
+        "options": [
+          "SELECT",
+          "DELETE",
+          "DROP",
+          "INSERT"
+        ],
+        "answer": "0"
+      },
+      {
+        "prompt": "Which clause filters rows?",
+        "options": [
+          "ORDER BY",
+          "WHERE",
+          "GROUP BY",
+          "LIMIT"
+        ],
+        "answer": "1"
+      },
+      {
+        "prompt": "What identifies each row uniquely?",
+        "options": [
+          "Comment",
+          "View",
+          "Primary key",
+          "Alias"
+        ],
+        "answer": "2"
+      },
+      {
+        "prompt": "Which command adds a row?",
+        "options": [
+          "ALTER",
+          "SELECT",
+          "UPDATE",
+          "INSERT"
+        ],
+        "answer": "3"
+      },
+      {
+        "prompt": "Which command changes existing rows?",
+        "options": [
+          "UPDATE",
+          "CREATE",
+          "DROP",
+          "SELECT"
+        ],
+        "answer": "0"
+      },
+      {
+        "prompt": "Which function counts rows?",
+        "options": [
+          "SUM()",
+          "COUNT()",
+          "AVG()",
+          "MIN()"
+        ],
+        "answer": "1"
+      },
+      {
+        "prompt": "Which clause sorts query results?",
+        "options": [
+          "WHERE",
+          "HAVING",
+          "ORDER BY",
+          "JOIN"
+        ],
+        "answer": "2"
+      },
+      {
+        "prompt": "Which keyword removes duplicate result rows?",
+        "options": [
+          "ALL",
+          "AS",
+          "ON",
+          "DISTINCT"
+        ],
+        "answer": "3"
+      },
+      {
+        "prompt": "What does a foreign key reference?",
+        "options": [
+          "A key in a related table",
+          "A file path",
+          "An HTTP route",
+          "A CSS rule"
+        ],
+        "answer": "0"
+      },
+      {
+        "prompt": "Which operation combines related tables?",
+        "options": [
+          "COMMIT",
+          "JOIN",
+          "ROLLBACK",
+          "LIMIT"
+        ],
+        "answer": "1"
+      }
+    ],
+    "meeting": {
+      "weekday": 2,
+      "start": "09:00",
+      "end": "10:30",
+      "location": "Room A1"
+    }
+  },
+  {
+    "code": "NET101",
+    "title": "Mạng máy tính",
+    "quiz": "Networking fundamentals quiz",
+    "questions": [
+      {
+        "prompt": "What does DNS resolve?",
+        "options": [
+          "Domain names to IP addresses",
+          "Passwords to hashes",
+          "HTML to CSS",
+          "Files to ZIP"
+        ],
+        "answer": "0"
+      },
+      {
+        "prompt": "Which protocol provides reliable ordered delivery?",
+        "options": [
+          "UDP",
+          "TCP",
+          "ICMP",
+          "ARP"
+        ],
+        "answer": "1"
+      },
+      {
+        "prompt": "What is the default HTTPS port?",
+        "options": [
+          "21",
+          "80",
+          "443",
+          "53"
+        ],
+        "answer": "2"
+      },
+      {
+        "prompt": "Which address is IPv4 loopback?",
+        "options": [
+          "8.8.8.8",
+          "192.168.1.1",
+          "0.0.0.0",
+          "127.0.0.1"
+        ],
+        "answer": "3"
+      },
+      {
+        "prompt": "Which device forwards packets between networks?",
+        "options": [
+          "Router",
+          "Keyboard",
+          "Monitor",
+          "Printer"
+        ],
+        "answer": "0"
+      },
+      {
+        "prompt": "How many bits are in an IPv4 address?",
+        "options": [
+          "16",
+          "32",
+          "64",
+          "128"
+        ],
+        "answer": "1"
+      },
+      {
+        "prompt": "Which protocol commonly assigns IP settings automatically?",
+        "options": [
+          "FTP",
+          "SMTP",
+          "DHCP",
+          "SSH"
+        ],
+        "answer": "2"
+      },
+      {
+        "prompt": "Which tool commonly tests reachability with ICMP?",
+        "options": [
+          "git",
+          "npm",
+          "pip",
+          "ping"
+        ],
+        "answer": "3"
+      },
+      {
+        "prompt": "Which protocol encrypts HTTP traffic?",
+        "options": [
+          "TLS",
+          "ARP",
+          "DHCP",
+          "DNS"
+        ],
+        "answer": "0"
+      },
+      {
+        "prompt": "What does a subnet mask describe?",
+        "options": [
+          "Password length",
+          "Network and host portions of an address",
+          "CPU speed",
+          "File encoding"
+        ],
+        "answer": "1"
+      }
+    ],
+    "meeting": {
+      "weekday": 3,
+      "start": "09:00",
+      "end": "10:30",
+      "location": "Room A1"
+    }
+  }
+]
