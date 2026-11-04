@@ -1,4 +1,4 @@
-# CodeMark_LMS
+# CodeMark
 
 A classroom learning management system built with **Java 21+, Spring Boot, JPA/Hibernate and WebSocket**, with a **Next.js, TypeScript and Tailwind CSS** frontend.
 
