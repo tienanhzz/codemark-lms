@@ -1,4 +1,5 @@
 "use client";
+import { confirmInline } from "../../../../components/InlineConfirm";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { api, errorMessage } from "../../../../lib/api";
@@ -55,7 +56,7 @@ export default function BlacklistPage() {
         body: { network: form.get("network"), reason: form.get("reason") },
       });
       (event.target as HTMLFormElement).reset();
-      setNotice("Network added to the global blacklist.");
+      setNotice("Đã thêm địa chỉ mạng vào danh sách chặn.");
       await load();
     } catch (err) {
       setError(errorMessage(err));
@@ -65,10 +66,10 @@ export default function BlacklistPage() {
   }
 
   async function remove(row: NetworkRow) {
-    if (!confirm(`Remove ${row.network} from the blacklist?`)) return;
+    if (!await confirmInline(`Remove ${row.network} from the blacklist?`)) return;
     try {
       await api(`/api/admin/ip-blacklist/${row.id}`, { method: "DELETE" });
-      setNotice("Network removed from the blacklist.");
+      setNotice("Đã gỡ chặn địa chỉ mạng.");
       await load();
     } catch (err) {
       setError(errorMessage(err));
@@ -79,31 +80,31 @@ export default function BlacklistPage() {
     <div>
       <PageHeader
         icon="fa-ban"
-        title="Global IP blacklist"
-        description="Individual IPs and CIDR networks are denied HTTP login/API and WebSocket connections."
+        title="Danh sách IP bị chặn toàn hệ thống"
+        description="Địa chỉ IP và dải CIDR trong danh sách không thể đăng nhập hoặc kết nối hệ thống."
       />
       {error && <Alert tone="danger" className="mb-3">{error}</Alert>}
       {notice && <Alert tone="success" className="mb-3">{notice}</Alert>}
 
-      <Card title="Add network" subtitle="Use an individual address or CIDR range">
+      <Card title="Thêm địa chỉ mạng" subtitle="Nhập địa chỉ IP hoặc dải CIDR">
         <form onSubmit={add} className="grid gap-3 sm:grid-cols-3">
-          <Field label="IP or CIDR">
+          <Field label="IP hoặc CIDR">
             <Input name="network" required placeholder="203.0.113.0/24" />
           </Field>
-          <Field label="Reason">
-            <Input name="reason" placeholder="Abuse, classroom policy…" maxLength={250} />
+          <Field label="Lý do">
+            <Input name="reason" placeholder="Lý do chặn…" maxLength={250} />
           </Field>
           <div className="flex items-end">
             <Button type="submit" variant="danger" loading={saving} className="w-full">
-              <i className="fa-solid fa-ban" /> Block network
+              <i className="fa-solid fa-ban" /> Chặn địa chỉ mạng
             </Button>
           </div>
         </form>
       </Card>
 
-      <Card className="mt-4" title="Blacklisted networks" bodyClassName="p-0">
+      <Card className="mt-4" title="Địa chỉ mạng bị chặn" bodyClassName="p-0">
         {loading ? (
-          <Spinner label="Loading blacklist…" />
+          <Spinner label="Đang tải danh sách chặn…" />
         ) : networks.length ? (
           <div className="divide-y divide-slate-50">
             {networks.map((row) => (
@@ -116,12 +117,12 @@ export default function BlacklistPage() {
                     {row.network}
                   </p>
                   <p className="text-xs text-slate-500">
-                    {row.reason || "No reason recorded"} · added{" "}
+                    {row.reason || "No reason recorded"} · thêm lúc{" "}
                     {formatDateTime(row.createdAt)}
                   </p>
                 </div>
                 <Button size="sm" variant="secondary" onClick={() => remove(row)}>
-                  <i className="fa-solid fa-trash text-rose-500" /> Remove
+                  <i className="fa-solid fa-trash text-rose-500" /> Gỡ bỏ
                 </Button>
               </div>
             ))}
@@ -130,8 +131,8 @@ export default function BlacklistPage() {
           <div className="p-4">
             <EmptyState
               icon="fa-shield-halved"
-              title="No blacklisted networks"
-              description="Use this list to block abusive or non-classroom networks globally."
+              title="Chưa có địa chỉ mạng bị chặn"
+              description="Dùng danh sách này để chặn địa chỉ mạng trên toàn hệ thống."
             />
           </div>
         )}

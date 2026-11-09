@@ -1,4 +1,5 @@
 "use client";
+import { confirmInline } from "../../../../components/InlineConfirm";
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -234,7 +235,7 @@ export default function AttemptPage() {
           }),
         ));
         await api(`/api/attempts/${attempt.id}/submit`, { method: "POST" });
-        if (automatic) setNotice("Time is up — your attempt was submitted automatically.");
+        if (automatic) setNotice("Hết giờ, bài làm đã được nộp tự động.");
         await load();
       } catch (err) {
         submittedRef.current = false;
@@ -320,35 +321,34 @@ export default function AttemptPage() {
     }
   }
 
-  if (loading) return <Spinner label="Loading attempt…" />;
+  if (loading) return <Spinner label="Đang tải lượt làm…" />;
   if (error && !attempt) return <Alert tone="danger">{error}</Alert>;
   if (!attempt) return null;
 
   if (attempt.status === "submitted") {
     return (
       <div className="mx-auto max-w-xl">
-        <Card title="Attempt submitted" subtitle={`Submitted ${formatDateTime(attempt.submittedAt)}`}>
+        <Card title="Đã nộp bài" subtitle={`Submitted ${formatDateTime(attempt.submittedAt)}`}>
           <div className="text-center">
             <p className="text-4xl font-bold text-slate-800">
               {attempt.score ?? 0}
               <span className="text-lg text-slate-400"> / {attempt.maxScore}</span>
             </p>
             <p className="mt-2 text-sm text-slate-500">
-              Your answers were graded on the server. Code questions may take a moment to
-              finish when the isolated runner is available.
+              Bài được chấm trên máy chủ. Câu lập trình có thể cần thêm thời gian xử lý.
             </p>
             <div className="mt-5 flex justify-center gap-2">
               <Link
                 href={`/assessments/${attempt.assessmentId}`}
                 className="rounded-md bg-teal-700 px-4 py-2 text-sm font-medium text-white"
               >
-                Back to assessment
+                Quay lại bài kiểm tra
               </Link>
               <Link
                 href={`/courses/${attempt.assessment?.courseId || ""}`}
                 className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700"
               >
-                Back to course
+                Quay lại lớp học
               </Link>
             </div>
           </div>
@@ -370,8 +370,8 @@ export default function AttemptPage() {
             {attempt.assessment?.title || "Assessment attempt"}
           </p>
           <p className="text-xs text-slate-500">
-            Deadline {formatDateTime(attempt.deadline)} · {answeredCount}/
-            {questions.length} answered · {attempt.flaggedQuestions?.length || 0} flagged
+            Hạn nộp {formatDateTime(attempt.deadline)} · {answeredCount}/
+            {questions.length} đã trả lời · {attempt.flaggedQuestions?.length || 0} đã đánh dấu
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -403,13 +403,13 @@ export default function AttemptPage() {
             variant="success"
             loading={submitting}
             disabled={expired}
-            onClick={() => {
-              if (confirm("Submit this attempt? You cannot change answers afterwards.")) {
+            onClick={async () => {
+              if (await confirmInline("Nộp bài này? Sau khi nộp bạn không thể thay đổi đáp án.")) {
                 submit(false);
               }
             }}
           >
-            <i className="fa-solid fa-paper-plane" /> Submit
+            <i className="fa-solid fa-paper-plane" /> Nộp
           </Button>
         </div>
       </div>
@@ -422,7 +422,7 @@ export default function AttemptPage() {
               {alertMessage}
             </span>
             <button onClick={() => setAlertMessage("")} className="text-xs underline">
-              Dismiss
+              Ẩn thông báo
             </button>
           </div>
         </Alert>
@@ -431,13 +431,12 @@ export default function AttemptPage() {
       {notice && <Alert tone="info" className="mb-3">{notice}</Alert>}
       {expired && (
         <Alert tone="danger" className="mb-3">
-          The server deadline has passed. Submit is disabled; your teacher can force-submit
-          the attempt.
+          Đã quá hạn trên máy chủ. Giảng viên có thể buộc nộp bài.
         </Alert>
       )}
 
       <div className="grid gap-4 lg:grid-cols-[220px_1fr]">
-        <Card title="Questions" bodyClassName="p-2">
+        <Card title="Câu hỏi" bodyClassName="p-2">
           <div className="grid grid-cols-5 gap-1 lg:grid-cols-4">
             {questions.map((item, itemIndex) => {
               const answered = (answers[String(item.id)] || "").trim().length > 0;
@@ -445,7 +444,7 @@ export default function AttemptPage() {
                 <button
                   key={item.id}
                   aria-label={`Question ${itemIndex + 1}${attempt.flaggedQuestions?.includes(item.id) ? ", flagged for review" : ""}`}
-                  onClick={() => {
+                  onClick={async () => {
                     setIndex(itemIndex);
                     setRunResults(null);
                   }}
@@ -465,21 +464,21 @@ export default function AttemptPage() {
             })}
           </div>
           <div className="mt-3 space-y-1 border-t border-slate-100 p-2 text-[11px] text-slate-500">
-            <p><i className="fa-solid fa-flag mr-1 text-amber-500" /> Flagged for review (does not affect score)</p>
+            <p><i className="fa-solid fa-flag mr-1 text-amber-500" /> Đánh dấu để xem lại (không ảnh hưởng điểm)</p>
             <p>
               <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-400" />
-              Answered
+              Đã trả lời
             </p>
             <p>
               <span className="mr-1 inline-block h-2 w-2 rounded-full bg-slate-300" />
-              Unanswered
+              Chưa trả lời
             </p>
           </div>
         </Card>
 
         <Card
           title={`Question ${index + 1} of ${questions.length}`}
-          subtitle={`${question?.points ?? 0} points · ${question?.kind || ""}${
+          subtitle={`${question?.points ?? 0} điểm · ${question?.kind || ""}${
             question?.language ? ` · ${question.language}` : ""
           }`}
         >
@@ -526,7 +525,7 @@ export default function AttemptPage() {
                 <Textarea
                   value={answers[String(question.id)] || ""}
                   onChange={(event) => updateAnswer(question.id, event.target.value)}
-                  placeholder="Your answer…"
+                  placeholder="Câu trả lời của bạn…"
                 />
               )}
 
@@ -541,12 +540,12 @@ export default function AttemptPage() {
                   />
                   {question.testCases && question.testCases.length > 0 && (
                     <div className="space-y-1 rounded-md border border-slate-100 bg-slate-50 p-2 text-xs">
-                      <p className="font-semibold text-slate-600">Visible test cases</p>
+                      <p className="font-semibold text-slate-600">Bộ kiểm thử công khai</p>
                       {question.testCases.map((testCase, caseIndex) => (
                         <div key={caseIndex} className="rounded bg-white p-2">
-                          <p className="text-slate-500">Input:</p>
+                          <p className="text-slate-500">Đầu vào:</p>
                           <pre className="whitespace-pre-wrap">{testCase.input || "(empty)"}</pre>
-                          <p className="text-slate-500">Expected:</p>
+                          <p className="text-slate-500">Kết quả mong đợi:</p>
                           <pre className="whitespace-pre-wrap">
                             {testCase.expectedOutput}
                           </pre>
@@ -560,19 +559,19 @@ export default function AttemptPage() {
                     loading={running}
                     onClick={runSample}
                   >
-                    <i className="fa-solid fa-play" /> Run visible samples
+                    <i className="fa-solid fa-play" /> Chạy thử mẫu công khai
                   </Button>
                   {runResults && (
                     <div className="space-y-1">
                       {runResults.length === 0 && (
-                        <Alert tone="info">No visible test cases for this question.</Alert>
+                        <Alert tone="info">Câu hỏi này chưa có bộ kiểm thử công khai.</Alert>
                       )}
                       {runResults.map((result) => (
                         <Alert
                           key={result.testCaseId}
                           tone={result.passed ? "success" : "danger"}
                         >
-                          Case #{result.testCaseId}:{" "}
+                          Bộ kiểm thử #{result.testCaseId}:{" "}
                           {result.passed ? "passed" : result.error || "failed"}
                           {!result.passed && result.stderr && (
                             <pre className="mt-1 max-h-32 overflow-auto whitespace-pre-wrap text-xs">
@@ -590,38 +589,38 @@ export default function AttemptPage() {
                 <Button
                   variant="secondary"
                   disabled={index === 0}
-                  onClick={() => {
+                  onClick={async () => {
                     setIndex((value) => Math.max(0, value - 1));
                     setRunResults(null);
                   }}
                 >
-                  <i className="fa-solid fa-arrow-left" /> Previous
+                  <i className="fa-solid fa-arrow-left" /> Trước
                 </Button>
                 {index < questions.length - 1 ? (
                   <Button
-                    onClick={() => {
+                    onClick={async () => {
                       setIndex((value) => Math.min(questions.length - 1, value + 1));
                       setRunResults(null);
                     }}
                   >
-                    Next <i className="fa-solid fa-arrow-right" />
+                    Tiếp <i className="fa-solid fa-arrow-right" />
                   </Button>
                 ) : (
                   <Button
                     variant="success"
                     loading={submitting}
                     disabled={expired}
-                    onClick={() => {
-                      if (confirm("Submit this attempt?")) submit(false);
+                    onClick={async () => {
+                      if (await confirmInline("Nộp bài này?")) submit(false);
                     }}
                   >
-                    <i className="fa-solid fa-paper-plane" /> Submit attempt
+                    <i className="fa-solid fa-paper-plane" /> Nộp bài
                   </Button>
                 )}
               </div>
             </div>
           ) : (
-            <Alert tone="info">This assessment has no questions.</Alert>
+            <Alert tone="info">Bài kiểm tra này chưa có câu hỏi.</Alert>
           )}
         </Card>
       </div>
@@ -629,13 +628,13 @@ export default function AttemptPage() {
       <div className="mt-4 flex justify-end">
         <Button
           variant="ghost"
-          onClick={() => {
-            if (confirm("Leave this page? Your saved answers remain on the server.")) {
+          onClick={async () => {
+            if (await confirmInline("Rời trang này? Các đáp án đã lưu vẫn được giữ trên máy chủ.")) {
               router.push(`/assessments/${attempt.assessmentId}`);
             }
           }}
         >
-          Leave attempt
+          Rời bài làm
         </Button>
       </div>
     </div>

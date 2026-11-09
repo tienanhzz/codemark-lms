@@ -76,7 +76,7 @@ export default function DashboardPage() {
       .slice(0, 6);
   }, [schedule]);
 
-  if (loading) return <Spinner label="Loading your workspace…" />;
+  if (loading) return <Spinner label="Đang tải không gian học tập…" />;
   if (error) return <Alert tone="danger">{error}</Alert>;
   if (!dashboard || !user) return null;
 
@@ -87,7 +87,7 @@ export default function DashboardPage() {
   return (
     <div>
       <div className="mb-6 rounded-2xl border border-teal-900/10 bg-[#102c36] p-5 sm:p-7">
-      <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-200">Your digital classroom</p>
+      <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-200">Lớp học trực tuyến</p>
       <div className="dashboard-welcome">
       <PageHeader
         icon="fa-gauge-high"
@@ -105,7 +105,7 @@ export default function DashboardPage() {
             className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             <i className="fa-solid fa-calendar-days" />
-            Weekly schedule
+            Lịch học tuần
           </Link>
         }
       />
@@ -115,7 +115,7 @@ export default function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           icon="fa-book-open"
-          label="Current courses"
+          label="Lớp học hiện tại"
           value={dashboard.currentCourses}
           hint={`${dashboard.courses.length} total enrolments`}
           tone="sky"
@@ -124,23 +124,23 @@ export default function DashboardPage() {
           <>
             <StatCard
               icon="fa-star"
-              label="Average score"
+              label="Điểm trung bình"
               value={dashboard.averageScore ?? "—"}
-              hint="Submitted assessments"
+              hint="Bài kiểm tra đã nộp"
               tone="emerald"
             />
             <StatCard
               icon="fa-file-signature"
-              label="Upcoming assessments"
+              label="Bài kiểm tra sắp tới"
               value={dashboard.upcomingAssessments.length}
-              hint="Published and open"
+              hint="Đã công bố và đang mở"
               tone="amber"
             />
             <StatCard
               icon="fa-qrcode"
-              label="Open attendance"
+              label="Mở điểm danh"
               value={dashboard.openAttendance.length}
-              hint="Sessions accepting check-in"
+              hint="Phiên đang nhận điểm danh"
               tone="purple"
             />
           </>
@@ -148,23 +148,23 @@ export default function DashboardPage() {
           <>
             <StatCard
               icon="fa-users"
-              label="Accounts"
+              label="Tài khoản"
               value={Object.values(stats?.users || {}).reduce((a, b) => a + b, 0)}
               hint={`${stats?.activeSessions ?? 0} active sessions`}
               tone="emerald"
             />
             <StatCard
               icon="fa-user-graduate"
-              label="Students"
+              label="Sinh viên"
               value={stats?.users?.student ?? 0}
               hint={`${stats?.users?.teacher ?? 0} teachers`}
               tone="amber"
             />
             <StatCard
               icon="fa-triangle-exclamation"
-              label="Pending leave"
+              label="Đơn nghỉ chờ duyệt"
               value={stats?.pendingLeave ?? 0}
-              hint="Awaiting approval"
+              hint="Chờ xét duyệt"
               tone="rose"
             />
           </>
@@ -172,23 +172,23 @@ export default function DashboardPage() {
           <>
             <StatCard
               icon="fa-chalkboard-user"
-              label="Managed courses"
+              label="Lớp đang quản lý"
               value={managed.length}
-              hint="You are the course owner"
+              hint="Bạn là người phụ trách lớp"
               tone="emerald"
             />
             <StatCard
               icon="fa-file-signature"
-              label="Assessments"
+              label="Bài tập và bài thi"
               value={stats?.assessments ?? dashboard.upcomingAssessments.length}
-              hint="Across your courses"
+              hint="Trong các lớp của bạn"
               tone="amber"
             />
             <StatCard
               icon="fa-triangle-exclamation"
-              label="Pending leave"
+              label="Đơn nghỉ chờ duyệt"
               value={dashboard.pendingLeave}
-              hint="Requests to review"
+              hint="Đơn cần xét duyệt"
               tone="rose"
             />
           </>
@@ -198,11 +198,11 @@ export default function DashboardPage() {
       <div className="mt-5 grid gap-5 xl:grid-cols-3">
         <Card
           className="xl:col-span-2"
-          title="This week"
-          subtitle="Meetings for your current-semester courses"
+          title="Tuần này"
+          subtitle="Buổi học thuộc các lớp trong học kỳ hiện tại"
           actions={
             <Link href="/schedule" className="text-xs font-semibold text-teal-700">
-              Full calendar <i className="fa-solid fa-arrow-right ml-1" />
+              Lịch đầy đủ <i className="fa-solid fa-arrow-right ml-1" />
             </Link>
           }
         >
@@ -234,13 +234,13 @@ export default function DashboardPage() {
           ) : (
             <EmptyState
               icon="fa-calendar-xmark"
-              title="No meetings scheduled"
-              description="Course meetings added by teachers will appear here."
+              title="Chưa có lịch học"
+              description="Lịch giảng viên thêm sẽ xuất hiện tại đây."
             />
           )}
         </Card>
 
-        <Card title="Upcoming assessments">
+        <Card title="Bài kiểm tra sắp tới">
           {dashboard.upcomingAssessments.length ? (
             <div className="space-y-2">
               {dashboard.upcomingAssessments.map((assessment) => (
@@ -252,23 +252,23 @@ export default function DashboardPage() {
                   <p className="text-sm font-semibold text-slate-700">{assessment.title}</p>
                   <p className="mt-1 text-xs text-slate-500">
                     <i className="fa-regular fa-clock mr-1" />
-                    Opens {formatDateTime(assessment.opensAt)}
+                    Mở lúc {formatDateTime(assessment.opensAt)}
                   </p>
                   <p className="text-xs text-slate-500">
-                    Closes {formatDateTime(assessment.closesAt)}
+                    Đóng lúc {formatDateTime(assessment.closesAt)}
                   </p>
                 </Link>
               ))}
             </div>
           ) : (
-            <EmptyState icon="fa-file-circle-check" title="Nothing upcoming" />
+            <EmptyState icon="fa-file-circle-check" title="Chưa có nội dung sắp tới" />
           )}
         </Card>
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
         {isAdmin && stats ? (
-          <Card title="Accounts by role" subtitle="System user distribution">
+          <Card title="Tài khoản theo vai trò" subtitle="Phân bố vai trò người dùng">
             <BarChart
               data={Object.entries(stats.users).map(([label, value]) => ({
                 label,
@@ -279,25 +279,25 @@ export default function DashboardPage() {
             <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-500">
               <span>
                 <i className="fa-solid fa-book mr-1 text-teal-600" />
-                {stats.courses} courses
+                {stats.courses} lớp học
               </span>
               <span>
                 <i className="fa-solid fa-file-signature mr-1 text-amber-500" />
-                {stats.assessments} assessments
+                {stats.assessments} bài kiểm tra
               </span>
               <span>
                 <i className="fa-solid fa-pen-to-square mr-1 text-emerald-600" />
-                {stats.attempts} attempts
+                {stats.attempts} lượt làm
               </span>
               <span>
                 <i className="fa-solid fa-qrcode mr-1 text-purple-600" />
-                {stats.attendanceCheckins} check-ins
+                {stats.attendanceCheckins} lượt điểm danh
               </span>
             </div>
           </Card>
         ) : (
           <Card
-            title="My courses"
+            title="Lớp của tôi"
             subtitle={isStudent ? "Current enrolments" : "Courses you manage or assist"}
           >
             {dashboard.courses.length ? (
@@ -313,7 +313,7 @@ export default function DashboardPage() {
                         {course.code} — {course.title}
                       </p>
                       <p className="text-xs text-slate-500">
-                        {course.term} · {formatDate(course.startDate)} to{" "}
+                        {course.term} · {formatDate(course.startDate)} đến{" "}
                         {formatDate(course.endDate)}
                       </p>
                     </div>
@@ -328,8 +328,8 @@ export default function DashboardPage() {
             ) : (
               <EmptyState
                 icon="fa-book-open"
-                title="No courses yet"
-                description="You will see enrolled courses here."
+                title="Chưa có lớp học"
+                description="Các lớp bạn tham gia sẽ xuất hiện ở đây."
               />
             )}
           </Card>
@@ -360,7 +360,7 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <EmptyState icon="fa-clipboard-list" title="No audit events yet" />
+              <EmptyState icon="fa-clipboard-list" title="Chưa có nhật ký" />
             )
           ) : dashboard.announcements.length ? (
             <div className="space-y-3">
@@ -375,7 +375,7 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <EmptyState icon="fa-bullhorn" title="No announcements yet" />
+            <EmptyState icon="fa-bullhorn" title="Chưa có thông báo" />
           )}
         </Card>
       </div>
@@ -383,10 +383,10 @@ export default function DashboardPage() {
       {isAdmin && (
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { href: "/admin/users", icon: "fa-users", label: "Manage users" },
-            { href: "/admin/sessions", icon: "fa-signal", label: "Active sessions" },
-            { href: "/admin/ip-blacklist", icon: "fa-ban", label: "IP blacklist" },
-            { href: "/admin/audit", icon: "fa-clipboard-list", label: "Audit log" },
+            { href: "/admin/users", icon: "fa-users", label: "Quản lý tài khoản" },
+            { href: "/admin/sessions", icon: "fa-signal", label: "Phiên hoạt động" },
+            { href: "/admin/ip-blacklist", icon: "fa-ban", label: "IP bị chặn" },
+            { href: "/admin/audit", icon: "fa-clipboard-list", label: "Nhật ký hoạt động" },
           ].map((item) => (
             <Link
               key={item.href}

@@ -1,4 +1,5 @@
 "use client";
+import { confirmInline } from "../../../../components/InlineConfirm";
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -76,7 +77,7 @@ export default function MonitorPage() {
     socket.on("disconnect", () => setConnected(false));
     socket.on("monitor_joined", () => setConnected(true));
     socket.on("monitor_denied", () =>
-      setError("You are not authorized to monitor this assessment."),
+      setError("Bạn không có quyền giám sát bài kiểm tra này."),
     );
     socket.on("proctor_event", (event: ProctorEvent) => {
       setEvents((current) => [event, ...current].slice(0, 200));
@@ -87,8 +88,8 @@ export default function MonitorPage() {
     socket.on(
       "teacher_action_ack",
       (payload: { action?: string; ok?: boolean; reason?: string }) => {
-        if (payload.ok) setNotice(`Action “${payload.action}” applied.`);
-        else setError(`Action failed: ${payload.reason || "unknown"}`);
+        if (payload.ok) setNotice(`Đã thực hiện thao tác “${payload.action}”.`);
+        else setError(`Thao tác thất bại: ${payload.reason || "chưa rõ nguyên nhân"}`);
       },
     );
     const heartbeat = window.setInterval(() => socket.emit("heartbeat"), 30000);
@@ -115,7 +116,7 @@ export default function MonitorPage() {
   ) {
     if (!socketRef.current) return;
     if (requireTarget && !selectedAttempt) {
-      setError("Select an attempt first.");
+      setError("Hãy chọn một lượt làm trước.");
       return;
     }
     setError("");
@@ -128,7 +129,7 @@ export default function MonitorPage() {
     });
   }
 
-  if (loading) return <Spinner label="Opening monitor…" />;
+  if (loading) return <Spinner label="Đang mở giám sát…" />;
   if (error && !assessment) return <Alert tone="danger">{error}</Alert>;
   if (!assessment) return null;
 
@@ -139,13 +140,13 @@ export default function MonitorPage() {
           href={`/assessments/${assessmentId}`}
           className="text-xs font-medium text-slate-500 hover:text-teal-700"
         >
-          <i className="fa-solid fa-arrow-left mr-1" /> Back to assessment
+          <i className="fa-solid fa-arrow-left mr-1" /> Quay lại bài kiểm tra
         </Link>
       </div>
       <PageHeader
         icon="fa-desktop"
         title={`Monitoring — ${assessment.title}`}
-        description="Authenticated telemetry, deadline control and forced submission."
+        description="Theo dõi hoạt động, điều chỉnh thời gian và buộc nộp bài."
         actions={
           <>
             <Badge tone={connected ? "active" : "danger"}>
@@ -162,7 +163,7 @@ export default function MonitorPage() {
                 ).catch((err) => setError(errorMessage(err)))
               }
             >
-              <i className="fa-solid fa-download" /> Export violations
+              <i className="fa-solid fa-download" /> Xuất vi phạm
             </Button>
           </>
         }
@@ -172,14 +173,14 @@ export default function MonitorPage() {
       {notice && <Alert tone="success" className="mb-3">{notice}</Alert>}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon="fa-user-clock" label="In progress" value={active.length} tone="amber" />
-        <StatCard icon="fa-circle-check" label="Submitted" value={submitted.length} tone="emerald" />
-        <StatCard icon="fa-triangle-exclamation" label="Telemetry events" value={events.length} tone="rose" />
-        <StatCard icon="fa-eye" label="Violation signals" value={violations.length} tone="purple" />
+        <StatCard icon="fa-user-clock" label="Đang làm" value={active.length} tone="amber" />
+        <StatCard icon="fa-circle-check" label="Đã nộp" value={submitted.length} tone="emerald" />
+        <StatCard icon="fa-triangle-exclamation" label="Sự kiện giám sát" value={events.length} tone="rose" />
+        <StatCard icon="fa-eye" label="Dấu hiệu vi phạm" value={violations.length} tone="purple" />
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-3">
-        <Card className="xl:col-span-2" title="Attempts" subtitle="Select an attempt to control it">
+        <Card className="xl:col-span-2" title="Lượt làm bài" subtitle="Chọn lượt làm để thao tác">
           {attempts.length ? (
             <div className="space-y-2">
               {attempts.map((attempt) => {
@@ -199,11 +200,11 @@ export default function MonitorPage() {
                   >
                     <div>
                       <p className="text-sm font-semibold text-slate-700">
-                        {attempt.student?.name || `Attempt #${attempt.id}`}
+                        {attempt.student?.name || `Lượt làm #${attempt.id}`}
                       </p>
                       <p className="text-xs text-slate-500">
-                        Q{attempt.currentQuestion ?? "—"} · deadline{" "}
-                        {formatDateTime(attempt.deadline)} · {attemptEvents.length} events
+                        Q{attempt.currentQuestion ?? "—"} · hạn nộp{" "}
+                        {formatDateTime(attempt.deadline)} · {attemptEvents.length} sự kiện
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -221,12 +222,12 @@ export default function MonitorPage() {
               })}
             </div>
           ) : (
-            <EmptyState icon="fa-user-clock" title="No attempts yet" />
+            <EmptyState icon="fa-user-clock" title="Chưa có lượt làm bài" />
           )}
         </Card>
 
         <Card
-          title="Exam controls"
+          title="Điều khiển bài thi"
           subtitle={
             selectedAttempt
               ? `Target: ${selectedAttempt.student?.name || selectedAttempt.id}`
@@ -241,7 +242,7 @@ export default function MonitorPage() {
                 disabled={!selectedAttempt}
                 onClick={() => action("adjust_time", { seconds: 300 })}
               >
-                <i className="fa-solid fa-plus" /> 5 min
+                <i className="fa-solid fa-plus" /> 5 phút
               </Button>
               <Button
                 size="sm"
@@ -249,7 +250,7 @@ export default function MonitorPage() {
                 disabled={!selectedAttempt}
                 onClick={() => action("adjust_time", { seconds: -300 })}
               >
-                <i className="fa-solid fa-minus" /> 5 min
+                <i className="fa-solid fa-minus" /> 5 phút
               </Button>
             </div>
             <Button
@@ -257,10 +258,10 @@ export default function MonitorPage() {
               variant="danger"
               className="w-full"
               disabled={!selectedAttempt}
-              onClick={() => {
+              onClick={async () => {
                 if (
                   selectedAttempt &&
-                  confirm(
+                  await confirmInline(
                     `Force-submit ${selectedAttempt.student?.name || "this attempt"}?`,
                   )
                 ) {
@@ -268,22 +269,22 @@ export default function MonitorPage() {
                 }
               }}
             >
-              <i className="fa-solid fa-stop" /> Force submit
+              <i className="fa-solid fa-stop" /> Buộc nộp bài
             </Button>
             <div className="border-t border-slate-100 pt-3">
-              <Field label="Broadcast / targeted alert">
+              <Field label="Thông báo chung / cá nhân">
                 <Textarea
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
                   className="min-h-16"
-                  placeholder="Stay on the exam page."
+                  placeholder="Vui lòng ở lại trang làm bài."
                 />
               </Field>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 <Button
                   size="sm"
                   disabled={!message.trim()}
-                  onClick={() => {
+                  onClick={async () => {
                     action("alert", { message });
                     setMessage("");
                   }}
@@ -295,19 +296,18 @@ export default function MonitorPage() {
                   size="sm"
                   variant="secondary"
                   disabled={!message.trim()}
-                  onClick={() => {
+                  onClick={async () => {
                     action("alert", { message }, false);
                     setMessage("");
                   }}
                 >
-                  Send to all
+                  Gửi cho tất cả
                 </Button>
               </div>
             </div>
             {!connected && (
               <Alert tone="warning">
-                Socket is disconnected. Reconnecting automatically; controls are disabled
-                until the live channel is restored.
+                Mất kết nối trực tiếp. Hệ thống đang kết nối lại; thao tác tạm khóa.
               </Alert>
             )}
           </div>
@@ -316,11 +316,11 @@ export default function MonitorPage() {
 
       <Card
         className="mt-5"
-        title="Live telemetry"
-        subtitle="Newest events first. Copy, paste, tab and focus signals are persisted."
+        title="Giám sát trực tiếp"
+        subtitle="Sự kiện mới nhất ở trên. Các thao tác sao chép, dán, chuyển tab và mất tập trung được lưu."
         actions={
           <Button variant="ghost" size="sm" onClick={() => setEvents([])}>
-            Clear view
+            Xóa nội dung hiển thị
           </Button>
         }
       >
@@ -340,7 +340,7 @@ export default function MonitorPage() {
                   <p className="font-semibold text-slate-700">
                     {event.kind.replaceAll("_", " ")}
                     <span className="ml-2 font-normal text-slate-400">
-                      attempt #{event.attemptId}
+                      lượt làm #{event.attemptId}
                     </span>
                   </p>
                   <span className="text-slate-400">{relativeTime(event.createdAt)}</span>
@@ -354,8 +354,8 @@ export default function MonitorPage() {
         ) : (
           <EmptyState
             icon="fa-satellite-dish"
-            title="Waiting for telemetry"
-            description="Focus, fullscreen, visibility, clipboard and connectivity events appear here in real time."
+            title="Đang chờ sự kiện"
+            description="Sự kiện tập trung, toàn màn hình, chuyển tab, sao chép và kết nối xuất hiện trực tiếp tại đây."
           />
         )}
       </Card>

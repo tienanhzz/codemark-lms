@@ -1,4 +1,5 @@
 "use client";
+import { confirmInline } from "../InlineConfirm";
 
 import { FormEvent, useEffect, useState } from "react";
 import { api, errorMessage } from "../../lib/api";
@@ -12,7 +13,7 @@ import {
   EmptyState,
   Field,
   Input,
-  Modal,
+  Drawer,
   Spinner,
   Textarea,
 } from "../ui";
@@ -64,7 +65,7 @@ export function AnnouncementsTab({ course, role, user }: CourseTabProps) {
   }
 
   async function remove(item: Announcement) {
-    if (!confirm("Delete this announcement?")) return;
+    if (!await confirmInline("Xóa thông báo này?")) return;
     try {
       await api(`/api/announcements/${item.id}`, { method: "DELETE" });
       await load();
@@ -73,18 +74,18 @@ export function AnnouncementsTab({ course, role, user }: CourseTabProps) {
     }
   }
 
-  if (loading) return <Spinner label="Loading announcements…" />;
+  if (loading) return <Spinner label="Đang tải thông báo…" />;
 
   return (
     <div className="space-y-4">
       {error && <Alert tone="danger">{error}</Alert>}
       <Card
-        title="Announcements"
-        subtitle="Course-wide messages"
+        title="Thông báo"
+        subtitle="Thông báo cho toàn lớp"
         actions={
           staff ? (
             <Button size="sm" onClick={() => setOpen(true)}>
-              <i className="fa-solid fa-bullhorn" /> New announcement
+              <i className="fa-solid fa-bullhorn" /> Thêm thông báo
             </Button>
           ) : undefined
         }
@@ -115,34 +116,34 @@ export function AnnouncementsTab({ course, role, user }: CourseTabProps) {
             ))}
           </div>
         ) : (
-          <EmptyState icon="fa-bullhorn" title="No announcements yet" />
+          <EmptyState icon="fa-bullhorn" title="Chưa có thông báo" />
         )}
       </Card>
 
-      <Modal
+      <Drawer
         open={open}
         onClose={() => setOpen(false)}
-        title="New announcement"
+        title="Thêm thông báo"
         footer={
           <>
             <Button variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              Hủy
             </Button>
             <Button type="submit" form="announcement-form" loading={saving}>
-              Publish
+              Công bố
             </Button>
           </>
         }
       >
         <form id="announcement-form" onSubmit={save} className="space-y-3">
-          <Field label="Title">
+          <Field label="Tiêu đề">
             <Input name="title" required />
           </Field>
-          <Field label="Message">
+          <Field label="Nội dung">
             <Textarea name="body" className="min-h-40" />
           </Field>
         </form>
-      </Modal>
+      </Drawer>
     </div>
   );
 }

@@ -1,4 +1,21 @@
+> Bản nâng cấp LMS và hướng dẫn tiếng Việt: [docs/BAO-CAO.md](docs/BAO-CAO.md). Admin mặc định: `0000000000`, mật khẩu ban đầu `CodeMark@2026!`, bắt đổi lần đầu.
+
 # CodeMark
+
+### Trang chủ, băng chuyền ảnh và thông báo công khai
+
+Cập nhật giao diện: bỏ bộ đếm và nút chuyển ảnh, dùng favicon web ở đầu sidebar. Trang đăng nhập căn giữa trên nền đơn giản; mục **Quên mật khẩu?** và **Cần hỗ trợ?** mở hướng dẫn dưới form. Việc cấp lại mật khẩu vẫn do quản trị viên thực hiện sau khi xác minh, chưa có luồng tự khôi phục.
+
+Mở `/` để xem trang chủ mới. Admin/giảng viên đăng thông báo bằng **Trang chủ → Đăng thông báo**; khách và sinh viên chỉ xem. Sidebar desktop thu gọn thành icon, mở khi rê chuột hoặc dùng bàn phím. Sau đăng nhập về trang chủ, riêng tài khoản bắt đổi mật khẩu vẫn về form đổi mật khẩu.
+
+Khởi động lại bằng `npm.cmd run dev` để backend tạo bảng thông báo mới. Chi tiết file thay đổi, thay ảnh, cách test, giả định và giới hạn: [docs/TRANG-CHU.md](docs/TRANG-CHU.md).
+
+### Sửa lỗi dữ liệu cũ và vị trí tạo hàng loạt (06/11/2026)
+
+- Đã sửa lỗi database cũ thiếu cột `cf_assessment.rank_weight`: khi khởi động backend mới, hệ thống sao lưu SQL rồi thêm cột với hệ số mặc định `1`. Không thay đổi điểm hoặc nội dung bài cũ; chạy lại không ghi đè hệ số đã cấu hình.
+- Tạo hàng loạt nằm tại **Tài khoản → Thêm tài khoản → Tạo tài khoản hàng loạt**. Không còn mục riêng trên thanh menu. Đường dẫn `/admin/bulk-accounts` cũ chuyển về màn hình tài khoản.
+- Sau khi cập nhật mã nguồn, dừng phiên `npm run dev` cũ bằng **Ctrl+C**, rồi chạy lại `npm.cmd run dev`. Java đang chạy không tự nhận mã mới chỉ bằng cách tải lại trang. Nếu dùng MariaDB, chạy lại script migration trước startup.
+- Chi tiết thay đổi và cách kiểm tra: [docs/SUA-LOI-TAI-KHOAN.md](docs/SUA-LOI-TAI-KHOAN.md).
 
 A classroom learning management system built with **Java 21+, Spring Boot, JPA/Hibernate and WebSocket**, with a **Next.js, TypeScript and Tailwind CSS** frontend.
 
@@ -39,14 +56,14 @@ The development launcher builds the backend JAR and starts both services. Press 
 
 Run `npm run seed` explicitly to create demo accounts and sample content. Normal startup does not create these accounts. Stop the backend before running seed, as the H2 database is opened by the running server.
 
-| Role | Email | Initial password |
+| Role | Mã đăng nhập | Initial password |
 | --- | --- | --- |
-| Admin | admin@demo.local | DemoPass123! |
-| Teacher | teacher@demo.local | DemoPass123! |
-| Teaching assistant | ta@demo.local | DemoPass123! |
-| Student | student1@demo.local | DemoPass123! |
+| Admin | 1000000000 | DemoPass123! |
+| Teacher | 1000000001 | DemoPass123! |
+| Teaching assistant | 1000000002 | DemoPass123! |
+| Student | 2025000001 | DemoPass123! |
 
-Additional student accounts are `student2@demo.local` and `student3@demo.local`. Seed preserves existing passwords and submissions.
+Additional student accounts are `2025000002` and `2025000003`. Seed preserves existing passwords and submissions.
 
 Each account has one active session. Signing in again revokes its previous session. Sessions expire after 120 seconds of inactivity; the frontend sends a heartbeat every 30 seconds. Use separate accounts and browser profiles when testing different roles.
 
@@ -164,6 +181,17 @@ Integration coverage includes authentication, authorization, LAN origin checks, 
 GitHub Actions builds and tests the Java backend and builds the Next.js frontend.
 
 ## Limitations
+
+### Thông báo bắt buộc đổi mật khẩu lần đầu
+
+- Khi tài khoản có cờ `mustChangePassword`, trang Tài khoản hiển thị lời nhắc ngay trên form đổi mật khẩu.
+- Bấm một chức năng khác trên thanh điều hướng sẽ giữ nguyên form và hiển thị tên chức năng bị chặn. Trang tự cuộn đến thông báo, không mở popup và không làm mất mật khẩu đang nhập.
+- Sau khi đổi mật khẩu thành công, lời nhắc được xóa và các chức năng được mở theo quyền tài khoản. Đăng xuất vẫn dùng được trước khi đổi mật khẩu.
+- Các file liên quan: `frontend/components/AuthProvider.tsx` giữ lời nhắc; `frontend/components/AppShell.tsx` chặn điều hướng; `frontend/app/(app)/account/page.tsx` hiển thị lời nhắc trong form.
+- Kiểm tra thủ công: đăng nhập bằng tài khoản mới, nhập một phần form, bấm Lớp học/Bảng xếp hạng/Lịch học và kiểm tra thông báo cùng dữ liệu nhập vẫn còn. Đổi mật khẩu thành công rồi bấm lại các chức năng để kiểm tra điều hướng. Thử cả menu trên điện thoại và phím Tab/Enter.
+- Giả định: “log” là thông báo trên giao diện; không lưu thêm nhật ký thao tác này vào database.
+
+### Các giới hạn khác
 
 - Legacy SQLite import is not implemented.
 - MariaDB and the Docker language runners still need validation in their deployment environments.

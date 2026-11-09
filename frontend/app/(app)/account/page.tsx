@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { api, errorMessage } from "../../../lib/api";
 import { roleLabel } from "../../../lib/format";
 import { useAuth } from "../../../components/AuthProvider";
@@ -17,10 +17,18 @@ import {
 const MIN_PASSWORD = 12;
 
 export default function AccountPage() {
-  const { user } = useAuth();
+  const { user, refresh, passwordReminder } = useAuth();
+  const reminderRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    if (user?.mustChangePassword && passwordReminder) {
+      reminderRef.current?.focus({ preventScroll: true });
+      reminderRef.current?.scrollIntoView({ block: "center" });
+    }
+  }, [user?.mustChangePassword, passwordReminder]);
 
   async function changePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,15 +42,15 @@ export default function AccountPage() {
     setNotice("");
 
     if (newPassword.length < MIN_PASSWORD) {
-      setError(`New password must be at least ${MIN_PASSWORD} characters.`);
+      setError(`Mật khẩu mới cần ít nhất ${MIN_PASSWORD} ký tự.`);
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("The new password and confirmation do not match.");
+      setError("Mật khẩu mới và xác nhận không khớp.");
       return;
     }
     if (newPassword === currentPassword) {
-      setError("Choose a new password that differs from the current one.");
+      setError("Mật khẩu mới phải khác mật khẩu hiện tại.");
       return;
     }
 
@@ -53,13 +61,14 @@ export default function AccountPage() {
         body: { currentPassword, newPassword },
       });
       form.reset();
-      setNotice("Password updated. Keep your new password somewhere safe.");
+      await refresh();
+      setNotice("Đã đổi mật khẩu thành công.");
     } catch (err) {
       setError(
         errorMessage(err) === "invalid current password"
-          ? "Your current password is incorrect."
+          ? "Mật khẩu hiện tại không chính xác."
           : errorMessage(err) === "weak password"
-            ? `New password must be at least ${MIN_PASSWORD} characters.`
+            ? `Mật khẩu mới cần ít nhất ${MIN_PASSWORD} ký tự.`
             : errorMessage(err),
       );
     } finally {
@@ -73,39 +82,48 @@ export default function AccountPage() {
     <div className="mx-auto max-w-3xl">
       <PageHeader
         icon="fa-user-gear"
-        title="My account"
-        description="Review your identity and rotate your password."
+        title="Tài khoản của tôi"
+        description="Xem thông tin tài khoản và đổi mật khẩu."
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <StatCard
           icon="fa-id-badge"
-          label="Display name"
+          label="Họ tên"
           value={user.name}
           hint={
             <>
               <i className="fa-solid fa-at mr-1" />
-              {user.email}
+              {user.studentId}
             </>
           }
           tone="sky"
         />
         <StatCard
           icon="fa-shield-halved"
-          label="System role"
+          label="Vai trò hệ thống"
           value={roleLabel(user.role)}
-          hint="Issued by an administrator"
+          hint="Do quản trị viên cấp"
           tone="purple"
         />
       </div>
 
       <Card
         className="mt-5"
-        title="Change password"
-        subtitle={`Use at least ${MIN_PASSWORD} characters. Changing your password keeps this session active.`}
+        title="Đổi mật khẩu"
+        subtitle={`Mật khẩu cần ít nhất ${MIN_PASSWORD} ký tự. Phiên đăng nhập vẫn được giữ sau khi đổi mật khẩu.`}
       >
+        {user.mustChangePassword && (
+          <div ref={reminderRef} tabIndex={-1} role="alert" className="mb-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <Alert tone="warning">
+              {passwordReminder
+                ? `Bạn cần đổi mật khẩu lần đầu trước khi sử dụng chức năng “${passwordReminder.feature}”. Vui lòng hoàn tất đổi mật khẩu bên dưới.`
+                : "Tài khoản mới cần đổi mật khẩu lần đầu trước khi sử dụng các chức năng khác."}
+            </Alert>
+          </div>
+        )}
         <form onSubmit={changePassword} className="grid gap-3 sm:grid-cols-2">
-          <Field label="Current password" className="sm:col-span-2">
+          <Field label="Mật khẩu hiện tại" className="sm:col-span-2">
             <Input
               name="currentPassword"
               type="password"
@@ -113,7 +131,7 @@ export default function AccountPage() {
               required
             />
           </Field>
-          <Field label="New password">
+          <Field label="Mật khẩu mới">
             <Input
               name="newPassword"
               type="password"
@@ -122,7 +140,7 @@ export default function AccountPage() {
               required
             />
           </Field>
-          <Field label="Confirm new password">
+          <Field label="Nhập lại mật khẩu mới">
             <Input
               name="confirmPassword"
               type="password"
@@ -143,27 +161,25 @@ export default function AccountPage() {
           )}
           <div className="sm:col-span-2">
             <Button type="submit" loading={saving}>
-              <i className="fa-solid fa-key" /> Update password
+              <i className="fa-solid fa-key" /> Cập nhật mật khẩu
             </Button>
           </div>
         </form>
       </Card>
 
-      <Card className="mt-5" title="Session security" subtitle="How this deployment protects your account">
+      <Card className="mt-5" title="Bảo mật phiên đăng nhập" subtitle="Cách hệ thống bảo vệ tài khoản của bạn">
         <ul className="space-y-2 text-sm text-slate-600">
           <li className="flex items-start gap-2">
             <i className="fa-solid fa-circle-check mt-1 text-emerald-500" />
-            Only one active session is allowed; signing in elsewhere revokes the previous
-            session and is audited.
+            Mỗi tài khoản chỉ có một phiên hoạt động. Đăng nhập nơi khác sẽ thu hồi phiên cũ và ghi nhật ký.
           </li>
           <li className="flex items-start gap-2">
             <i className="fa-solid fa-circle-check mt-1 text-emerald-500" />
-            Sessions expire after two minutes without authenticated HTTP or WebSocket
-            activity.
+            Phiên hết hạn sau hai phút không hoạt động.
           </li>
           <li className="flex items-start gap-2">
             <i className="fa-solid fa-circle-check mt-1 text-emerald-500" />
-            Your password is stored as a one-way hash and is never returned by the API.
+            Mật khẩu được băm một chiều và không được trả về qua API.
           </li>
         </ul>
       </Card>

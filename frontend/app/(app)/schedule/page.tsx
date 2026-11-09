@@ -50,22 +50,22 @@ export default function SchedulePage() {
     [meetings],
   );
 
-  if (loading) return <Spinner label="Loading timetable…" />;
+  if (loading) return <Spinner label="Đang tải thời khóa biểu…" />;
   if (error) return <Alert tone="danger">{error}</Alert>;
 
   return (
     <div>
       <PageHeader
         icon="fa-calendar-days"
-        title="Weekly schedule"
-        description="Your weekly classes, meeting times and locations."
+        title="Lịch học tuần"
+        description="Các lớp, giờ học và địa điểm trong tuần."
       />
 
       {meetings.length === 0 ? (
         <EmptyState
           icon="fa-calendar-xmark"
-          title="No meetings scheduled"
-          description="Once a teacher adds weekly meeting times, they appear here."
+          title="Chưa có lịch học"
+          description="Lịch học sẽ xuất hiện khi giảng viên thêm buổi học."
         />
       ) : (
         <>
@@ -112,7 +112,7 @@ export default function SchedulePage() {
                     ))
                   ) : (
                     <p className="px-1 py-4 text-center text-[11px] text-slate-300">
-                      No classes
+                      Chưa có lớp học
                     </p>
                   )}
                 </div>
@@ -120,7 +120,7 @@ export default function SchedulePage() {
             ))}
           </div>
 
-          <Card className="mt-5" title="Course terms" subtitle="Reference dates for each scheduled course">
+          <Card className="mt-5" title="Học kỳ của lớp" subtitle="Thời gian áp dụng lịch cho từng lớp">
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from(new Map(meetings.map((m) => [m.courseId, m])).values()).map(
                 (meeting) => (

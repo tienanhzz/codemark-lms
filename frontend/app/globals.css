@@ -148,3 +148,18 @@ input[type="time"] {
     transition: none;
   }
 }
+
+@keyframes drawer-in {from {opacity:0;transform:translateX(24px)} to {opacity:1;transform:translateX(0)}}
+.drawer-panel {animation: drawer-in .2s ease-out;}
+@media(prefers-reduced-motion:reduce){.drawer-panel{animation:none}}
+
+/* Trên desktop, chỉ mở rộng sidebar khi rê chuột hoặc dùng bàn phím. */
+@media (min-width: 1024px) {
+  .compact-sidebar { width: 5rem; }
+  .compact-sidebar .sidebar-label { display: none; }
+  .compact-sidebar:hover, .compact-sidebar:focus-within { width: 16rem; box-shadow: 12px 0 30px rgb(15 23 42 / 12%); }
+  .compact-sidebar:hover .sidebar-label, .compact-sidebar:focus-within .sidebar-label { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .compact-sidebar { transition: none; }
+}

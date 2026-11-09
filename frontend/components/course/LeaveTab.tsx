@@ -24,6 +24,7 @@ export function LeaveTab({ course, role }: CourseTabProps) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
+  const [notes,setNotes] = useState<Record<number,string>>({});
   const [filter, setFilter] = useState("pending");
 
   async function load() {
@@ -49,7 +50,7 @@ export function LeaveTab({ course, role }: CourseTabProps) {
     const form = new FormData(event.currentTarget);
     const file = form.get("evidence");
     if (file instanceof File && file.size > 5 * 1024 * 1024) {
-      setError("Evidence must be 5 MiB or smaller.");
+      setError("Minh chứng phải nhỏ hơn hoặc bằng 5 MiB.");
       return;
     }
     setSaving(true);
@@ -61,7 +62,7 @@ export function LeaveTab({ course, role }: CourseTabProps) {
         rawBody: form,
       });
       (event.target as HTMLFormElement).reset();
-      setNotice("Leave request submitted for review.");
+      setNotice("Đã gửi đơn chờ xét duyệt.");
       await load();
     } catch (err) {
       setError(errorMessage(err));
@@ -71,17 +72,13 @@ export function LeaveTab({ course, role }: CourseTabProps) {
   }
 
   async function decide(item: LeaveRequest, status: "approved" | "rejected") {
-    const note = prompt(
-      status === "approved" ? "Optional approval note:" : "Reason for rejection:",
-      "",
-    );
-    if (note === null) return;
+    const note = notes[item.id] || "";
     try {
       await api(`/api/leave-requests/${item.id}/decision`, {
         method: "POST",
         body: { status, note },
       });
-      setNotice(`Request ${status}.`);
+      setNotice(`Đã cập nhật trạng thái đơn.`);
       await load();
     } catch (err) {
       setError(errorMessage(err));
@@ -93,7 +90,7 @@ export function LeaveTab({ course, role }: CourseTabProps) {
     [items, filter],
   );
 
-  if (loading) return <Spinner label="Loading leave requests…" />;
+  if (loading) return <Spinner label="Đang tải đơn nghỉ phép…" />;
 
   return (
     <div className="space-y-4">
@@ -101,11 +98,11 @@ export function LeaveTab({ course, role }: CourseTabProps) {
       {notice && <Alert tone="success">{notice}</Alert>}
 
       {!staff && (
-        <Card title="Request leave" subtitle="Attach one JPEG, PNG, WebP image or PDF (max 5 MiB)">
+        <Card title="Xin nghỉ phép" subtitle="Đính kèm ảnh JPEG, PNG, WebP hoặc PDF (tối đa 5 MiB)">
           <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
-            <Field label="Course meeting">
+            <Field label="Buổi học">
               <Select name="meetingId" defaultValue="">
-                <option value="">No specific meeting</option>
+                <option value="">Không chọn buổi cụ thể</option>
                 {course.meetings?.map((meeting) => (
                   <option key={meeting.id} value={meeting.id}>
                     {weekdayName(meeting.weekday)} {meeting.start}–{meeting.end}
@@ -113,7 +110,7 @@ export function LeaveTab({ course, role }: CourseTabProps) {
                 ))}
               </Select>
             </Field>
-            <Field label="Evidence file">
+            <Field label="File minh chứng">
               <input
                 name="evidence"
                 type="file"
@@ -121,12 +118,12 @@ export function LeaveTab({ course, role }: CourseTabProps) {
                 className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium"
               />
             </Field>
-            <Field label="Reason" className="sm:col-span-2">
-              <Textarea name="reason" required placeholder="Explain the absence…" />
+            <Field label="Lý do" className="sm:col-span-2">
+              <Textarea name="reason" required placeholder="Giải thích lý do vắng…" />
             </Field>
             <div className="sm:col-span-2">
               <Button type="submit" loading={saving}>
-                <i className="fa-solid fa-paper-plane" /> Submit request
+                <i className="fa-solid fa-paper-plane" /> Gửi đơn
               </Button>
             </div>
           </form>
@@ -134,7 +131,7 @@ export function LeaveTab({ course, role }: CourseTabProps) {
       )}
 
       <Card
-        title="Leave requests"
+        title="Đơn nghỉ phép"
         subtitle={staff ? "Approve or reject with an audit trail" : "Your submitted requests"}
         actions={
           staff ? (
@@ -143,10 +140,10 @@ export function LeaveTab({ course, role }: CourseTabProps) {
               onChange={(event) => setFilter(event.target.value)}
               className="w-40"
             >
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-              <option value="all">All</option>
+              <option value="pending">Chờ duyệt</option>
+              <option value="approved">Đã duyệt</option>
+              <option value="rejected">Đã từ chối</option>
+              <option value="all">Tất cả</option>
             </Select>
           ) : undefined
         }
@@ -176,7 +173,7 @@ export function LeaveTab({ course, role }: CourseTabProps) {
                     </p>
                     {item.decisionNote && (
                       <p className="mt-1 text-xs text-slate-500">
-                        Decision note: {item.decisionNote}
+                        Ghi chú xét duyệt: {item.decisionNote}
                       </p>
                     )}
                   </div>
@@ -194,24 +191,25 @@ export function LeaveTab({ course, role }: CourseTabProps) {
                         ).catch((err) => setError(errorMessage(err)))
                       }
                     >
-                      <i className="fa-solid fa-download" /> Evidence
+                      <i className="fa-solid fa-download" /> Minh chứng
                     </Button>
                   )}
                   {staff && item.status === "pending" && (
                     <>
+                      <Textarea aria-label="Ghi chú xét duyệt" placeholder="Lý do / ghi chú xét duyệt" value={notes[item.id] || ""} onChange={e=>setNotes({...notes,[item.id]:e.target.value})}/>
                       <Button
                         size="sm"
                         variant="success"
                         onClick={() => decide(item, "approved")}
                       >
-                        <i className="fa-solid fa-check" /> Approve
+                        <i className="fa-solid fa-check" /> Duyệt
                       </Button>
                       <Button
                         size="sm"
                         variant="danger"
                         onClick={() => decide(item, "rejected")}
                       >
-                        <i className="fa-solid fa-xmark" /> Reject
+                        <i className="fa-solid fa-xmark" /> Từ chối
                       </Button>
                     </>
                   )}
@@ -222,7 +220,7 @@ export function LeaveTab({ course, role }: CourseTabProps) {
         ) : (
           <EmptyState
             icon="fa-envelope-open-text"
-            title="No leave requests"
+            title="Chưa có đơn nghỉ phép"
             description={
               staff
                 ? "No requests match this filter."

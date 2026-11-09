@@ -9,6 +9,7 @@ import {
   useEffect,
 } from "react";
 import { cn, initials } from "../lib/format";
+import { createPortal } from "react-dom";
 
 type Variant = "primary" | "secondary" | "danger" | "success" | "ghost" | "warning";
 
@@ -46,7 +47,7 @@ export function Button({
       )}
     >
       {loading && <i className="fa-solid fa-circle-notch animate-spin" />}
-      {children}
+      {typeof children === "string" ? ({admin:"Quản trị viên",teacher:"Giảng viên",ta:"Trợ giảng",student:"Sinh viên",pending:"Chờ duyệt",approved:"Đã duyệt",rejected:"Đã từ chối",quiz:"Bài tập",exam:"Bài thi",assignment:"Bài tập",submitted:"Đã nộp",in_progress:"Đang làm",code:"Lập trình",mcq:"Trắc nghiệm",short:"Trả lời ngắn",draft:"Bản nháp",published:"Đã công bố"} as Record<string,string>)[children] || children : children}
     </button>
   );
 }
@@ -170,7 +171,7 @@ export function Badge({
         className,
       )}
     >
-      {children}
+      {typeof children === "string" ? ({admin:"Quản trị viên",teacher:"Giảng viên",ta:"Trợ giảng",student:"Sinh viên",pending:"Chờ duyệt",approved:"Đã duyệt",rejected:"Đã từ chối",quiz:"Bài tập",exam:"Bài thi",assignment:"Bài tập",submitted:"Đã nộp",in_progress:"Đang làm",code:"Lập trình",mcq:"Trắc nghiệm",short:"Trả lời ngắn",draft:"Bản nháp",published:"Đã công bố"} as Record<string,string>)[children] || children : children}
     </span>
   );
 }
@@ -269,13 +270,14 @@ export function StatCard({
   );
 }
 
-export function Modal({
+export function Drawer({
   open,
   onClose,
   title,
   children,
   footer,
   width = "max-w-lg",
+  mode = "drawer",
 }: {
   open: boolean;
   onClose: () => void;
@@ -283,7 +285,15 @@ export function Modal({
   children: ReactNode;
   footer?: ReactNode;
   width?: string;
+  mode?: "drawer" | "page";
 }) {
+  useEffect(() => {
+    if (!open || mode !== "page") return;
+    document.getElementById("drawer-root")?.scrollIntoView({block:"start"});
+    const content = document.getElementById("screen-content");
+    if (content) content.hidden = true;
+    return () => { if (content) content.hidden = false; };
+  }, [open, mode]);
   useEffect(() => {
     if (!open) return;
     const handler = (event: KeyboardEvent) => {
@@ -294,11 +304,11 @@ export function Modal({
   }, [open, onClose]);
 
   if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/50 p-4 backdrop-blur-sm">
+  const panel = (
+    <div className="drawer-panel relative z-10 my-4 flex w-full justify-end border-l-4 border-teal-600 bg-teal-50 p-3">
       <div
         className={cn(
-          "mt-10 w-full rounded-2xl border border-slate-200 bg-white shadow-xl",
+          "w-full rounded-2xl border border-slate-200 bg-white shadow-sm",
           width,
         )}
       >
@@ -307,12 +317,12 @@ export function Modal({
           <button
             onClick={onClose}
             className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-            aria-label="Close"
+            aria-label="Đóng"
           >
-            <i className="fa-solid fa-xmark" />
+            Quay lại
           </button>
         </header>
-        <div className="max-h-[70vh] overflow-y-auto p-4">{children}</div>
+        <div className="p-4">{children}</div>
         {footer && (
           <footer className="flex justify-end gap-2 border-t border-slate-100 px-4 py-3">
             {footer}
@@ -321,6 +331,8 @@ export function Modal({
       </div>
     </div>
   );
+  const root = typeof document !== "undefined" ? document.getElementById("drawer-root") : null;
+  return root ? createPortal(panel, root) : panel;
 }
 
 export function Tabs({

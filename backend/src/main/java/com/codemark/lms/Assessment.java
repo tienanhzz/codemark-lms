@@ -23,6 +23,9 @@ class Assessment extends BaseEntity {
   String description = "";
 
   String kind = "quiz";
+  @Column(nullable=false)
+  @org.hibernate.annotations.ColumnDefault("1")
+  double rankWeight = 1;
   Instant opensAt;
   Instant closesAt;
   int durationMinutes = 60;

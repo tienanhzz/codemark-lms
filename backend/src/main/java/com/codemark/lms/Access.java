@@ -15,7 +15,11 @@ public class Access {
   private final BCryptPasswordEncoder passwords = new BCryptPasswordEncoder();
 
   String hash(String password) {
+    Api.require(validPassword(password), "weak_password", 400);
     return passwords.encode(password);
+  }
+  static boolean validPassword(String value) {
+    return value!=null && value.length()>=12 && value.getBytes(java.nio.charset.StandardCharsets.UTF_8).length<=72;
   }
 
   boolean matches(String password, String hash) {
@@ -27,7 +31,9 @@ public class Access {
   }
 
   User current(HttpServletRequest r) {
-    return authenticate(r.getSession(false), r.getRemoteAddr());
+    User u = authenticate(r.getSession(false), r.getRemoteAddr());
+    Api.require(!u.mustChangePassword || Set.of("/api/auth/me", "/api/auth/password", "/api/auth/logout", "/api/auth/heartbeat").contains(r.getRequestURI()), "password_change_required", 403);
+    return u;
   }
 
   User authenticate(HttpSession session, String ip) {
@@ -116,14 +122,15 @@ public class Access {
 
   Map<String, Object> login(HttpServletRequest r, Map<String, Object> b) {
     Api.require(!blocked(r.getRemoteAddr()), "network_denied", 403);
+    Api.require(Api.text(b, "studentId", "").matches("[0-9]{10}"), "invalid_credentials", 401);
     User u =
         store
-            .list(User.class, "where e.email=?1", Api.text(b, "email", "").trim().toLowerCase())
+            .list(User.class, "where e.studentId=?1", Api.text(b, "studentId", "").trim().toLowerCase())
             .stream()
             .findFirst()
             .orElse(null);
     Api.require(
-        u != null && passwords.matches(Api.text(b, "password", ""), u.passwordHash),
+        u != null && !u.pendingCode && passwords.matches(Api.text(b, "password", ""), u.passwordHash),
         "invalid_credentials",
         401);
     HttpSession old = r.getSession(false);

@@ -1,4 +1,5 @@
 "use client";
+import { confirmInline } from "../InlineConfirm";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { api, errorMessage } from "../../lib/api";
@@ -94,7 +95,7 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
   }
 
   async function remove(post: DiscussionPost) {
-    if (!confirm("Delete this discussion post?")) return;
+    if (!await confirmInline("Xóa bài thảo luận này?")) return;
     try {
       await api(`/api/discussions/${post.id}`, { method: "DELETE" });
       await load();
@@ -103,7 +104,7 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
     }
   }
 
-  if (loading) return <Spinner label="Loading discussions…" />;
+  if (loading) return <Spinner label="Đang tải thảo luận…" />;
 
   function renderPost(post: DiscussionPost, nested = false) {
     return (
@@ -130,12 +131,12 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => {
+                  onClick={async () => {
                     setReplyTo(replyTo === post.id ? null : post.id);
                     setReplyBody("");
                   }}
                 >
-                  <i className="fa-solid fa-reply" /> Reply
+                  <i className="fa-solid fa-reply" /> Trả lời
                 </Button>
               )}
               {(staff || post.author?.id === user.id) && (
@@ -152,15 +153,15 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
             <Textarea
               value={replyBody}
               onChange={(event) => setReplyBody(event.target.value)}
-              placeholder="Write a reply…"
+              placeholder="Viết trả lời…"
               className="min-h-16 flex-1"
             />
             <div className="flex flex-col gap-1">
               <Button size="sm" loading={saving} onClick={() => reply(post.id)}>
-                Send
+                Gửi
               </Button>
               <Button size="sm" variant="secondary" onClick={() => setReplyTo(null)}>
-                Cancel
+                Hủy
               </Button>
             </div>
           </div>
@@ -172,16 +173,16 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
   return (
     <div className="space-y-4">
       {error && <Alert tone="danger">{error}</Alert>}
-      <Card title="Discussions" subtitle="Ask questions and reply to classmates">
+      <Card title="Thảo luận" subtitle="Đặt câu hỏi và trả lời bạn cùng lớp">
         <form onSubmit={post} className="flex flex-col gap-2 sm:flex-row">
           <Textarea
             value={body}
             onChange={(event) => setBody(event.target.value)}
-            placeholder="Start a discussion…"
+            placeholder="Bắt đầu thảo luận…"
             className="min-h-16 flex-1"
           />
           <Button type="submit" loading={saving} className="sm:self-end">
-            <i className="fa-solid fa-paper-plane" /> Post
+            <i className="fa-solid fa-paper-plane" /> Đăng
           </Button>
         </form>
         {roots.length ? (
@@ -189,8 +190,8 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
         ) : (
           <EmptyState
             icon="fa-comments"
-            title="No discussions yet"
-            description="Be the first to start a conversation."
+            title="Chưa có thảo luận"
+            description="Hãy bắt đầu cuộc thảo luận."
           />
         )}
       </Card>

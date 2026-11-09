@@ -65,10 +65,12 @@ class CodeAnswerGrader implements AnswerGrader {
 
 @Service
 class GradingService {
+  private final RankService rank;
   private final Store store;
   private final List<AnswerGrader> graders;
 
-  GradingService(Store s, List<AnswerGrader> g) {
+  GradingService(Store s, List<AnswerGrader> g, RankService rank) {
+    this.rank = rank;
     store = s;
     graders = g;
   }
@@ -91,6 +93,7 @@ class GradingService {
     attempt.maxScore = max;
     attempt.status = "submitted";
     attempt.submittedAt = Instant.now();
+    if (max > 0) rank.best(attempt.student, attempt.assessment.kind.equals("exam") ? "exam" : "assignment", attempt.assessment.id, attempt.score / max * 100 * attempt.assessment.rankWeight, attempt.assessment.createdBy);
   }
 
   void checkOpen(Attempt attempt) {

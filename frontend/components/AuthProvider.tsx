@@ -15,14 +15,25 @@ type AuthContextValue = {
   user: User | null | undefined;
   loading: boolean;
   refresh: () => Promise<User | null>;
-  login: (email: string, password: string) => Promise<User>;
+  login: (studentId: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
+  passwordReminder: { feature: string } | null;
+  remindPasswordChange: (feature: string) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [passwordReminder, setPasswordReminder] = useState<{ feature: string } | null>(null);
+
+  const remindPasswordChange = useCallback((feature: string) => {
+    setPasswordReminder({ feature });
+  }, []);
+
+  useEffect(() => {
+    if (!user?.mustChangePassword) setPasswordReminder(null);
+  }, [user]);
 
   const refresh = useCallback(async () => {
     try {
@@ -42,12 +53,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("lms:unauthorized", onUnauthorized);
   }, [refresh]);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (studentId: string, password: string) => {
     const response = await api<{ user: User }>("/api/auth/login", {
       method: "POST",
-      body: { email, password },
+      body: { studentId, password },
     });
     setUser(response.user);
+    setPasswordReminder(null);
     return response.user;
   }, []);
 
@@ -62,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading: user === undefined, refresh, login, logout }}
+      value={{ user, loading: user === undefined, refresh, login, logout, passwordReminder, remindPasswordChange }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,0 +1,58 @@
+﻿D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Announcement.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Announcement.java:8: @Table(name = "cf_announcement")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Announcement.java:12: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Announcement.java:15: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Assessment.java:9: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Assessment.java:10: @Table(name = "cf_assessment")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Assessment.java:14: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Assessment.java:17: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Attempt.java:9: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Attempt.java:10: @Table(name = "cf_attempt")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Attempt.java:14: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Attempt.java:17: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\AttendanceRecord.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\AttendanceRecord.java:8: @Table(
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\AttendanceRecord.java:14: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\AttendanceRecord.java:17: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\AttendanceSession.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\AttendanceSession.java:8: @Table(name = "cf_attendancesession")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\AttendanceSession.java:12: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\AttendanceSession.java:15: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\AuditEvent.java:9: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\AuditEvent.java:10: @Table(name = "cf_auditevent")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Course.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Course.java:8: @Table(name = "cf_course")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Course.java:20: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\DiscussionPost.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\DiscussionPost.java:8: @Table(name = "cf_discussionpost")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\DiscussionPost.java:12: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\DiscussionPost.java:15: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Enrollment.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Enrollment.java:8: @Table(
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Enrollment.java:14: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Enrollment.java:17: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\IpBlacklist.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\IpBlacklist.java:8: @Table(name = "cf_ipblacklist")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\LeaveRequest.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\LeaveRequest.java:8: @Table(name = "cf_leaverequest")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\LeaveRequest.java:12: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\LeaveRequest.java:15: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\LeaveRequest.java:29: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Lesson.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Lesson.java:8: @Table(name = "cf_lesson")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Lesson.java:12: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Meeting.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Meeting.java:8: @Table(name = "cf_meeting")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Meeting.java:12: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\ProctorEvent.java:9: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\ProctorEvent.java:10: @Table(name = "cf_proctorevent")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\ProctorEvent.java:14: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\ProctorEvent.java:17: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Question.java:9: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Question.java:10: @Table(name = "cf_question")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\Question.java:14: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\TestCase.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\TestCase.java:8: @Table(name = "cf_testcase")
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\TestCase.java:12: @ManyToOne(fetch = FetchType.EAGER)
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\User.java:7: @Entity
+D:\Java\Project_LMS\codemark\backend\src\main\java\com\codemark\lms\User.java:8: @Table(name = "cf_user")

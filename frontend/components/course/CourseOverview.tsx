@@ -1,4 +1,5 @@
 "use client";
+import { confirmInline } from "../InlineConfirm";
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -14,7 +15,7 @@ import {
   EmptyState,
   Field,
   Input,
-  Modal,
+  Drawer,
   Select,
   StatCard,
   Textarea,
@@ -57,7 +58,7 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
     setSavingMeeting(true);
     setMeetingError("");
     try {
-      await api(`/api/courses/${course.id}/meetings`, {
+      await api(`/api/courses/${course.id}/buổi học`, {
         method: "POST",
         body: {
           weekday: Number(form.get("weekday")),
@@ -76,9 +77,9 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
   }
 
   async function removeMeeting(meetingId: number) {
-    if (!confirm("Remove this meeting from the weekly schedule?")) return;
+    if (!await confirmInline("Gỡ buổi học này khỏi lịch tuần?")) return;
     try {
-      await api(`/api/courses/${course.id}/meetings/${meetingId}`, { method: "DELETE" });
+      await api(`/api/courses/${course.id}/buổi học/${meetingId}`, { method: "DELETE" });
       await refreshCourse();
     } catch (err) {
       setError(errorMessage(err));
@@ -112,7 +113,7 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
   }
 
   async function removeCourse() {
-    if (!confirm(`Delete ${course.code} and all of its content? This cannot be undone.`))
+    if (!await confirmInline(`Delete ${course.code} and all of its content? This cannot be undone.`))
       return;
     try {
       await api(`/api/courses/${course.id}`, { method: "DELETE" });
@@ -129,30 +130,30 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           icon="fa-user-group"
-          label="Students"
+          label="Sinh viên"
           value={stats?.roster.student ?? course.studentCount ?? 0}
           hint={`${stats?.roster.ta ?? 0} teaching assistants`}
           tone="emerald"
         />
         <StatCard
           icon="fa-book"
-          label="Lessons"
+          label="Bài học"
           value={stats?.lessons ?? course.lessonCount ?? 0}
-          hint="Published and draft"
+          hint="Đã công bố và bản nháp"
           tone="sky"
         />
         <StatCard
           icon="fa-file-signature"
-          label="Assessments"
+          label="Bài tập và bài thi"
           value={stats?.assessments ?? course.assessmentCount ?? 0}
           hint={`${stats?.submittedAttempts ?? 0} submissions`}
           tone="amber"
         />
         <StatCard
           icon="fa-star"
-          label="Average score"
+          label="Điểm trung bình"
           value={stats?.averageScore ?? "—"}
-          hint="Submitted attempts"
+          hint="Lượt làm đã nộp"
           tone="purple"
         />
       </div>
@@ -160,12 +161,12 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
       <div className="grid gap-5 lg:grid-cols-3">
         <Card
           className="lg:col-span-2"
-          title="Weekly meetings"
-          subtitle="Recurring class times for this course"
+          title="Lịch học hàng tuần"
+          subtitle="Lịch học lặp lại hàng tuần của lớp"
           actions={
             owner ? (
               <Button variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
-                <i className="fa-solid fa-pen" /> Edit course
+                <i className="fa-solid fa-pen" /> Sửa lớp học
               </Button>
             ) : undefined
           }
@@ -200,8 +201,8 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
           ) : (
             <EmptyState
               icon="fa-calendar-xmark"
-              title="No meetings yet"
-              description="Add a recurring meeting so students see it on their timetable."
+              title="Chưa có buổi học"
+              description="Thêm lịch học lặp lại để sinh viên xem trên thời khóa biểu."
             />
           )}
 
@@ -210,7 +211,7 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
               onSubmit={addMeeting}
               className="mt-4 grid gap-3 rounded-md border border-slate-100 bg-slate-50 p-3 sm:grid-cols-2 lg:grid-cols-5"
             >
-              <Field label="Day">
+              <Field label="Thứ">
                 <Select name="weekday" defaultValue="0">
                   {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
                     (day, index) => (
@@ -221,18 +222,18 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
                   )}
                 </Select>
               </Field>
-              <Field label="Start">
+              <Field label="Bắt đầu">
                 <Input name="start" type="time" required />
               </Field>
-              <Field label="End">
+              <Field label="Kết thúc">
                 <Input name="end" type="time" required />
               </Field>
-              <Field label="Location">
-                <Input name="location" required placeholder="Room A1" />
+              <Field label="Địa điểm">
+                <Input name="location" required placeholder="Phòng A1" />
               </Field>
               <div className="flex items-end">
                 <Button type="submit" className="w-full" loading={savingMeeting}>
-                  <i className="fa-solid fa-plus" /> Add
+                  <i className="fa-solid fa-plus" /> Thêm
                 </Button>
               </div>
               {meetingError && (
@@ -244,33 +245,33 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
           )}
         </Card>
 
-        <Card title="Course details">
+        <Card title="Thông tin lớp">
           <dl className="space-y-3 text-sm">
             <div>
-              <dt className="text-xs uppercase tracking-wide text-slate-400">Code</dt>
+              <dt className="text-xs uppercase tracking-wide text-slate-400">Mã</dt>
               <dd className="font-semibold text-slate-700">{course.code}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wide text-slate-400">Term</dt>
+              <dt className="text-xs uppercase tracking-wide text-slate-400">Học kỳ</dt>
               <dd className="text-slate-700">{course.term}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wide text-slate-400">Dates</dt>
+              <dt className="text-xs uppercase tracking-wide text-slate-400">Thời gian</dt>
               <dd className="text-slate-700">
                 {formatDate(course.startDate)} – {formatDate(course.endDate)}
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wide text-slate-400">Owner</dt>
+              <dt className="text-xs uppercase tracking-wide text-slate-400">Phụ trách</dt>
               <dd className="text-slate-700">{course.owner?.name || "—"}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wide text-slate-400">State</dt>
+              <dt className="text-xs uppercase tracking-wide text-slate-400">Trạng thái</dt>
               <dd>
                 {course.published ? (
-                  <Badge tone="published">Published</Badge>
+                  <Badge tone="published">Đã công bố</Badge>
                 ) : (
-                  <Badge tone="draft">Draft</Badge>
+                  <Badge tone="draft">Bản nháp</Badge>
                 )}
               </dd>
             </div>
@@ -285,7 +286,7 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
               className="mt-4 w-full"
               onClick={removeCourse}
             >
-              <i className="fa-solid fa-trash" /> Delete course
+              <i className="fa-solid fa-trash" /> Xóa lớp học
             </Button>
           )}
         </Card>
@@ -293,27 +294,27 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
 
       {staff && stats && (
         <div className="grid gap-5 lg:grid-cols-2">
-          <Card title="Roster distribution" subtitle="Course membership by role">
+          <Card title="Phân bố thành viên" subtitle="Thành viên lớp theo vai trò">
             <BarChart
               data={[
-                { label: "Students", value: stats.roster.student || 0 },
-                { label: "Teaching assistants", value: stats.roster.ta || 0 },
-                { label: "Teachers", value: stats.roster.teacher || 0 },
+                { label: "Sinh viên", value: stats.roster.student || 0 },
+                { label: "Trợ giảng", value: stats.roster.ta || 0 },
+                { label: "Giảng viên", value: stats.roster.teacher || 0 },
               ]}
               color="bg-emerald-600"
             />
           </Card>
-          <Card title="Course activity" subtitle="Attendance and leave workload">
+          <Card title="Hoạt động lớp" subtitle="Điểm danh và nghỉ phép">
             <div className="grid grid-cols-2 gap-3">
               <StatCard
                 icon="fa-qrcode"
-                label="Attendance sessions"
+                label="Phiên điểm danh"
                 value={stats.attendanceSessions}
                 tone="sky"
               />
               <StatCard
                 icon="fa-triangle-exclamation"
-                label="Pending leave"
+                label="Đơn nghỉ chờ duyệt"
                 value={stats.pendingLeave}
                 tone="amber"
               />
@@ -322,49 +323,49 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
         </div>
       )}
 
-      <Modal
+      <Drawer
         open={editOpen}
         onClose={() => setEditOpen(false)}
-        title="Edit course"
+        title="Sửa lớp học"
         width="max-w-2xl"
         footer={
           <>
             <Button variant="secondary" onClick={() => setEditOpen(false)}>
-              Cancel
+              Hủy
             </Button>
             <Button type="submit" form="edit-course-form" loading={saving}>
-              <i className="fa-solid fa-floppy-disk" /> Save
+              <i className="fa-solid fa-floppy-disk" /> Lưu
             </Button>
           </>
         }
       >
         <form id="edit-course-form" onSubmit={saveCourse} className="grid gap-3 sm:grid-cols-2">
-          <Field label="Code">
+          <Field label="Mã">
             <Input value={course.code} disabled />
           </Field>
-          <Field label="Term">
+          <Field label="Học kỳ">
             <Input name="term" defaultValue={course.term} required />
           </Field>
-          <Field label="Title" className="sm:col-span-2">
+          <Field label="Tiêu đề" className="sm:col-span-2">
             <Input name="title" defaultValue={course.title} required />
           </Field>
-          <Field label="Start date">
+          <Field label="Ngày bắt đầu">
             <Input name="startDate" type="date" defaultValue={course.startDate} required />
           </Field>
-          <Field label="End date">
+          <Field label="Ngày kết thúc">
             <Input name="endDate" type="date" defaultValue={course.endDate} required />
           </Field>
-          <Field label="Description" className="sm:col-span-2">
+          <Field label="Mô tả" className="sm:col-span-2">
             <Textarea name="description" defaultValue={course.description} />
           </Field>
-          <Field label="Publication" className="sm:col-span-2">
+          <Field label="Công bố" className="sm:col-span-2">
             <Select name="published" defaultValue={course.published ? "on" : "off"}>
-              <option value="off">Draft</option>
-              <option value="on">Published</option>
+              <option value="off">Bản nháp</option>
+              <option value="on">Đã công bố</option>
             </Select>
           </Field>
         </form>
-      </Modal>
+      </Drawer>
     </div>
   );
 }

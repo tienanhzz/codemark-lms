@@ -10,7 +10,14 @@ class User extends BaseEntity {
   protected User() {}
 
   @Column(unique = true)
-  String email;
+  String studentId;
+  boolean pendingCode;
+  boolean mustChangePassword;
+
+  @PrePersist @PreUpdate
+  void validateCode() {
+    Api.require(studentId == null ? pendingCode : studentId.matches("[0-9]{10}"), "invalid_student_id", 400);
+  }
 
   String passwordHash;
   String name;

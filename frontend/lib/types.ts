@@ -3,7 +3,9 @@ export type CourseRole = Role | null;
 
 export type User = {
   id: number;
-  email: string;
+  studentId: string;
+  pendingCode: boolean;
+  mustChangePassword: boolean;
   name: string;
   role: Role;
 };
@@ -150,6 +152,7 @@ export type Assessment = {
   closesAt: string;
   durationMinutes: number;
   maxAttempts: number;
+  rankWeight: number;
   published: boolean;
   createdAt: string;
   role: CourseRole;

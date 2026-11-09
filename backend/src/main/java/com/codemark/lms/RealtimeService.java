@@ -33,6 +33,7 @@ class RealtimeService {
 
   void message(String id, HttpSession session, String ip, String event, Map<String, Object> b) {
     User u = access.authenticate(session, ip);
+    require(!u.mustChangePassword || event.equals("heartbeat"), "password_change_required", 403);
     switch (event) {
       case "heartbeat" -> hub.send(id, "heartbeat_ack", map("serverTime", Instant.now()));
       case "join_course" -> {

@@ -28,7 +28,7 @@ export default function AdminOverviewPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <Spinner label="Loading administration overview…" />;
+  if (loading) return <Spinner label="Đang tải trang quản trị…" />;
   if (error) return <Alert tone="danger">{error}</Alert>;
   if (!stats) return null;
 
@@ -38,29 +38,29 @@ export default function AdminOverviewPage() {
     <div>
       <PageHeader
         icon="fa-shield-halved"
-        title="Administration"
-        description="Users, sessions, network restrictions and the audit trail."
+        title="Quản trị"
+        description="Tài khoản, phiên đăng nhập, chặn mạng và nhật ký hoạt động."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon="fa-users" label="Accounts" value={totalUsers} tone="purple" />
+        <StatCard icon="fa-users" label="Tài khoản" value={totalUsers} tone="purple" />
         <StatCard
           icon="fa-signal"
-          label="Active sessions"
+          label="Phiên hoạt động"
           value={stats.activeSessions}
           tone="emerald"
         />
-        <StatCard icon="fa-book" label="Courses" value={stats.courses} tone="sky" />
+        <StatCard icon="fa-book" label="Lớp học" value={stats.courses} tone="sky" />
         <StatCard
           icon="fa-file-signature"
-          label="Assessments"
+          label="Bài tập và bài thi"
           value={stats.assessments}
           tone="amber"
         />
       </div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <Card title="Accounts by role" subtitle="System user distribution">
+        <Card title="Tài khoản theo vai trò" subtitle="Phân bố vai trò người dùng">
           <BarChart
             data={Object.entries(stats.users).map(([label, value]) => ({
               label,
@@ -69,29 +69,29 @@ export default function AdminOverviewPage() {
             color="bg-purple-600"
           />
         </Card>
-        <Card title="Operational counters" subtitle="Activity across the deployment">
+        <Card title="Số liệu hoạt động" subtitle="Hoạt động trên toàn hệ thống">
           <div className="grid grid-cols-2 gap-3">
             <StatCard
               icon="fa-pen-to-square"
-              label="Attempts"
+              label="Lượt làm bài"
               value={stats.attempts}
               tone="sky"
             />
             <StatCard
               icon="fa-qrcode"
-              label="Check-ins"
+              label="Lượt điểm danh"
               value={stats.attendanceCheckins}
               tone="emerald"
             />
             <StatCard
               icon="fa-triangle-exclamation"
-              label="Pending leave"
+              label="Đơn nghỉ chờ duyệt"
               value={stats.pendingLeave}
               tone="amber"
             />
             <StatCard
               icon="fa-user-clock"
-              label="Active sessions"
+              label="Phiên hoạt động"
               value={stats.activeSessions}
               tone="rose"
             />
@@ -101,11 +101,11 @@ export default function AdminOverviewPage() {
 
       <Card
         className="mt-5"
-        title="Recent audit events"
-        subtitle="Security-relevant activity across the system"
+        title="Nhật ký gần đây"
+        subtitle="Hoạt động bảo mật trên toàn hệ thống"
         actions={
           <Link href="/admin/audit" className="text-xs font-semibold text-teal-700">
-            Full audit log <i className="fa-solid fa-arrow-right ml-1" />
+            Nhật ký đầy đủ <i className="fa-solid fa-arrow-right ml-1" />
           </Link>
         }
       >
@@ -129,7 +129,7 @@ export default function AdminOverviewPage() {
             ))}
           </div>
         ) : (
-          <EmptyState icon="fa-clipboard-list" title="No audit events yet" />
+          <EmptyState icon="fa-clipboard-list" title="Chưa có nhật ký" />
         )}
       </Card>
     </div>

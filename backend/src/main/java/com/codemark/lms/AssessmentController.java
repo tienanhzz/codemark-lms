@@ -73,6 +73,10 @@ class AssessmentController {
     require(a.title != null && !a.title.isBlank(), "title_required", 400);
     a.description = text(b, "description", a.description);
     a.kind = text(b, "kind", a.kind);
+    if (b.containsKey("rankWeight")) {
+      a.rankWeight = Double.parseDouble(b.get("rankWeight").toString());
+      require(Double.isFinite(a.rankWeight) && a.rankWeight > 0 && a.rankWeight <= 10, "invalid_weight", 400);
+    }
     a.opensAt = instant(b, "opensAt", a.opensAt == null ? Instant.now() : a.opensAt);
     a.closesAt =
         instant(b, "closesAt", a.closesAt == null ? Instant.now().plusSeconds(86400) : a.closesAt);

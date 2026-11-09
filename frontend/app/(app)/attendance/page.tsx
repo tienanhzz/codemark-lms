@@ -41,7 +41,7 @@ export default function AttendancePage() {
     setSuccess("");
     try {
       await api("/api/attendance/check-in", { method: "POST", body: { token } });
-      setSuccess("Attendance recorded. Keep this page open in case you need to check another session.");
+      setSuccess("Đã ghi nhận points danh. Keep this page open in case you need to check another session.");
       setToken("");
       await loadDashboard();
     } catch (err) {
@@ -55,15 +55,15 @@ export default function AttendancePage() {
     <div className="mx-auto max-w-2xl">
       <PageHeader
         icon="fa-qrcode"
-        title="Attendance check-in"
-        description="Scan the teacher's rotating QR code or paste the token shown beside it."
+        title="Điểm danh"
+        description="Quét mã QR của giảng viên hoặc dán mã điểm danh hiển thị bên cạnh."
       />
       {error && <Alert tone="danger" className="mb-3">{error}</Alert>}
       {success && <Alert tone="success" className="mb-3">{success}</Alert>}
 
-      <Card title="Enter attendance token" subtitle="The token expires after 30 seconds and cannot be reused">
+      <Card title="Nhập mã điểm danh" subtitle="Mã hết hạn sau 30 giây và không thể dùng lại">
         <form onSubmit={checkIn} className="space-y-3">
-          <Field label="Token">
+          <Field label="Mã điểm danh">
             <Input
               value={token}
               onChange={(event) => setToken(event.target.value)}
@@ -73,18 +73,18 @@ export default function AttendancePage() {
             />
           </Field>
           <Button type="submit" loading={busy} className="w-full">
-            <i className="fa-solid fa-check-to-slot" /> Check in
+            <i className="fa-solid fa-check-to-slot" /> Điểm danh
           </Button>
         </form>
       </Card>
 
       <Card
         className="mt-4"
-        title="Open sessions"
-        subtitle="Sessions currently accepting check-ins for your courses"
+        title="Mở phiên"
+        subtitle="Các phiên đang nhận điểm danh trong lớp của bạn"
       >
         {!dashboard ? (
-          <Spinner label="Loading sessions…" />
+          <Spinner label="Đang tải phiên…" />
         ) : dashboard.openAttendance.length ? (
           <div className="space-y-2">
             {dashboard.openAttendance.map((session) => {
@@ -101,14 +101,14 @@ export default function AttendancePage() {
                       {course?.code} — {course?.title}
                     </p>
                     <p className="text-xs text-slate-500">
-                      Closes {formatDateTime(session.closesAt)}
+                      Đóng lúc {formatDateTime(session.closesAt)}
                     </p>
                   </div>
                   <Link
                     href={`/courses/${session.courseId}`}
                     className="text-xs font-semibold text-teal-700"
                   >
-                    Open course
+                    Mở lớp học
                   </Link>
                 </div>
               );
@@ -116,7 +116,7 @@ export default function AttendancePage() {
           </div>
         ) : (
           <p className="py-4 text-center text-sm text-slate-500">
-            No open attendance sessions right now.
+            Hiện chưa có phiên điểm danh nào mở.
           </p>
         )}
       </Card>

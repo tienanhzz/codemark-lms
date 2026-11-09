@@ -193,7 +193,7 @@
         "prompt": "Which input type hides typed characters?",
         "options": [
           "text",
-          "email",
+          "studentId",
           "number",
           "password"
         ],

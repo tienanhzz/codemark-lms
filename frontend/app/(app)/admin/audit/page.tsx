@@ -77,12 +77,12 @@ export default function AuditPage() {
     <div>
       <PageHeader
         icon="fa-clipboard-list"
-        title="Audit log"
-        description="Immutable security and activity events. Proctoring data is personal data — review retention policy."
+        title="Nhật ký hoạt động"
+        description="Nhật ký bảo mật và hoạt động chỉ được thêm. Dữ liệu giám sát cần được lưu giữ theo quy định của trường."
         actions={
           <>
             <Button variant="secondary" onClick={load}>
-              <i className="fa-solid fa-rotate" /> Refresh
+              <i className="fa-solid fa-rotate" /> Làm mới
             </Button>
             <Button
               variant="secondary"
@@ -92,7 +92,7 @@ export default function AuditPage() {
                 )
               }
             >
-              <i className="fa-solid fa-download" /> Export CSV
+              <i className="fa-solid fa-download" /> Xuất CSV
             </Button>
           </>
         }
@@ -116,16 +116,16 @@ export default function AuditPage() {
           onChange={(event) => setLimit(event.target.value)}
           className="w-36"
         >
-          <option value="50">50 events</option>
-          <option value="100">100 events</option>
-          <option value="200">200 events</option>
+          <option value="50">50 sự kiện</option>
+          <option value="100">100 sự kiện</option>
+          <option value="200">200 sự kiện</option>
         </Select>
-        <span className="text-xs text-slate-500">{total} matching events</span>
+        <span className="text-xs text-slate-500">{total} sự kiện phù hợp</span>
       </div>
 
       <Card bodyClassName="p-0">
         {loading ? (
-          <Spinner label="Loading audit events…" />
+          <Spinner label="Đang tải sự kiện nhật ký…" />
         ) : events.length ? (
           <div className="divide-y divide-slate-50">
             {events.map((event) => (
@@ -136,7 +136,7 @@ export default function AuditPage() {
                       {event.kind.replaceAll("_", " ")}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {formatDateTime(event.createdAt)} · actor {event.actorId ?? "system"} ·{" "}
+                      {formatDateTime(event.createdAt)} · người thực hiện {event.actorId ?? "system"} ·{" "}
                       {event.ip || "unknown IP"}
                     </p>
                   </div>
@@ -150,7 +150,7 @@ export default function AuditPage() {
           </div>
         ) : (
           <div className="p-4">
-            <EmptyState icon="fa-clipboard-list" title="No matching audit events" />
+            <EmptyState icon="fa-clipboard-list" title="Chưa có sự kiện phù hợp nhật ký" />
           </div>
         )}
       </Card>

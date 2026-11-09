@@ -14,7 +14,7 @@ import {
   EmptyState,
   Field,
   Input,
-  Modal,
+  Drawer,
   PageHeader,
   Select,
   Spinner,
@@ -69,7 +69,7 @@ export default function CoursesPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
-  const [ownerEmail, setOwnerEmail] = useState("");
+  const [ownerCode, setOwnerCode] = useState("");
   const canCreate = user?.role === "admin" || user?.role === "teacher";
 
   async function load() {
@@ -114,19 +114,19 @@ export default function CoursesPage() {
         endDate: form.get("endDate"),
         published: form.get("published") === "on",
       };
-      if (user?.role === "admin" && ownerEmail.trim()) {
+      if (user?.role === "admin" && ownerCode.trim()) {
         const found = await api<{ users: User[] }>(
-          `/api/users/search?q=${encodeURIComponent(ownerEmail.trim())}`,
+          `/api/users/search?q=${encodeURIComponent(ownerCode.trim())}`,
         );
         const owner = found.users.find(
-          (candidate) => candidate.email.toLowerCase() === ownerEmail.trim().toLowerCase(),
+          (candidate) => candidate.studentId.toLowerCase() === ownerCode.trim().toLowerCase(),
         );
         if (!owner) throw new Error("Owner account not found.");
         body.ownerId = owner.id;
       }
       await api("/api/courses", { method: "POST", body });
       setCreateOpen(false);
-      setOwnerEmail("");
+      setOwnerCode("");
       setLoading(true);
       await load();
     } catch (err) {
@@ -136,13 +136,13 @@ export default function CoursesPage() {
     }
   }
 
-  if (loading) return <Spinner label="Loading courses…" />;
+  if (loading) return <Spinner label="Đang tải lớp học…" />;
 
   return (
     <div>
       <PageHeader
         icon="fa-book-open"
-        title="Courses"
+        title="Lớp học"
         description={
           user?.role === "student"
             ? "Courses you are enrolled in for the current and previous terms."
@@ -152,7 +152,7 @@ export default function CoursesPage() {
           canCreate ? (
             <Button onClick={() => setCreateOpen(true)}>
               <i className="fa-solid fa-plus" />
-              New course
+              Thêm lớp học
             </Button>
           ) : undefined
         }
@@ -166,12 +166,12 @@ export default function CoursesPage() {
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search code, title, term or owner"
+            placeholder="Tìm mã lớp, tiêu đề, học kỳ hoặc giảng viên"
             className="pl-8"
           />
         </div>
         <span className="text-xs text-slate-500">
-          {filtered.length} of {courses.length} courses
+          {filtered.length} of {courses.length} lớp học
         </span>
       </div>
 
@@ -187,7 +187,7 @@ export default function CoursesPage() {
           action={
             canCreate ? (
               <Button onClick={() => setCreateOpen(true)}>
-                <i className="fa-solid fa-plus" /> Create course
+                <i className="fa-solid fa-plus" /> Tạo lớp học
               </Button>
             ) : undefined
           }
@@ -229,15 +229,15 @@ export default function CoursesPage() {
                 </span>
                 <span>
                   <i className={cn("fa-solid fa-clock mr-1", colors.icon)} />
-                  {course.meetings?.length || 0} meetings
+                  {course.meetings?.length || 0} buổi học
                 </span>
                 <span>
                   <i className={cn("fa-solid fa-user-group mr-1", colors.icon)} />
-                  {course.studentCount ?? 0} students
+                  {course.studentCount ?? 0} sinh viên
                 </span>
                 <span>
                   <i className={cn("fa-solid fa-file-signature mr-1", colors.icon)} />
-                  {course.assessmentCount ?? 0} assessments
+                  {course.assessmentCount ?? 0} bài kiểm tra
                 </span>
               </div>
               <div className={cn("mt-4 flex items-center justify-between border-t pt-3 text-[11px] text-slate-500", colors.divider)}>
@@ -246,9 +246,9 @@ export default function CoursesPage() {
                 </span>
                 <span>
                   {course.published ? (
-                    <Badge tone="published">Published</Badge>
+                    <Badge tone="published">Đã công bố</Badge>
                   ) : (
-                    <Badge tone="draft">Draft</Badge>
+                    <Badge tone="draft">Bản nháp</Badge>
                   )}
                 </span>
               </div>
@@ -258,59 +258,59 @@ export default function CoursesPage() {
         </div>
       )}
 
-      <Modal
+      <Drawer
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        title="Create course"
+        title="Tạo lớp học"
         width="max-w-2xl"
         footer={
           <>
             <Button variant="secondary" onClick={() => setCreateOpen(false)}>
-              Cancel
+              Hủy
             </Button>
             <Button type="submit" form="create-course-form" loading={saving}>
-              <i className="fa-solid fa-floppy-disk" /> Save course
+              <i className="fa-solid fa-floppy-disk" /> Lưu lớp học
             </Button>
           </>
         }
       >
         <form id="create-course-form" onSubmit={createCourse} className="grid gap-3 sm:grid-cols-2">
-          <Field label="Course code">
+          <Field label="Mã lớp">
             <Input name="code" required placeholder="CS101" maxLength={32} />
           </Field>
-          <Field label="Term / semester">
-            <Input name="term" required placeholder="2026 Fall" maxLength={64} />
+          <Field label="Học kỳ">
+            <Input name="term" required placeholder="Học kỳ 1 năm 2026" maxLength={64} />
           </Field>
-          <Field label="Title" className="sm:col-span-2">
-            <Input name="title" required placeholder="Introduction to Computer Science" />
+          <Field label="Tiêu đề" className="sm:col-span-2">
+            <Input name="title" required placeholder="Nhập môn khoa học máy tính" />
           </Field>
-          <Field label="Start date">
+          <Field label="Ngày bắt đầu">
             <Input name="startDate" type="date" required />
           </Field>
-          <Field label="End date">
+          <Field label="Ngày kết thúc">
             <Input name="endDate" type="date" required />
           </Field>
           {user?.role === "admin" && (
             <Field
-              label="Owner email (optional)"
-              hint="Leave blank to own the course yourself."
+              label="Mã giảng viên phụ trách (tùy chọn)"
+              hint="Để trống nếu bạn là giảng viên phụ trách."
               className="sm:col-span-2"
             >
               <Input
-                value={ownerEmail}
-                onChange={(event) => setOwnerEmail(event.target.value)}
-                type="email"
-                placeholder="teacher@school.example"
+                value={ownerCode}
+                onChange={(event) => setOwnerCode(event.target.value)}
+                type="text" inputMode="numeric" pattern="[0-9]{10}" maxLength={10}
+                placeholder="1000000001"
               />
             </Field>
           )}
-          <Field label="Description" className="sm:col-span-2">
-            <Textarea name="description" placeholder="Course outline and expectations" />
+          <Field label="Mô tả" className="sm:col-span-2">
+            <Textarea name="description" placeholder="Đề cương và mục tiêu lớp học" />
           </Field>
-          <Field label="Publication" className="sm:col-span-2">
+          <Field label="Công bố" className="sm:col-span-2">
             <Select name="published" defaultValue="off">
-              <option value="off">Draft — hidden from students</option>
-              <option value="on">Published — visible to enrolled students</option>
+              <option value="off">Bản nháp — ẩn với sinh viên</option>
+              <option value="on">Công bố — hiển thị với sinh viên trong lớp</option>
             </Select>
           </Field>
           {formError && (
@@ -319,7 +319,7 @@ export default function CoursesPage() {
             </Alert>
           )}
         </form>
-      </Modal>
+      </Drawer>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { Providers } from "../components/Providers";
 
 export const metadata: Metadata = {
   title: "CodeMark_ClassFlow",
-  description: "Secure Learning Management System for classrooms",
+  description: "Hệ thống quản lý học tập và xếp hạng sinh viên",
   icons: {
     icon: "/branding/favicon.svg",
   },
@@ -15,7 +15,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="vi">
       <body className="bg-slate-100 text-slate-800 antialiased">
         <Providers>{children}</Providers>
       </body>

@@ -13,7 +13,7 @@ import {
   EmptyState,
   Field,
   Input,
-  Modal,
+  Drawer,
   Select,
   Spinner,
   Textarea,
@@ -66,6 +66,7 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
           closesAt: new Date(String(form.get("closesAt"))).toISOString(),
           durationMinutes: Number(form.get("durationMinutes")),
           maxAttempts: Number(form.get("maxAttempts")),
+          rankWeight: Number(form.get("rankWeight") || 1),
           published: form.get("published") === "on",
           ipAllowlist: allowlist,
         },
@@ -79,18 +80,18 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
     }
   }
 
-  if (loading) return <Spinner label="Loading assessments…" />;
+  if (loading) return <Spinner label="Đang tải bài kiểm tra…" />;
 
   return (
     <div className="space-y-4">
       {error && <Alert tone="danger">{error}</Alert>}
       <Card
-        title="Assessments"
-        subtitle="Quizzes, exams and code challenges"
+        title="Bài tập và bài thi"
+        subtitle="Bài tập, bài thi và bài lập trình"
         actions={
           staff ? (
             <Button size="sm" onClick={() => setOpen(true)}>
-              <i className="fa-solid fa-plus" /> New assessment
+              <i className="fa-solid fa-plus" /> Tạo bài kiểm tra
             </Button>
           ) : undefined
         }
@@ -117,9 +118,9 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
                       </p>
                     </div>
                     {assessment.published ? (
-                      <Badge tone="published">Published</Badge>
+                      <Badge tone="published">Đã công bố</Badge>
                     ) : (
-                      <Badge tone="draft">Draft</Badge>
+                      <Badge tone="draft">Bản nháp</Badge>
                     )}
                   </div>
                   <p className="mt-2 line-clamp-2 min-h-8 text-xs text-slate-500">
@@ -133,18 +134,18 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
                     </p>
                     <p>
                       <i className="fa-solid fa-hourglass-half mr-1" />
-                      {assessment.durationMinutes} min · {assessment.maxAttempts} attempt(s)
+                      {assessment.durationMinutes} phút · {assessment.maxAttempts} lượt làm(s)
                     </p>
                     {staff ? (
                       <p>
                         <i className="fa-solid fa-list-check mr-1" />
-                        {assessment.questionCount ?? 0} questions ·{" "}
-                        {assessment.attemptCount ?? 0} attempts
+                        {assessment.questionCount ?? 0} câu hỏi ·{" "}
+                        {assessment.attemptCount ?? 0} lượt làm
                       </p>
                     ) : (
                       <p>
                         <i className="fa-solid fa-user-check mr-1" />
-                        {submitted.length} submitted
+                        {submitted.length} đã nộp
                         {inProgress ? " · 1 in progress" : ""}
                         {submitted.length
                           ? ` · best ${Math.max(
@@ -161,7 +162,7 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
         ) : (
           <EmptyState
             icon="fa-file-signature"
-            title="No assessments yet"
+            title="Chưa có bài kiểm tra"
             description={
               staff
                 ? "Create a quiz or code challenge and publish it when ready."
@@ -171,67 +172,70 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
         )}
       </Card>
 
-      <Modal
+      <Drawer
         open={open}
         onClose={() => setOpen(false)}
-        title="New assessment"
+        title="Tạo bài kiểm tra"
         width="max-w-2xl"
         footer={
           <>
             <Button variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              Hủy
             </Button>
             <Button type="submit" form="assessment-form" loading={saving}>
-              <i className="fa-solid fa-floppy-disk" /> Save
+              <i className="fa-solid fa-floppy-disk" /> Lưu
             </Button>
           </>
         }
       >
         <form id="assessment-form" onSubmit={save} className="grid gap-3 sm:grid-cols-2">
-          <Field label="Title" className="sm:col-span-2">
+          <Field label="Hệ số điểm rank" hint="100% kết quả = 100 điểm × hệ số">
+            <Input name="rankWeight" type="number" min={0.1} max={10} step={0.1} defaultValue={1} required />
+          </Field>
+          <Field label="Tiêu đề" className="sm:col-span-2">
             <Input name="title" required />
           </Field>
-          <Field label="Type">
+          <Field label="Loại">
             <Select name="kind" defaultValue="quiz">
-              <option value="quiz">Quiz</option>
-              <option value="exam">Exam</option>
-              <option value="code">Code challenge</option>
+              <option value="quiz">Bài tập</option>
+              <option value="exam">Bài thi</option>
+              <option value="code">Bài lập trình</option>
             </Select>
           </Field>
-          <Field label="Duration (minutes)">
+          <Field label="Thời gian (phút)">
             <Input name="durationMinutes" type="number" min={1} max={600} defaultValue={60} />
           </Field>
-          <Field label="Opens at">
+          <Field label="Mở lúc">
             <Input name="opensAt" type="datetime-local" required />
           </Field>
-          <Field label="Closes at">
+          <Field label="Đóng lúc">
             <Input name="closesAt" type="datetime-local" required />
           </Field>
-          <Field label="Max attempts">
+          <Field label="Số lần làm tối đa">
             <Input name="maxAttempts" type="number" min={1} max={10} defaultValue={1} />
           </Field>
-          <Field label="Visibility">
+          <Field label="Hiển thị">
             <label className="flex items-center gap-2 pt-2 text-sm text-slate-600">
               <input
                 type="checkbox"
                 name="published"
                 className="h-4 w-4 rounded border-slate-300"
               />
-              Publish immediately
+              Công bố ngay
             </label>
           </Field>
           <Field
-            label="IP / CIDR allow-list"
-            hint="Optional. One network per line or comma separated. Empty allows any non-blacklisted IP."
+            label="Danh sách IP / CIDR được phép"
+            hint="Không bắt buộc. Mỗi dòng một địa chỉ mạng hoặc ngăn cách bằng dấu phẩy. Để trống để cho phép các IP không bị chặn."
             className="sm:col-span-2"
           >
             <Textarea name="ipAllowlist" placeholder="192.168.1.0/24" />
           </Field>
-          <Field label="Description" className="sm:col-span-2">
-            <Textarea name="description" placeholder="Instructions for students" />
+          <Field label="Mô tả" className="sm:col-span-2">
+            <Textarea name="description" placeholder="Hướng dẫn sinh viên" />
           </Field>
         </form>
-      </Modal>
+      </Drawer>
     </div>
   );
 }

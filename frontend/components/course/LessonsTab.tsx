@@ -1,4 +1,5 @@
 "use client";
+import { confirmInline } from "../InlineConfirm";
 
 import { FormEvent, useEffect, useState } from "react";
 import { api, errorMessage } from "../../lib/api";
@@ -12,7 +13,7 @@ import {
   EmptyState,
   Field,
   Input,
-  Modal,
+  Drawer,
   Spinner,
   Textarea,
 } from "../ui";
@@ -72,7 +73,7 @@ export function LessonsTab({ course, role }: CourseTabProps) {
   }
 
   async function remove(lesson: Lesson) {
-    if (!confirm(`Delete lesson “${lesson.title}”?`)) return;
+    if (!await confirmInline(`Delete lesson “${lesson.title}”?`)) return;
     try {
       await api(`/api/lessons/${lesson.id}`, { method: "DELETE" });
       await load();
@@ -81,24 +82,24 @@ export function LessonsTab({ course, role }: CourseTabProps) {
     }
   }
 
-  if (loading) return <Spinner label="Loading lessons…" />;
+  if (loading) return <Spinner label="Đang tải bài học…" />;
 
   return (
     <div className="space-y-4">
       {error && <Alert tone="danger">{error}</Alert>}
       <Card
-        title="Lessons"
-        subtitle="Course material ordered by position"
+        title="Bài học"
+        subtitle="Tài liệu lớp theo thứ tự"
         actions={
           staff ? (
             <Button
               size="sm"
-              onClick={() => {
+              onClick={async () => {
                 setEditing(null);
                 setOpen(true);
               }}
             >
-              <i className="fa-solid fa-plus" /> New lesson
+              <i className="fa-solid fa-plus" /> Thêm bài học
             </Button>
           ) : undefined
         }
@@ -114,11 +115,11 @@ export function LessonsTab({ course, role }: CourseTabProps) {
                   <div>
                     <p className="text-sm font-semibold text-slate-700">{lesson.title}</p>
                     <p className="text-[11px] text-slate-400">
-                      Position {lesson.position} · {formatDateTime(lesson.createdAt)}
+                      Thứ tự {lesson.position} · {formatDateTime(lesson.createdAt)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {!lesson.published && <Badge tone="draft">Draft</Badge>}
+                    {!lesson.published && <Badge tone="draft">Bản nháp</Badge>}
                     <i
                       className={`fa-solid fa-chevron-${
                         expanded === lesson.id ? "up" : "down"
@@ -136,15 +137,15 @@ export function LessonsTab({ course, role }: CourseTabProps) {
                         <Button
                           size="sm"
                           variant="secondary"
-                          onClick={() => {
+                          onClick={async () => {
                             setEditing(lesson);
                             setOpen(true);
                           }}
                         >
-                          <i className="fa-solid fa-pen" /> Edit
+                          <i className="fa-solid fa-pen" /> Sửa
                         </Button>
                         <Button size="sm" variant="danger" onClick={() => remove(lesson)}>
-                          <i className="fa-solid fa-trash" /> Delete
+                          <i className="fa-solid fa-trash" /> Xóa
                         </Button>
                       </div>
                     )}
@@ -156,13 +157,13 @@ export function LessonsTab({ course, role }: CourseTabProps) {
         ) : (
           <EmptyState
             icon="fa-book"
-            title="No lessons yet"
+            title="Chưa có bài học"
             description={staff ? "Add the first lesson for this course." : "Your teacher has not published lessons yet."}
           />
         )}
       </Card>
 
-      <Modal
+      <Drawer
         open={open}
         onClose={() => {
           setOpen(false);
@@ -174,40 +175,40 @@ export function LessonsTab({ course, role }: CourseTabProps) {
           <>
             <Button
               variant="secondary"
-              onClick={() => {
+              onClick={async () => {
                 setOpen(false);
                 setEditing(null);
               }}
             >
-              Cancel
+              Hủy
             </Button>
             <Button type="submit" form="lesson-form" loading={saving}>
-              <i className="fa-solid fa-floppy-disk" /> Save lesson
+              <i className="fa-solid fa-floppy-disk" /> Lưu bài học
             </Button>
           </>
         }
       >
         <form id="lesson-form" onSubmit={save} className="space-y-3">
-          <Field label="Title">
+          <Field label="Tiêu đề">
             <Input name="title" defaultValue={editing?.title || ""} required />
           </Field>
-          <Field label="Content">
+          <Field label="Nội dung">
             <Textarea
               name="content"
               defaultValue={editing?.content || ""}
               className="min-h-48"
-              placeholder="Lesson notes, links and instructions…"
+              placeholder="Ghi chú, liên kết và hướng dẫn bài học…"
             />
           </Field>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Position">
+            <Field label="Thứ tự">
               <Input
                 name="position"
                 type="number"
                 defaultValue={editing?.position ?? lessons.length}
               />
             </Field>
-            <Field label="Visibility">
+            <Field label="Hiển thị">
               <label className="flex items-center gap-2 pt-2 text-sm text-slate-600">
                 <input
                   type="checkbox"
@@ -215,12 +216,12 @@ export function LessonsTab({ course, role }: CourseTabProps) {
                   defaultChecked={editing ? editing.published : true}
                   className="h-4 w-4 rounded border-slate-300"
                 />
-                Visible to students
+                Hiển thị với sinh viên
               </label>
             </Field>
           </div>
         </form>
-      </Modal>
+      </Drawer>
     </div>
   );
 }

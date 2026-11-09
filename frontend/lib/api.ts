@@ -76,6 +76,7 @@ export async function api<T = unknown>(
         : `Request failed (${response.status})`;
     throw new ApiError(message, response.status, payload);
   }
+  if (typeof window !== "undefined" && ["POST", "PUT", "PATCH"].includes(rest.method || "")) window.dispatchEvent(new Event("lms:points"));
   return payload as T;
 }
 
@@ -97,7 +98,27 @@ export async function download(path: string, filename: string) {
 }
 
 export function errorMessage(error: unknown) {
-  if (error instanceof ApiError) return error.message.replaceAll("_", " ");
-  if (error instanceof Error) return error.message;
-  return "Something went wrong.";
+  const messages: Record<string,string> = {
+    invalid_credentials:"Mã đăng nhập hoặc mật khẩu không đúng.", authentication_required:"Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.",
+    forbidden:"Bạn không có quyền thực hiện thao tác này.", password_change_required:"Bạn phải đổi mật khẩu trước khi tiếp tục.",
+    weak_password:"Mật khẩu cần ít nhất 12 ký tự và tối đa 72 byte UTF-8.", invalid_current_password:"Mật khẩu hiện tại không đúng.",
+    password_must_differ:"Mật khẩu mới phải khác mật khẩu hiện tại.", invalid_student_id:"Mã đăng nhập phải có đúng 10 chữ số.",
+    invalid_user:"Kiểm tra mã 10 số, họ tên và vai trò.",duplicate_student_id:"Mã đăng nhập đã tồn tại.",
+    invalid_csv_header:"Tên cột CSV không đúng. Kiểm tra dòng tiêu đề và tên cột đã chọn.",invalid_csv:"File CSV không hợp lệ.",
+    file_too_large:"File vượt quá 1 MiB.",too_many_rows:"File vượt quá 1000 dòng.",invalid_url:"Liên kết phải là URL http hoặc https hợp lệ.",
+    invalid_score:"Điểm không hợp lệ hoặc vượt điểm tối đa.",invalid_tiers:"Tier phải bắt đầu từ 0, ngưỡng tăng dần, tên không trùng.",
+    invalid_dates:"Ngày bắt đầu phải trước ngày kết thúc.",no_active_season:"Chưa có mùa hoạt động.",invalid_points:"Điểm hoặc lý do không hợp lệ.",
+    deadline_exceeded:"Đã quá hạn nộp bài.",conflict:"Dữ liệu đã thay đổi hoặc đang được sử dụng. Vui lòng tải lại.",not_found:"Không tìm thấy dữ liệu.",
+    network_denied:"Địa chỉ mạng này không được phép truy cập.",runner_unavailable:"Bộ chấm lập trình chưa hoạt động.",max_attempts_reached:"Bạn đã hết lượt làm bài.",
+    student_not_enrolled:"Sinh viên chưa tham gia lớp này.",invalid_request:"Dữ liệu gửi lên không hợp lệ."
+  };
+  if (error instanceof ApiError) {
+    if (messages[error.message]) return messages[error.message];
+    if (error.status === 0) return "Không kết nối được máy chủ. Kiểm tra backend và địa chỉ API.";
+    if (error.status >= 500) return `Máy chủ gặp lỗi (HTTP ${error.status}). Vui lòng kiểm tra log backend hoặc liên hệ quản trị viên.`;
+    if (error.status === 404) return "Không tìm thấy chức năng trên máy chủ. Kiểm tra backend đã chạy bản mới nhất.";
+    const code = /^[a-z][a-z0-9_]{0,79}$/.test(error.message) ? `, mã: ${error.message}` : "";
+    return `Yêu cầu chưa được xử lý (HTTP ${error.status}${code}). Vui lòng kiểm tra dữ liệu và thử lại.`;
+  }
+  return "Có lỗi xảy ra. Vui lòng thử lại.";
 }

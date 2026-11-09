@@ -30,30 +30,30 @@ export function GradebookTab({ course }: CourseTabProps) {
       .finally(() => setLoading(false));
   }, [course.id]);
 
-  if (loading) return <Spinner label="Building gradebook…" />;
+  if (loading) return <Spinner label="Đang tạo bảng điểm…" />;
   if (error) return <Alert tone="danger">{error}</Alert>;
   if (!data) return null;
 
   return (
     <Card
-      title="Gradebook"
-      subtitle="Best submitted score per assessment and attendance totals"
+      title="Bảng điểm"
+      subtitle="Điểm cao nhất của từng bài kiểm tra và tổng điểm danh"
     >
       {data.rows.length ? (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wide text-slate-400">
-                <th className="sticky left-0 bg-white py-2">Student</th>
+                <th className="sticky left-0 bg-white py-2">Sinh viên</th>
                 {data.assessments.map((assessment) => (
                   <th key={assessment.id} className="py-2 text-center">
                     <span className="block max-w-28 truncate">{assessment.title}</span>
                     {!assessment.published && (
-                      <span className="text-[10px] normal-case text-amber-600">draft</span>
+                      <span className="text-[10px] normal-case text-amber-600">Bản nháp</span>
                     )}
                   </th>
                 ))}
-                <th className="py-2 text-center">Attendance</th>
+                <th className="py-2 text-center">Điểm danh</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -64,7 +64,7 @@ export function GradebookTab({ course }: CourseTabProps) {
                       <Avatar name={row.student.name} role={row.student.role} />
                       <div>
                         <p className="font-medium text-slate-700">{row.student.name}</p>
-                        <p className="text-xs text-slate-400">{row.student.email}</p>
+                        <p className="text-xs text-slate-400">{row.student.studentId}</p>
                       </div>
                     </div>
                   </td>
@@ -80,7 +80,7 @@ export function GradebookTab({ course }: CourseTabProps) {
                               {score.best} / {score.maxScore}
                             </p>
                             <p className="text-[10px] text-slate-400">
-                              {score.attempts} attempt(s)
+                              {score.attempts} lượt làm(s)
                             </p>
                           </div>
                         )}
@@ -96,7 +96,7 @@ export function GradebookTab({ course }: CourseTabProps) {
           </table>
         </div>
       ) : (
-        <EmptyState icon="fa-table-list" title="No students enrolled" />
+        <EmptyState icon="fa-table-list" title="Chưa có sinh viên tham gia" />
       )}
     </Card>
   );

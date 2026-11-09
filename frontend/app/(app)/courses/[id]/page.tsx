@@ -23,6 +23,7 @@ import { GradebookTab } from "../../../../components/course/GradebookTab";
 import { LeaveTab } from "../../../../components/course/LeaveTab";
 import { LessonsTab } from "../../../../components/course/LessonsTab";
 import { RosterTab } from "../../../../components/course/RosterTab";
+import { QuizLinksTab } from "../../../../components/course/QuizLinksTab";
 import { isStaff } from "../../../../components/course/types";
 
 export default function CoursePage() {
@@ -49,23 +50,24 @@ export default function CoursePage() {
     load();
   }, [load]);
 
-  if (loading) return <Spinner label="Loading course…" />;
+  if (loading) return <Spinner label="Đang tải lớp học…" />;
   if (error) return <Alert tone="danger">{error}</Alert>;
   if (!course || !user) return null;
 
   const staff = isStaff(course.role);
   const tabs = [
-    { id: "overview", label: "Overview", icon: "fa-circle-info" },
-    { id: "lessons", label: "Lessons", icon: "fa-book" },
-    { id: "announcements", label: "Announcements", icon: "fa-bullhorn" },
-    { id: "discussions", label: "Discussions", icon: "fa-comments" },
-    { id: "assessments", label: "Assessments", icon: "fa-file-signature" },
-    { id: "attendance", label: "Attendance", icon: "fa-qrcode" },
-    { id: "leave", label: "Leave", icon: "fa-envelope-open-text" },
+    { id: "quiz-links", label: "Quiz link", icon: "fa-link" },
+    { id: "overview", label: "Tổng quan", icon: "fa-circle-info" },
+    { id: "lessons", label: "Bài học", icon: "fa-book" },
+    { id: "announcements", label: "Thông báo", icon: "fa-bullhorn" },
+    { id: "discussions", label: "Thảo luận", icon: "fa-comments" },
+    { id: "assessments", label: "Bài tập và bài thi", icon: "fa-file-signature" },
+    { id: "attendance", label: "Điểm danh", icon: "fa-qrcode" },
+    { id: "leave", label: "Nghỉ phép", icon: "fa-envelope-open-text" },
     ...(staff
       ? [
-          { id: "roster", label: "Roster", icon: "fa-users" },
-          { id: "gradebook", label: "Gradebook", icon: "fa-table-list" },
+          { id: "roster", label: "Thành viên", icon: "fa-users" },
+          { id: "gradebook", label: "Bảng điểm", icon: "fa-table-list" },
         ]
       : []),
   ];
@@ -76,7 +78,7 @@ export default function CoursePage() {
     <div>
       <div className="mb-3">
         <Link href="/courses" className="text-xs font-medium text-slate-500 hover:text-teal-700">
-          <i className="fa-solid fa-arrow-left mr-1" /> All courses
+          <i className="fa-solid fa-arrow-left mr-1" /> Tất cả lớp học
         </Link>
       </div>
       <PageHeader
@@ -91,9 +93,9 @@ export default function CoursePage() {
               {course.role}
             </Badge>
             {course.published ? (
-              <Badge tone="published">Published</Badge>
+              <Badge tone="published">Đã công bố</Badge>
             ) : (
-              <Badge tone="draft">Draft</Badge>
+              <Badge tone="draft">Bản nháp</Badge>
             )}
           </>
         }
@@ -102,6 +104,7 @@ export default function CoursePage() {
         <Tabs tabs={tabs} active={tab} onChange={setTab} />
       </div>
       <div className="mt-4">
+        {tab === "quiz-links" && <QuizLinksTab {...props} />}
         {tab === "overview" && <CourseOverview {...props} />}
         {tab === "lessons" && <LessonsTab {...props} />}
         {tab === "announcements" && <AnnouncementsTab {...props} />}

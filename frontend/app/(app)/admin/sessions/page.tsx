@@ -1,4 +1,5 @@
 "use client";
+import { confirmInline } from "../../../../components/InlineConfirm";
 
 import { useCallback, useEffect, useState } from "react";
 import { api, errorMessage } from "../../../../lib/api";
@@ -18,7 +19,7 @@ import {
 type SessionRow = {
   id: number;
   name: string;
-  email: string;
+  studentId: string;
   role: Role;
   ip: string | null;
   userAgent: string | null;
@@ -50,11 +51,11 @@ export default function AdminSessionsPage() {
   }, [load]);
 
   async function revoke(row: SessionRow) {
-    if (!confirm(`Revoke the active session for ${row.name}?`)) return;
+    if (!await confirmInline(`Revoke the active session for ${row.name}?`)) return;
     setError("");
     try {
       await api(`/api/admin/sessions/${row.id}`, { method: "DELETE" });
-      setNotice(`Session revoked for ${row.name}.`);
+      setNotice(`Đã thu hồi phiên của ${row.name}.`);
       await load();
     } catch (err) {
       setError(errorMessage(err));
@@ -65,11 +66,11 @@ export default function AdminSessionsPage() {
     <div>
       <PageHeader
         icon="fa-signal"
-        title="Active sessions"
-        description="Each account may have exactly one server-side session. Sessions expire after 2 minutes of inactivity."
+        title="Phiên hoạt động"
+        description="Mỗi tài khoản có một phiên đăng nhập. Phiên hết hạn sau 2 phút không hoạt động."
         actions={
           <Button variant="secondary" onClick={load}>
-            <i className="fa-solid fa-rotate" /> Refresh
+            <i className="fa-solid fa-rotate" /> Làm mới
           </Button>
         }
       />
@@ -78,17 +79,17 @@ export default function AdminSessionsPage() {
 
       <Card bodyClassName="p-0">
         {loading && sessions.length === 0 ? (
-          <Spinner label="Loading sessions…" />
+          <Spinner label="Đang tải phiên…" />
         ) : sessions.length ? (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-sm">
               <thead>
                 <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wide text-slate-400">
-                  <th className="px-4 py-3">Account</th>
-                  <th className="px-4 py-3">Role</th>
+                  <th className="px-4 py-3">Tài khoản</th>
+                  <th className="px-4 py-3">Vai trò</th>
                   <th className="px-4 py-3">IP</th>
-                  <th className="px-4 py-3">Last activity</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3">Hoạt động gần nhất</th>
+                  <th className="px-4 py-3 text-right">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -99,7 +100,7 @@ export default function AdminSessionsPage() {
                         <Avatar name={row.name} role={row.role} />
                         <div>
                           <p className="font-medium text-slate-700">{row.name}</p>
-                          <p className="text-xs text-slate-400">{row.email}</p>
+                          <p className="text-xs text-slate-400">{row.studentId}</p>
                           <p className="max-w-xs truncate text-[10px] text-slate-300">
                             {row.userAgent || "unknown user agent"}
                           </p>
@@ -117,7 +118,7 @@ export default function AdminSessionsPage() {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Button size="sm" variant="danger" onClick={() => revoke(row)}>
-                        <i className="fa-solid fa-power-off" /> Revoke
+                        <i className="fa-solid fa-power-off" /> Thu hồi
                       </Button>
                     </td>
                   </tr>
@@ -129,8 +130,8 @@ export default function AdminSessionsPage() {
           <div className="p-4">
             <EmptyState
               icon="fa-signal"
-              title="No active sessions"
-              description="Sessions appear after a successful sign-in."
+              title="Không có phiên hoạt động"
+              description="Phiên xuất hiện sau khi đăng nhập thành công."
             />
           </div>
         )}
