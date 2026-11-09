@@ -51,6 +51,7 @@ export default function AssessmentPage() {
   const [casesQuestion, setCasesQuestion] = useState<Question | null>(null);
   const [cases, setCases] = useState<TestCase[]>([]);
   const [caseLoading, setCaseLoading] = useState(false);
+  const [availableTags, setAvailableTags] = useState<Array<{tagId:string;label:string}>>([]);
 
   const staff = isStaff(assessment?.role);
 
@@ -59,6 +60,8 @@ export default function AssessmentPage() {
       const data = await api<Assessment>(`/api/assessments/${assessmentId}`);
       setAssessment(data);
       if (isStaff(data.role)) {
+        const taxonomy = await api<{tags:Array<{tagId:string;label:string;codingQuestion:boolean;assignable:boolean}>}>("/api/taxonomy");
+        setAvailableTags(taxonomy.tags.filter((tag)=>tag.codingQuestion&&tag.assignable));
         const list = await api<{ attempts: Attempt[] }>(
           `/api/assessments/${assessmentId}/attempts`,
         );
@@ -158,6 +161,7 @@ export default function AssessmentPage() {
         answer: form.get("answer"),
         points: Number(form.get("points") || 1),
         position: Number(form.get("position") || 0),
+        tagIds: form.getAll("tagIds").map(String),
       };
       if (editingQuestion) {
         await api(`/api/questions/${editingQuestion.id}`, { method: "PATCH", body });
@@ -703,6 +707,11 @@ export default function AssessmentPage() {
               type="number"
               defaultValue={editingQuestion?.position ?? assessment.questions?.length ?? 0}
             />
+          </Field>
+          <Field label="Chủ đề" hint="Có thể chọn nhiều thẻ; danh mục cha chỉ dùng để điều hướng." className="sm:col-span-2">
+            <select name="tagIds" multiple defaultValue={editingQuestion?.tagIds||[]} className="w-full min-h-32 rounded-lg border border-slate-200 bg-white p-2 text-sm">
+              {availableTags.map(tag=><option key={tag.tagId} value={tag.tagId}>{tag.label} · {tag.tagId}</option>)}
+            </select>
           </Field>
           <Field
             label="Đáp án đúng"

@@ -170,6 +170,7 @@ class AssessmentController {
       require(b.get("options") instanceof List<?>, "invalid_options", 400);
       q.options = ((List<?>) b.get("options")).stream().map(Object::toString).toList();
     }
+    if (b.containsKey("tagIds")) q.tagIds = LearningTaxonomyController.validatedTagIds(store,b.get("tagIds"),false);
     if (q.kind.equals("mcq")) {
       require(q.options.size() >= 2 && q.answer != null, "invalid_options", 400);
       integer(map("answer", q.answer), "answer", 0, 0, q.options.size() - 1);

@@ -163,3 +163,40 @@ input[type="time"] {
 @media (prefers-reduced-motion: reduce) {
   .compact-sidebar { transition: none; }
 }
+
+/* Home illustration: seamless loops using transforms and SVG strokes only. */
+.learning-motion-scene { font-family: inherit; }
+.learning-motion-satellite { transform-origin: 500px 270px; }
+.learning-motion[data-paused="true"] svg * { animation-play-state: paused !important; }
+.learning-motion [data-paused="true"] svg * { animation-play-state: paused !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .learning-motion-slide,
+  .learning-motion button span { transition: none !important; }
+}
+
+@keyframes learning-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes learning-orbit { to { stroke-dashoffset: -396; } }
+@keyframes learning-satellite { to { transform: rotate(360deg); } }
+@keyframes learning-beacon {
+  0%, 30%, 100% { opacity: .35; }
+  60%, 80% { opacity: 1; }
+}
+@keyframes learning-signal { to { stroke-dashoffset: -68; } }
+@keyframes learning-network { to { stroke-dashoffset: -160; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .learning-motion-float { animation: learning-float 6s ease-in-out infinite; }
+  .learning-motion-float-delayed { animation-delay: -2s; animation-duration: 7s; }
+  .learning-motion-float-slow { animation-delay: -4s; animation-duration: 8s; }
+  .learning-motion-monitor { animation: learning-float 9s ease-in-out infinite; }
+  .learning-motion-orbit { animation: learning-orbit 18s linear infinite; }
+  .learning-motion-satellite { animation: learning-satellite 36s linear infinite; }
+  .learning-motion-beacon { animation: learning-beacon 8s ease-in-out infinite; }
+  .learning-motion-stars { animation: learning-beacon 6s ease-in-out infinite; }
+  .learning-motion-signal { animation: learning-signal 6s linear infinite; }
+  .learning-motion-network { animation: learning-network 8s linear infinite; }
+}

@@ -28,12 +28,17 @@ export function LessonsTab({ course, role }: CourseTabProps) {
   const [editing, setEditing] = useState<Lesson | null>(null);
   const [saving, setSaving] = useState(false);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [availableTags, setAvailableTags] = useState<Array<{tagId:string;label:string}>>([]);
 
   async function load() {
     setLoading(true);
     try {
       const data = await api<{ lessons: Lesson[] }>(`/api/courses/${course.id}/lessons`);
       setLessons(data.lessons);
+      if (staff) {
+        const taxonomy = await api<{tags:Array<{tagId:string;label:string;lesson:boolean;assignable:boolean}>}>("/api/taxonomy");
+        setAvailableTags(taxonomy.tags.filter((tag)=>tag.lesson&&tag.assignable));
+      }
     } catch (err) {
       setError(errorMessage(err));
     } finally {
@@ -56,6 +61,7 @@ export function LessonsTab({ course, role }: CourseTabProps) {
         content: form.get("content"),
         position: Number(form.get("position") || 0),
         published: form.get("published") === "on",
+        tagIds: form.getAll("tagIds").map(String),
       };
       if (editing) {
         await api(`/api/lessons/${editing.id}`, { method: "PATCH", body });
@@ -132,6 +138,7 @@ export function LessonsTab({ course, role }: CourseTabProps) {
                     <p className="prose-lesson text-sm text-slate-600">
                       {lesson.content || "No content."}
                     </p>
+                    {!!lesson.tagIds?.length && <p className="mt-2 text-xs text-slate-500">Chủ đề: {lesson.tagIds.join(", ")}</p>}
                     {staff && (
                       <div className="mt-3 flex gap-2">
                         <Button
@@ -199,6 +206,11 @@ export function LessonsTab({ course, role }: CourseTabProps) {
               className="min-h-48"
               placeholder="Ghi chú, liên kết và hướng dẫn bài học…"
             />
+          </Field>
+          <Field label="Chủ đề" hint="Có thể chọn nhiều thẻ.">
+            <select name="tagIds" multiple defaultValue={editing?.tagIds||[]} className="w-full min-h-28 rounded-lg border border-slate-200 bg-white p-2 text-sm">
+              {availableTags.map(tag=><option key={tag.tagId} value={tag.tagId}>{tag.label} · {tag.tagId}</option>)}
+            </select>
           </Field>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Thứ tự">

@@ -23,9 +23,14 @@ class Question extends BaseEntity {
   @JdbcTypeCode(SqlTypes.JSON)
   List<String> options = new ArrayList<>();
 
+  @JdbcTypeCode(SqlTypes.JSON)
+  List<String> tagIds = new ArrayList<>();
+
   @Column(length = 100000)
   String answer;
 
   double points = 1;
   int position;
+
+  @PostLoad void normalizeTags() { if (tagIds == null) tagIds = new ArrayList<>(); }
 }

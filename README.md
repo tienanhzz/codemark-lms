@@ -58,10 +58,10 @@ Run `npm run seed` explicitly to create demo accounts and sample content. Normal
 
 | Role | Mã đăng nhập | Initial password |
 | --- | --- | --- |
-| Admin | 1000000000 | DemoPass123! |
-| Teacher | 1000000001 | DemoPass123! |
-| Teaching assistant | 1000000002 | DemoPass123! |
-| Student | 2025000001 | DemoPass123! |
+| Admin | 1000000000 | CodeMark@2026 |
+| Teacher | 1000000001 | CodeMark@2026 |
+| Teaching assistant | 1000000002 | CodeMark@2026 |
+| Student | 2025000001 | CodeMark@2026 |
 
 Additional student accounts are `2025000002` and `2025000003`. Seed preserves existing passwords and submissions.
 

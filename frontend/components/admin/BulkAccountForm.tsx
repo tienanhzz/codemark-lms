@@ -43,7 +43,7 @@ export function BulkAccountForm({ onCreated }: { onCreated: () => Promise<void> 
         return <Alert tone="danger">Chỉ quản trị viên được sử dụng.</Alert>;
     return <div className="space-y-4">
     <Card title="Tạo tài khoản hàng loạt" subtitle="CSV UTF-8, 2 cột studentId,password. Mật khẩu 12–72 byte. Tất cả tài khoản phải đổi mật khẩu lần đầu.">
-    <Button onClick={() => saveCsv("studentId,password\n2025999999,MatKhauMau@2026\n", "tai-khoan-mau.csv")}>Tải file mẫu</Button>
+    <Button onClick={() => saveCsv("studentId,password\n2025999999,CodeMark@2026\n", "tai-khoan-mau.csv")}>Tải file mẫu</Button>
     <div className="my-4 rounded-xl border-2 border-dashed border-teal-500 p-12 text-center" tabIndex={0} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); file(e.dataTransfer.files[0]); }}>Kéo thả file CSV vào đây</div>
     <label className="block text-sm">Hoặc chọn file khi không thể kéo thả<input type="file" accept=".csv" onChange={e => file(e.target.files?.[0])}/>
     </label>

@@ -108,7 +108,7 @@ class DemoSeed {
               u.studentId = studentId;
               u.name = name;
               u.role = role;
-              u.passwordHash = access.hash("DemoPass123!");
+              u.passwordHash = access.hash("CodeMark@2026");
               return store.save(u);
             });
   }

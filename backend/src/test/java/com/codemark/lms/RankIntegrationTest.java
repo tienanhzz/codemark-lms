@@ -28,7 +28,7 @@ class RankIntegrationTest {
     var admin=login("0000000000","CodeMark@2026!");
     mvc.perform(get("/api/rank/config").session(admin)).andExpect(status().isForbidden());
     postJson("/api/auth/password",Api.map("currentPassword","CodeMark@2026!","newPassword","AdminNew@2026!"),admin);
-    var teacher=login("1000000001","DemoPass123!"); var student=login("2025000001","DemoPass123!");
+    var teacher=login("1000000001","CodeMark@2026"); var student=login("2025000001","CodeMark@2026");
     mvc.perform(post("/api/admin/bulk-accounts").session(student).contentType("application/json").content("{}" )).andExpect(status().isForbidden());
     String csv="studentId,password\n2025888888,StudentNew@2026\nabc,bad\n2025777777,Duplicate@2026\n2025777777,Duplicate@2026\n2025000001,ExistingPass@2026\n";
     var preview=postJson("/api/admin/bulk-accounts",Api.map("csv",csv),admin);

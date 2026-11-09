@@ -23,6 +23,7 @@ const NAV: Array<{
   { href: "/rank-adjustment", label: "Điều chỉnh điểm", icon: "fa-pen", roles: ["admin", "teacher"] },
   { href: "/leaderboard", label: "Bảng xếp hạng", icon: "fa-trophy", roles: ALL },
   { href: "/admin/rank", label: "Mùa và điểm rank", icon: "fa-ranking-star", roles: ["admin"] },
+  { href: "/admin/taxonomy", label: "Danh mục nội dung", icon: "fa-tags", roles: ["admin"] },
   { href: "/dashboard", label: "Tổng quan", icon: "fa-gauge-high", roles: ALL },
   { href: "/schedule", label: "Lịch học tuần", icon: "fa-calendar-days", roles: ALL },
   { href: "/courses", label: "Lớp học", icon: "fa-book-open", roles: ALL },
@@ -105,7 +106,7 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
         )}
       >
         <div className="flex h-20 shrink-0 items-center gap-3 border-b border-white/10 px-5">
-          <img src="/branding/favicon.svg" alt="CodeMark" width={40} height={40} className="h-10 w-10 shrink-0 rounded-xl" />
+          <img src="/branding/favicon.png" alt="Logo Cyb3rT1t@ns" width={40} height={40} className="h-10 w-10 shrink-0 rounded-xl object-contain" />
           <span className="sidebar-label whitespace-nowrap text-lg font-semibold text-white">CodeMark</span>
         </div>
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
@@ -204,7 +205,7 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
             </> : <Link href="/login" className="inline-flex items-center gap-2 rounded-xl bg-teal-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-900"><i className="fa-solid fa-right-to-bracket" aria-hidden="true"/> Đăng nhập</Link>}
           </div>
         </header>
-        <div className="flex flex-col gap-4 xl:flex-row"><main id="workspace-content" tabIndex={-1} className="workspace-content min-w-0 flex-1 p-4 outline-none sm:p-6 lg:p-8"><div id="drawer-root"/><div id="screen-content">{user?.mustChangePassword && pathname !== "/account" ? <p>Vui lòng đổi mật khẩu ở trang Tài khoản.</p> : children}</div></main>{user && !user.mustChangePassword && <aside className="w-full shrink-0 p-4 xl:sticky xl:top-24 xl:h-[calc(100vh-6rem)] xl:w-80 xl:overflow-y-auto"><Leaderboard/></aside>}</div>
+        <div className="flex flex-col gap-4 xl:flex-row"><main id="workspace-content" tabIndex={-1} className="workspace-content min-w-0 flex-1 p-4 outline-none sm:p-6 lg:p-8"><div id="drawer-root"/><div id="screen-content">{user?.mustChangePassword && pathname !== "/account" ? <p>Vui lòng đổi mật khẩu ở trang Tài khoản.</p> : children}</div></main>{user && !user.mustChangePassword && pathname !== "/leaderboard" && <aside aria-label="Xếp hạng nhanh" className="w-full min-w-0 shrink-0 self-start p-4 xl:sticky xl:top-24 xl:w-96 xl:pl-0 xl:pr-6 xl:pt-8 2xl:w-[26rem]"><Leaderboard/></aside>}</div>
       </div>
     </div>
   );

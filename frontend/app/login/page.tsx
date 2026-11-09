@@ -46,7 +46,7 @@ export default function LoginPage() {
           className="login-enter login-enter-form w-full rounded-2xl border border-slate-200 bg-white p-7 shadow-sm sm:p-9"
         >
           <div className="mb-7 flex justify-center">
-            <img src="/branding/logo.svg" alt="CodeMark — Kết nối học tập" width={360} height={64} className="h-auto w-56 max-w-full" />
+            <img src="/branding/logo.png" alt="Cyb3rT1t@ns — We Are Bigger On The Inside" width={1156} height={359} className="h-auto w-full max-w-xs" />
           </div>
           <h1 className="text-center text-2xl font-semibold tracking-tight text-slate-900">Chào mừng trở lại</h1>
           <p className="mt-2 text-center text-sm leading-6 text-slate-500">

@@ -1,2 +1,5 @@
 import { Leaderboard } from "../../../components/Leaderboard";
-export default function Page(){return <Leaderboard full/>;}
+
+export default function LeaderboardPage() {
+  return <Leaderboard full />;
+}
