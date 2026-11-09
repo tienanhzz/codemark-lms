@@ -28,6 +28,11 @@ public class Store {
   <T> List<T> all(Class<T> type) {
     return list(type, "order by e.id");
   }
+  <T> List<T> locked(Class<T> type, String condition, Object... values) {
+    var query=em.createQuery("select e from " + type.getSimpleName() + " e " + condition,type);
+    for(int i=0;i<values.length;i++) query.setParameter(i+1,values[i]);
+    return query.setLockMode(LockModeType.PESSIMISTIC_WRITE).getResultList();
+  }
 
   void delete(Object entity) {
     em.remove(entity);

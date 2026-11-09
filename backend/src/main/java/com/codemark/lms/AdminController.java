@@ -47,7 +47,7 @@ class AdminController {
     return store.all(User.class).stream()
         .filter(
             u ->
-                (u.name.toLowerCase().contains(term) || u.email.toLowerCase().contains(term))
+                (u.name.toLowerCase().contains(term) || Objects.toString(u.studentId, "").contains(term))
                     && (role.isBlank() || u.role.equals(role)))
         .toList();
   }
@@ -71,22 +71,25 @@ class AdminController {
   }
 
   void userFields(User u, Map<String, Object> b, boolean create) {
-    u.email = text(b, "email", u.email);
+    u.studentId = text(b, "studentId", u.studentId);
     u.name = text(b, "name", u.name);
     u.role = text(b, "role", u.role);
     require(
-        u.email != null
-            && u.email.contains("@")
+        u.studentId != null
+            && u.studentId.matches("[0-9]{10}")
             && u.name != null
             && !u.name.isBlank()
             && Set.of("admin", "teacher", "ta", "student").contains(u.role),
         "invalid_user",
         400);
-    u.email = u.email.trim().toLowerCase();
+    u.studentId = u.studentId.trim().toLowerCase();
+    require(store.list(User.class, "where e.studentId=?1", u.studentId).stream().allMatch(other -> Objects.equals(other.id, u.id)), "duplicate_student_id", 409);
+    u.pendingCode = false;
     String password = text(b, "password", "");
     if (create || !password.isEmpty()) {
-      require(password.length() >= 12 && password.length() <= 72, "weak_password", 400);
+      require(Access.validPassword(password), "weak_password", 400);
       u.passwordHash = access.hash(password);
+      u.mustChangePassword = true;
       u.activeSession = null;
     }
   }

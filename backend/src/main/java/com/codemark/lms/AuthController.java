@@ -52,9 +52,11 @@ class AuthController {
         access.matches(Api.text(b, "currentPassword", ""), u.passwordHash),
         "invalid_current_password",
         400);
-    String password = Api.required(b, "newPassword");
-    Api.require(password.length() >= 12 && password.length() <= 72, "weak_password", 400);
+    String password = Api.text(b, "newPassword", "");
+    Api.require(Access.validPassword(password), "weak_password", 400);
+    Api.require(!access.matches(password, u.passwordHash), "password_must_differ", 400);
     u.passwordHash = access.hash(password);
+    u.mustChangePassword = false;
     access.audit(u, "password_changed", r.getRemoteAddr());
     return Api.map("ok", true);
   }

@@ -102,6 +102,10 @@ class CourseController {
   Object delete(HttpServletRequest r, @PathVariable long id) {
     User u = access.current(r);
     Course c = access.owner(u, id);
+    for (QuizLink quiz : store.list(QuizLink.class, "where e.course=?1", c)) {
+      store.list(QuizResult.class, "where e.quiz=?1", quiz).forEach(store::delete);
+      store.delete(quiz);
+    }
     for (Assessment a : store.list(Assessment.class, "where e.course=?1", c))
       AssessmentController.deleteAssessment(store, a);
     for (AttendanceSession a : store.list(AttendanceSession.class, "where e.course=?1", c)) {
@@ -203,7 +207,7 @@ class CourseController {
     User actor = access.current(r);
     Course c = access.course(actor, id, true);
     User user =
-        store.list(User.class, "where e.email=?1", required(b, "email").toLowerCase()).stream()
+        store.list(User.class, "where e.studentId=?1", required(b, "studentId").toLowerCase()).stream()
             .findFirst()
             .orElseThrow(() -> new Failure("user_not_found", 404));
     require(

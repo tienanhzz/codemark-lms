@@ -1,0 +1,24 @@
+Ngày kiểm chứng: 06/11/2026
+
+node scripts/maven.mjs package
+- Biên dịch target Java 21, môi trường chạy Java 25.
+- IdentityMigrationTest: 2 tests.
+- LmsIntegrationTest: 12 tests.
+- RankIntegrationTest: 3 tests.
+- WebSocketIntegrationTest: 3 tests.
+- Tổng: 20 tests, 0 failures, 0 errors, 0 skipped.
+- Đóng gói Spring Boot jar: backend/target/classflow-1.0.0.jar.
+
+npm.cmd run build:frontend
+- Next.js 15.5.28: compiled successfully.
+- TypeScript validation passed.
+- Sinh 19 static pages, các trang động được liệt kê trong route build.
+
+Quét nguồn frontend/app, frontend/components, frontend/lib:
+- Không còn định danh email hoặc địa chỉ mẫu @school/@demo: 0 kết quả.
+- confirm(), prompt(), window.open, Modal, dialog: 0 kết quả.
+- Alert là thanh trạng thái trong HTML, không phải window.alert.
+
+Browser QA: không chạy được vì browser access host unavailable.
+Migration H2 chạy 2 lần được test trên DB thử; DB thật/MariaDB chưa chạy.
+ZIP nguồn loại trừ .env thật, database, backup, node_modules và .git.

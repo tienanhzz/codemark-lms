@@ -42,7 +42,7 @@ class LmsIntegrationTest {
               web.title = "Web Development Fundamentals";
               meeting.weekday = 0;
               User teacher =
-                  store.list(User.class, "where e.email=?1", "teacher@demo.local").get(0);
+                  store.list(User.class, "where e.studentId=?1", "1000000001").get(0);
               return List.of(
                   web.id,
                   meeting.id,
@@ -65,7 +65,7 @@ class LmsIntegrationTest {
           assertEquals(original.get(3), store.all(Attempt.class).size());
           assertEquals(
               original.get(4),
-              store.list(User.class, "where e.email=?1", "teacher@demo.local").get(0).passwordHash);
+              store.list(User.class, "where e.studentId=?1", "1000000001").get(0).passwordHash);
           var days = new HashSet<Integer>();
           for (String code : List.of("DEMO101", "WEB101", "DB101", "NET101")) {
             Course course = store.list(Course.class, "where e.code=?1", code).get(0);
@@ -85,14 +85,14 @@ class LmsIntegrationTest {
     seed.seed();
   }
 
-  MockHttpSession login(String email) throws Exception {
+  MockHttpSession login(String studentId) throws Exception {
     return (MockHttpSession)
         mvc.perform(
                 post("/api/auth/login")
                     .contentType("application/json")
                     .content(
                         json.writeValueAsBytes(
-                            Api.map("email", email, "password", "DemoPass123!"))))
+                            Api.map("studentId", studentId, "password", "DemoPass123!"))))
             .andExpect(status().isOk())
             .andReturn()
             .getRequest()
@@ -123,7 +123,7 @@ class LmsIntegrationTest {
 
   @Test
   void sessionsAndRoles() throws Exception {
-    MockHttpSession first = login("student1@demo.local"), second = login("student1@demo.local");
+    MockHttpSession first = login("2025000001"), second = login("2025000001");
     mvc.perform(get("/api/auth/me").session(first)).andExpect(status().isUnauthorized());
     mvc.perform(get("/api/auth/me").session(second))
         .andExpect(jsonPath("$.role").value("student"))
@@ -150,8 +150,8 @@ class LmsIntegrationTest {
 
   @Test
   void completeQuizFlagsAndHiddenAnswers() throws Exception {
-    var teacher = login("teacher@demo.local");
-    var student = login("student2@demo.local");
+    var teacher = login("1000000001");
+    var student = login("2025000002");
     long course = getJson("/api/courses", teacher).get("courses").get(0).get("id").asLong();
     JsonNode assessment =
         postJson(
@@ -208,8 +208,8 @@ class LmsIntegrationTest {
 
   @Test
   void attendanceTokenAndDuplicateCheckin() throws Exception {
-    var teacher = login("teacher@demo.local");
-    var student = login("student3@demo.local");
+    var teacher = login("1000000001");
+    var student = login("2025000003");
     long course = getJson("/api/courses", teacher).get("courses").get(0).get("id").asLong();
     var session =
         postJson(
@@ -238,8 +238,8 @@ class LmsIntegrationTest {
 
   @Test
   void evidenceUploadDecisionAndAccess() throws Exception {
-    var teacher = login("teacher@demo.local");
-    var student = login("student3@demo.local");
+    var teacher = login("1000000001");
+    var student = login("2025000003");
     long course = getJson("/api/courses", teacher).get("courses").get(0).get("id").asLong();
     var file =
         new MockMultipartFile(
@@ -276,8 +276,8 @@ class LmsIntegrationTest {
 
   @Test
   void dashboardAndAdminContracts() throws Exception {
-    var admin = login("admin@demo.local");
-    var student = login("student1@demo.local");
+    var admin = login("1000000000");
+    var student = login("2025000001");
     assertEquals(4, getJson("/api/dashboard", student).get("courses").size());
     assertEquals(4, getJson("/api/schedule/me", student).get("meetings").size());
     assertTrue(getJson("/api/users", admin).get("total").asInt() >= 6);
@@ -288,12 +288,12 @@ class LmsIntegrationTest {
 
   @Test
   void outsiderCannotAccessCourse() throws Exception {
-    var admin = login("admin@demo.local");
+    var admin = login("1000000000");
     postJson(
         "/api/users",
         Api.map(
-            "email",
-            "outsider@example.com",
+            "studentId",
+            "2025999998",
             "name",
             "Outsider",
             "password",
@@ -301,7 +301,7 @@ class LmsIntegrationTest {
             "role",
             "student"),
         admin);
-    var outsider = login("outsider@example.com");
+    var outsider = login("2025999998");
     long id = getJson("/api/courses", admin).get("courses").get(0).get("id").asLong();
     mvc.perform(get("/api/courses/" + id).session(outsider)).andExpect(status().isForbidden());
   }
@@ -321,12 +321,12 @@ class LmsIntegrationTest {
 
   @Test
   void expiredSessionDenied() throws Exception {
-    var student = login("student1@demo.local");
+    var student = login("2025000001");
     new org.springframework.transaction.support.TransactionTemplate(transactionManager)
         .execute(
             status -> {
               store
-                      .list(User.class, "where e.email=?1", "student1@demo.local")
+                      .list(User.class, "where e.studentId=?1", "2025000001")
                       .get(0)
                       .lastActivity =
                   java.time.Instant.now().minusSeconds(121);
@@ -337,8 +337,8 @@ class LmsIntegrationTest {
 
   @Test
   void deadlineAndAttemptLimitAreAuthoritative() throws Exception {
-    var teacher = login("teacher@demo.local");
-    var student = login("student2@demo.local");
+    var teacher = login("1000000001");
+    var student = login("2025000002");
     long course = getJson("/api/courses", teacher).get("courses").get(0).get("id").asLong();
     long assessment =
         postJson(
@@ -375,8 +375,8 @@ class LmsIntegrationTest {
 
   @Test
   void unpublishedAssessmentAndHiddenCasesStayPrivate() throws Exception {
-    var teacher = login("teacher@demo.local");
-    var student = login("student3@demo.local");
+    var teacher = login("1000000001");
+    var student = login("2025000003");
     long course = getJson("/api/courses", teacher).get("courses").get(0).get("id").asLong();
     long assessment =
         postJson(
@@ -416,3 +416,4 @@ class LmsIntegrationTest {
     assertFalse(getJson("/api/runner/status", student).get("available").asBoolean());
   }
 }
+

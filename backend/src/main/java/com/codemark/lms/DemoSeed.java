@@ -20,12 +20,12 @@ class DemoSeed {
 
   @Transactional
   public void seed() throws Exception {
-    User teacher = user("teacher@demo.local", "Demo Teacher", "teacher");
-    User ta = user("ta@demo.local", "Demo TA", "ta");
-    user("admin@demo.local", "Demo Admin", "admin");
+    User teacher = user("1000000001", "Demo Teacher", "teacher");
+    User ta = user("1000000002", "Demo TA", "ta");
+    user("1000000000", "Demo Admin", "admin");
     var students = new ArrayList<User>();
     for (int i = 1; i <= 3; i++)
-      students.add(user("student" + i + "@demo.local", "Demo Student " + i, "student"));
+      students.add(user("202500000" + i, "Demo Student " + i, "student"));
     try (var input = getClass().getResourceAsStream("/demo-questions.json")) {
       for (JsonNode subject : json.readTree(input)) {
         String code = subject.get("code").asText();
@@ -99,13 +99,13 @@ class DemoSeed {
     meeting.location = settings.get("location").asText();
   }
 
-  User user(String email, String name, String role) {
-    return store.list(User.class, "where e.email=?1", email).stream()
+  User user(String studentId, String name, String role) {
+    return store.list(User.class, "where e.studentId=?1", studentId).stream()
         .findFirst()
         .orElseGet(
             () -> {
               User u = new User();
-              u.email = email;
+              u.studentId = studentId;
               u.name = name;
               u.role = role;
               u.passwordHash = access.hash("DemoPass123!");

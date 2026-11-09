@@ -29,7 +29,7 @@ class WebSocketIntegrationTest {
     seed.seed();
   }
 
-  HttpClient client(String email) throws Exception {
+  HttpClient client(String studentId) throws Exception {
     var cookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
     var client = HttpClient.newBuilder().cookieHandler(cookies).build();
     var response =
@@ -39,7 +39,7 @@ class WebSocketIntegrationTest {
                 .POST(
                     HttpRequest.BodyPublishers.ofString(
                         json.writeValueAsString(
-                            Api.map("email", email, "password", "DemoPass123!"))))
+                            Api.map("studentId", studentId, "password", "DemoPass123!"))))
                 .build(),
             HttpResponse.BodyHandlers.ofString());
     assertEquals(200, response.statusCode());
@@ -110,7 +110,7 @@ class WebSocketIntegrationTest {
 
   @Test
   void authenticatedMonitorTelemetryAlertAndForceSubmit() throws Exception {
-    HttpClient teacher = client("teacher@demo.local"), student = client("student1@demo.local");
+    HttpClient teacher = client("1000000001"), student = client("2025000001");
     long course = get(teacher, "/api/courses").path("courses").get(0).path("id").asLong();
     long assessment =
         get(teacher, "/api/courses/" + course + "/assessments")
@@ -173,7 +173,7 @@ class WebSocketIntegrationTest {
 
   @Test
   void studentCannotJoinMonitor() throws Exception {
-    var client = client("student2@demo.local");
+    var client = client("2025000002");
     Inbox inbox = new Inbox();
     WebSocket ws = open(client, inbox);
     try {

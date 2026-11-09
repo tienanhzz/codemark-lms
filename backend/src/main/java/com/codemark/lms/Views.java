@@ -17,7 +17,7 @@ class Views {
   }
 
   static Map<String, Object> user(User u) {
-    return u == null ? null : map("id", u.id, "name", u.name, "email", u.email, "role", u.role);
+    return u == null ? null : map("id", u.id, "name", u.name, "studentId", u.studentId, "role", u.role, "pendingCode", u.pendingCode, "mustChangePassword", u.mustChangePassword);
   }
 
   Map<String, Object> course(Course c, User u) {
@@ -202,6 +202,8 @@ class Views {
             a.durationMinutes,
             "maxAttempts",
             a.maxAttempts,
+             "rankWeight",
+             a.rankWeight,
             "published",
             a.published,
             "createdAt",
