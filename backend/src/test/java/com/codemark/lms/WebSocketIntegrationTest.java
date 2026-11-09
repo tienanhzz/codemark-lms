@@ -39,7 +39,7 @@ class WebSocketIntegrationTest {
                 .POST(
                     HttpRequest.BodyPublishers.ofString(
                         json.writeValueAsString(
-                            Api.map("studentId", studentId, "password", "DemoPass123!"))))
+                            Api.map("studentId", studentId, "password", "CodeMark@2026"))))
                 .build(),
             HttpResponse.BodyHandlers.ofString());
     assertEquals(200, response.statusCode());

@@ -289,6 +289,7 @@ class CourseController {
     l.content = text(b, "content", l.content);
     l.position = integer(b, "position", l.position, 0, 10000);
     l.published = bool(b, "published", l.published);
+    if (b.containsKey("tagIds")) l.tagIds = LearningTaxonomyController.validatedTagIds(store,b.get("tagIds"),true);
   }
 
   @PatchMapping("/lessons/{id}")

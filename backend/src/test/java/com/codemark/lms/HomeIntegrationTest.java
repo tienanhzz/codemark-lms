@@ -25,7 +25,7 @@ class HomeIntegrationTest {
 
   MockHttpSession login(String code) throws Exception {
     return (MockHttpSession) mvc.perform(post("/api/auth/login").contentType("application/json")
-        .content(json.writeValueAsBytes(Api.map("studentId", code, "password", "DemoPass123!"))))
+        .content(json.writeValueAsBytes(Api.map("studentId", code, "password", "CodeMark@2026"))))
         .andExpect(status().isOk()).andReturn().getRequest().getSession();
   }
 
@@ -33,10 +33,10 @@ class HomeIntegrationTest {
     seed.seed();
     new TransactionTemplate(transactions).execute(status -> {
       User other = new User(); other.studentId = "1000000091"; other.name = "Giảng viên khác";
-      other.role = "teacher"; other.passwordHash = access.hash("DemoPass123!"); store.save(other);
+      other.role = "teacher"; other.passwordHash = access.hash("CodeMark@2026"); store.save(other);
       User firstLogin = new User(); firstLogin.studentId = "1000000092"; firstLogin.name = "Chưa đổi mật khẩu";
       firstLogin.role = "teacher"; firstLogin.mustChangePassword = true;
-      firstLogin.passwordHash = access.hash("DemoPass123!"); store.save(firstLogin);
+      firstLogin.passwordHash = access.hash("CodeMark@2026"); store.save(firstLogin);
       return null;
     });
     var teacher = login("1000000001");

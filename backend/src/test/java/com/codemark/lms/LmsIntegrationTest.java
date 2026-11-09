@@ -92,7 +92,7 @@ class LmsIntegrationTest {
                     .contentType("application/json")
                     .content(
                         json.writeValueAsBytes(
-                            Api.map("studentId", studentId, "password", "DemoPass123!"))))
+                            Api.map("studentId", studentId, "password", "CodeMark@2026"))))
             .andExpect(status().isOk())
             .andReturn()
             .getRequest()
@@ -297,7 +297,7 @@ class LmsIntegrationTest {
             "name",
             "Outsider",
             "password",
-            "DemoPass123!",
+            "CodeMark@2026",
             "role",
             "student"),
         admin);

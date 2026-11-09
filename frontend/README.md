@@ -28,12 +28,16 @@ The development launcher builds the backend JAR and starts both services. Press 
 Demo accounts
 Run npm run seed explicitly to create demo accounts and sample content. Normal startup does not create these accounts. Stop the backend before running seed, as the H2 database is opened by the running server.
 
-Role	Email	Initial password
-Admin	admin@demo.local	DemoPass123!
-Teacher	teacher@demo.local	DemoPass123!
-Teaching assistant	ta@demo.local	DemoPass123!
-Student	student1@demo.local	DemoPass123!
-Additional student accounts are student2@demo.local and student3@demo.local. Seed preserves existing passwords and submissions.
+The automatically created administrator is separate from these demo accounts: login code `0000000000`, initial password `CodeMark@2026!` (including the final `!`). It is created only when no administrator with a valid login code exists and requires a password change on first login.
+
+| Role | Mã đăng nhập | Mật khẩu ban đầu (Initial password) |
+| --- | --- | --- |
+| Admin | `1000000000` | `CodeMark@2026` |
+| Teacher | `1000000001` | `CodeMark@2026` |
+| Teaching assistant | `1000000002` | `CodeMark@2026` |
+| Student | `2025000001` | `CodeMark@2026` |
+
+Additional student accounts are `2025000002` and `2025000003`, with the same initial password. Sign in using the 10-digit login code above. The initial password applies to newly seeded accounts; seed preserves existing passwords and submissions.
 
 Each account has one active session. Signing in again revokes its previous session. Sessions expire after 120 seconds of inactivity; the frontend sends a heartbeat every 30 seconds. Use separate accounts and browser profiles when testing different roles.
 

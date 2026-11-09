@@ -1,42 +1,93 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-const slides = [
-  { image: "/home/learning.svg", tag: "HỌC TẬP MỖI NGÀY", title: "Kiến thức hôm nay.\nCơ hội ngày mai.", text: "Một nơi để học hỏi, thực hành và tự tin chinh phục mục tiêu.", alt: "Minh họa sách, máy tính và những ý tưởng học tập" },
-  { image: "/home/community.svg", tag: "KẾT NỐI CỘNG ĐỒNG", title: "Cùng nhau học.\nCùng nhau tiến bộ.", text: "Kết nối với giảng viên, theo dõi lớp học và không bỏ lỡ thông tin mới.", alt: "Minh họa các thành viên kết nối trong cộng đồng học tập" },
-  { image: "/home/progress.svg", tag: "GHI NHẬN NỖ LỰC", title: "Từng bước nhỏ.\nThành tích lớn.", text: "Hoàn thành bài tập, thử sức với bài thi và theo dõi thứ hạng của bạn.", alt: "Minh họa chiếc cúp trên các bậc tiến bộ" },
-];
+import { useEffect, useRef, useState } from "react";
+import { SCENE_NAMES, TechnologyScene } from "./home/TechnologyScenes";
 
 export function HomeCarousel() {
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const [inView, setInView] = useState(true);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
+  const screen = useRef<HTMLElement>(null);
+  const paused = !playing || !visible || !inView;
+
   useEffect(() => {
-    setPlaying(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncPreference = () => {
+      setReducedMotion(preference.matches);
+      setPlaying(!preference.matches);
+    };
+    const syncVisibility = () => setVisible(!document.hidden);
+    syncPreference();
+    syncVisibility();
+    preference.addEventListener("change", syncPreference);
+    document.addEventListener("visibilitychange", syncVisibility);
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    if (screen.current) observer.observe(screen.current);
+    return () => {
+      preference.removeEventListener("change", syncPreference);
+      document.removeEventListener("visibilitychange", syncVisibility);
+      observer.disconnect();
+    };
   }, []);
+
   useEffect(() => {
-    if (!playing || hovered || focused) return;
-    const timer = window.setInterval(() => setIndex(value => (value + 1) % slides.length), 6000);
-    return () => window.clearInterval(timer);
-  }, [playing, hovered, focused]);
-  const slide = slides[index];
-  return <section aria-label="Hình ảnh nổi bật" aria-roledescription="băng chuyền" className="relative overflow-hidden rounded-3xl bg-[#123b42] text-white"
-    onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-    onFocusCapture={() => setFocused(true)} onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
-    <div className="grid min-h-[360px] items-center gap-4 p-7 pb-16 sm:p-10 sm:pb-16 md:grid-cols-2" aria-live={playing ? "off" : "polite"}>
-      <div><p className="text-[11px] font-bold tracking-[0.22em] text-teal-200">{slide.tag}</p>
-        <h2 className="mt-5 whitespace-pre-line text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">{slide.title}</h2>
-        <p className="mt-5 max-w-md text-sm leading-7 text-teal-100/80">{slide.text}</p>
+    if (paused || hovered || focused) return;
+    const timer = window.setTimeout(() => setIndex(value => (value + 1) % SCENE_NAMES.length), 8000);
+    return () => window.clearTimeout(timer);
+  }, [index, paused, hovered, focused]);
+
+  function move(step: number) {
+    setIndex(value => (value + step + SCENE_NAMES.length) % SCENE_NAMES.length);
+  }
+
+  const controlClass = "grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/15 bg-[#0b2036]/80 text-sm text-cyan-100 backdrop-blur-sm transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-200 disabled:cursor-default disabled:opacity-60";
+
+  return (
+    <section ref={screen} aria-label="Cảnh công nghệ và trí tuệ nhân tạo trong vũ trụ"
+      aria-roledescription="băng chuyền" data-paused={paused}
+      onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}
+      className="learning-motion relative isolate overflow-hidden rounded-3xl border border-cyan-900/30 bg-[#061322] shadow-[0_18px_50px_-24px_rgba(8,47,73,0.55)]">
+      <div className="relative h-[320px] sm:aspect-[50/27] sm:h-auto sm:min-h-[360px]">
+        {SCENE_NAMES.map((name, sceneIndex) => (
+          <div key={name} role="group" aria-roledescription="cảnh"
+            aria-label={"Cảnh " + (sceneIndex + 1) + " / " + SCENE_NAMES.length + ": " + name}
+            aria-hidden={sceneIndex !== index} data-paused={paused || sceneIndex !== index}
+            className={"learning-motion-slide pointer-events-none absolute inset-0 transition-opacity duration-1000 ease-in-out " + (sceneIndex === index ? "opacity-100" : "opacity-0")}>
+            <TechnologyScene variant={sceneIndex} />
+          </div>
+        ))}
       </div>
-      <img key={slide.image} src={slide.image} alt={slide.alt} width={600} height={400} className="mx-auto h-44 w-full object-contain sm:h-64"/>
-    </div>
-    <button type="button" onClick={() => setPlaying(!playing)}
-      aria-label={playing ? "Dừng tự chuyển ảnh" : "Bật tự chuyển ảnh"}
-      title={playing ? "Dừng tự chuyển ảnh" : "Bật tự chuyển ảnh"}
-      className="absolute bottom-4 right-5 grid h-9 w-9 place-items-center rounded-full text-teal-100 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-200">
-      <i aria-hidden="true" className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`}/>
-    </button>
-  </section>;
+
+      <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between gap-2 bg-gradient-to-t from-[#061322]/90 to-transparent px-3 pb-3 pt-8 sm:px-5 sm:pb-5">
+        <div className="flex items-center gap-1.5">
+          <button type="button" aria-label="Cảnh trước" onClick={() => move(-1)} className={controlClass}>
+            <i aria-hidden="true" className="fa-solid fa-chevron-left" />
+          </button>
+          <button type="button" aria-label="Cảnh tiếp theo" onClick={() => move(1)} className={controlClass}>
+            <i aria-hidden="true" className="fa-solid fa-chevron-right" />
+          </button>
+        </div>
+        <div role="group" aria-label="Chọn cảnh" className="flex items-center">
+          {SCENE_NAMES.map((name, sceneIndex) => (
+            <button key={name} type="button" aria-label={"Xem cảnh " + (sceneIndex + 1) + ": " + name}
+              aria-current={sceneIndex === index ? "true" : undefined} onClick={() => setIndex(sceneIndex)}
+              className="grid h-10 w-8 place-items-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-200 sm:w-10">
+              <span aria-hidden="true" className={"h-1.5 rounded-full transition-all duration-500 " + (sceneIndex === index ? "w-5 bg-cyan-200" : "w-1.5 bg-white/35")} />
+            </button>
+          ))}
+        </div>
+        <button type="button" onClick={() => setPlaying(value => !value)} disabled={reducedMotion}
+          aria-label={reducedMotion ? "Chuyển động đã tắt theo cài đặt thiết bị" : playing ? "Tạm dừng chuyển động và tự chuyển cảnh" : "Phát chuyển động và tự chuyển cảnh"}
+          aria-pressed={!playing} className={controlClass}>
+          <i aria-hidden="true" className={"fa-solid " + (reducedMotion ? "fa-leaf" : playing ? "fa-pause" : "fa-play")} />
+        </button>
+      </div>
+    </section>
+  );
 }

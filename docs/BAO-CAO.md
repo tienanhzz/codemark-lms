@@ -26,7 +26,7 @@ Yêu cầu JDK 21+, Node.js 20.9+, npm, Maven 3.9+ (launcher tự dùng Maven tr
 4. Mở `http://localhost:3000`. Backend ở cổng 5000. Cấu hình kết nối vẫn theo `.env.example` và launcher cũ.
 5. Admin mặc định **mã `0000000000`, mật khẩu ban đầu `CodeMark@2026!`**, chỉ tạo khi chưa có admin có mã hợp lệ. Lần đầu bị chuyển đến Tài khoản và server chặn các API chức năng cho đến khi đổi mật khẩu. Không đưa mật khẩu này vào log.
 6. Admin vào Tài khoản, gán mã 10 số cho tài khoản cũ đang chờ mã và đặt lại mật khẩu nếu cần. Các ID, lượt nộp và quan hệ lớp được giữ nguyên. Dùng trang Mùa và điểm rank để tạo mùa đang hoạt động trước khi chấm bài.
-7. Dữ liệu mẫu tùy chọn: dừng backend rồi `npm.cmd run seed`. Tài khoản mẫu mới: admin `1000000000`, giảng viên `1000000001`, trợ giảng `1000000002`, sinh viên `2025000001`–`2025000003`; mật khẩu `DemoPass123!`. Chỉ dùng mẫu để thử, không cấp cho lớp thật. Seed giữ mật khẩu đã có.
+7. Dữ liệu mẫu tùy chọn: dừng backend rồi `npm.cmd run seed`. Tài khoản mẫu mới: admin `1000000000`, giảng viên `1000000001`, trợ giảng `1000000002`, sinh viên `2025000001`–`2025000003`; mật khẩu `CodeMark@2026`. Chỉ dùng mẫu để thử, không cấp cho lớp thật. Seed giữ mật khẩu đã có.
 
 Build/test: `node scripts/maven.mjs test`, `node scripts/maven.mjs package`, `npm.cmd run build:frontend`. Trên Windows dùng `npm.cmd` nếu execution policy chặn `npm.ps1`. CI hiện có vẫn chạy Maven verify và Next build trên Java 21/Node 22.
 

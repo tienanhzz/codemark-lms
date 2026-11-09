@@ -51,6 +51,7 @@ export type Lesson = {
   title: string;
   content: string;
   position: number;
+  tagIds: string[];
   published: boolean;
   createdAt: string;
 };
@@ -137,6 +138,7 @@ export type Question = {
   options: string[];
   points: number;
   position: number;
+  tagIds: string[];
   testCaseCount: number;
   answer?: string | null;
   testCases?: Array<{ input: string; expectedOutput: string; points: number }>;

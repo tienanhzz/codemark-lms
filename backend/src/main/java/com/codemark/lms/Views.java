@@ -82,6 +82,8 @@ class Views {
         l.content,
         "position",
         l.position,
+        "tagIds",
+        l.tagIds,
         "published",
         l.published,
         "createdAt",
@@ -152,6 +154,8 @@ class Views {
             q.points,
             "position",
             q.position,
+            "tagIds",
+            q.tagIds,
             "testCaseCount",
             cases.size());
     if (staff) d.put("answer", q.answer);
