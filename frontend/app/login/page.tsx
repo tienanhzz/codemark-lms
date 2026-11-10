@@ -29,7 +29,7 @@ export default function LoginPage() {
     } catch (err) {
       setError(
         errorMessage(err) === "invalid credentials"
-          ? "Mã đăng nhập hoặc mật khẩu không đúng."
+          ? "Mã sinh viên hoặc mật khẩu không đúng."
           : errorMessage(err),
       );
     } finally {
@@ -49,11 +49,8 @@ export default function LoginPage() {
             <img src="/branding/logo.png" alt="Cyb3rT1t@ns — We Are Bigger On The Inside" width={1156} height={359} className="h-auto w-full max-w-xs" />
           </div>
           <h1 className="text-center text-2xl font-semibold tracking-tight text-slate-900">Chào mừng trở lại</h1>
-          <p className="mt-2 text-center text-sm leading-6 text-slate-500">
-            Sử dụng mã đăng nhập 10 chữ số của trường.
-          </p>
           <div className="mt-6 space-y-4">
-            <Field label="Mã đăng nhập">
+            <Field label="Mã sinh viên">
               <Input
                 name="studentId"
                 type="text" inputMode="numeric" pattern="[0-9]{10}" maxLength={10}
@@ -94,10 +91,10 @@ export default function LoginPage() {
             <h2 id="login-help-title" className="mb-2 font-semibold text-slate-900">{help === "password" ? "Cấp lại mật khẩu" : "Hỗ trợ đăng nhập"}</h2>
             {help === "password" ? <>
               <p>Liên hệ quản trị viên của trường để xác minh tài khoản và được cấp lại mật khẩu.</p>
-              <p className="mt-2">Chuẩn bị họ tên, mã đăng nhập 10 chữ số và thông tin lớp. Sau khi nhận mật khẩu mới, đăng nhập và đổi mật khẩu theo hướng dẫn của hệ thống.</p>
+              <p className="mt-2">Chuẩn bị họ tên, mã sinh viên 10 chữ số và thông tin lớp. Sau khi nhận mật khẩu mới, đăng nhập và đổi mật khẩu theo hướng dẫn của hệ thống.</p>
             </> : <>
-              <p>Kiểm tra mã đăng nhập đủ 10 chữ số, phím Caps Lock và kết nối mạng.</p>
-              <p className="mt-2">Nếu chưa được cấp tài khoản hoặc vẫn không đăng nhập được, liên hệ giảng viên phụ trách lớp hoặc bộ phận quản trị hệ thống của trường. Cung cấp mã đăng nhập và nội dung lỗi để được hỗ trợ.</p>
+              <p>Kiểm tra mã sinh viên đủ 10 chữ số, phím Caps Lock và kết nối mạng.</p>
+              <p className="mt-2">Nếu chưa được cấp tài khoản hoặc vẫn không đăng nhập được, liên hệ giảng viên phụ trách lớp hoặc bộ phận quản trị hệ thống của trường. Cung cấp mã sinh viên và nội dung lỗi để được hỗ trợ.</p>
             </>}
             <p className="mt-2 text-xs text-slate-500">Không gửi mật khẩu của bạn khi yêu cầu hỗ trợ.</p>
             <button type="button" onClick={() => setHelp(null)} className="mt-3 font-medium text-teal-800 hover:underline">Đóng hướng dẫn</button>

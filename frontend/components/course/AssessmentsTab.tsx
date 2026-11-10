@@ -64,9 +64,10 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
           kind: form.get("kind"),
           opensAt: new Date(String(form.get("opensAt"))).toISOString(),
           closesAt: new Date(String(form.get("closesAt"))).toISOString(),
+          gradingDueAt: form.get("gradingDueAt") ? new Date(String(form.get("gradingDueAt"))).toISOString() : null,
           durationMinutes: Number(form.get("durationMinutes")),
           maxAttempts: Number(form.get("maxAttempts")),
-          rankWeight: Number(form.get("rankWeight") || 1),
+          difficulty: form.get("difficulty"),
           published: form.get("published") === "on",
           ipAllowlist: allowlist,
         },
@@ -189,15 +190,20 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
         }
       >
         <form id="assessment-form" onSubmit={save} className="grid gap-3 sm:grid-cols-2">
-          <Field label="Hệ số điểm rank" hint="100% kết quả = 100 điểm × hệ số">
-            <Input name="rankWeight" type="number" min={0.1} max={10} step={0.1} defaultValue={1} required />
+          <Field label="Độ khó" hint="Đạt từ 50% nhận EXP một lần">
+            <Select name="difficulty" defaultValue="easy">
+              <option value="easy">Dễ</option><option value="medium">Trung bình</option>
+              <option value="hard">Khó</option><option value="expert">Chuyên gia</option>
+            </Select>
           </Field>
           <Field label="Tiêu đề" className="sm:col-span-2">
             <Input name="title" required />
           </Field>
           <Field label="Loại">
             <Select name="kind" defaultValue="quiz">
-              <option value="quiz">Bài tập</option>
+              <option value="quiz">Quiz trắc nghiệm</option>
+              <option value="assignment">Bài tập</option>
+              <option value="project">Đồ án</option>
               <option value="exam">Bài thi</option>
               <option value="code">Bài lập trình</option>
             </Select>
@@ -210,6 +216,9 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
           </Field>
           <Field label="Đóng lúc">
             <Input name="closesAt" type="datetime-local" required />
+          </Field>
+          <Field label="Hạn hoàn thành chấm điểm" hint="Không bắt buộc; dùng ghi nhận chấm cả lớp đúng hạn.">
+            <Input name="gradingDueAt" type="datetime-local" />
           </Field>
           <Field label="Số lần làm tối đa">
             <Input name="maxAttempts" type="number" min={1} max={10} defaultValue={1} />

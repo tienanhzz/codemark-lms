@@ -26,6 +26,7 @@ import {
   Textarea,
 } from "../../../../components/ui";
 import { isStaff } from "../../../../components/course/types";
+import { TeacherGradePanel } from "../../../../components/TeacherGradePanel";
 
 function toLocalInput(value: string) {
   const date = new Date(value);
@@ -52,6 +53,7 @@ export default function AssessmentPage() {
   const [cases, setCases] = useState<TestCase[]>([]);
   const [caseLoading, setCaseLoading] = useState(false);
   const [availableTags, setAvailableTags] = useState<Array<{tagId:string;label:string}>>([]);
+  const [gradingId, setGradingId] = useState<number | null>(null);
 
   const staff = isStaff(assessment?.role);
 
@@ -127,9 +129,10 @@ export default function AssessmentPage() {
           description: form.get("description"),
           opensAt: new Date(String(form.get("opensAt"))).toISOString(),
           closesAt: new Date(String(form.get("closesAt"))).toISOString(),
+          gradingDueAt: form.get("gradingDueAt") ? new Date(String(form.get("gradingDueAt"))).toISOString() : null,
           durationMinutes: Number(form.get("durationMinutes")),
           maxAttempts: Number(form.get("maxAttempts")),
-          rankWeight: Number(form.get("rankWeight") || 1),
+          difficulty: form.get("difficulty"),
           ipAllowlist: allowlist,
         },
       });
@@ -541,6 +544,7 @@ export default function AssessmentPage() {
                         {formatDateTime(attempt.deadline)}
                       </td>
                       <td className="py-2 text-right">
+                        {attempt.status === "submitted" && <Button size="sm" variant="secondary" onClick={() => setGradingId(attempt.id)}>Chấm bài / Feedback</Button>}
                         <Link
                           href={`/monitor/${assessment.id}`}
                           className="text-xs font-semibold text-teal-700"
@@ -559,6 +563,13 @@ export default function AssessmentPage() {
         </Card>
       )}
 
+      <TeacherGradePanel attemptId={gradingId} onClose={() => setGradingId(null)} onSaved={() => { setNotice("Đã lưu điểm và feedback."); void load(); }} />
+      {!staff && attempts.some(attempt => attempt.teacherFeedback) && <Card title="Feedback từ giảng viên">
+        {attempts.filter(attempt => attempt.teacherFeedback).map(attempt => <section key={attempt.id} className="space-y-2 border-b border-slate-100 py-3">
+          <h3 className="font-semibold">Lượt làm #{attempt.id}</h3><p className="whitespace-pre-wrap text-sm leading-7">{attempt.teacherFeedback}</p>
+          {Object.entries(attempt.inlineFeedback || {}).map(([questionId, comment]) => <p key={questionId} className="whitespace-pre-wrap border-l-2 border-teal-300 pl-3 text-sm leading-7">Câu #{questionId}: {comment}</p>)}
+        </section>)}
+      </Card>}
       <Drawer
         open={editOpen}
         onClose={() => setEditOpen(false)}
@@ -580,7 +591,12 @@ export default function AssessmentPage() {
           onSubmit={saveAssessment}
           className="grid gap-3 sm:grid-cols-2"
         >
-          <Field label="Hệ số điểm rank"><Input name="rankWeight" type="number" min={0.1} max={10} step={0.1} defaultValue={assessment.rankWeight || 1} required /></Field>
+          <Field label="Độ khó" hint="Đạt từ 50% nhận EXP một lần">
+            <Select name="difficulty" defaultValue={assessment.difficulty || "easy"}>
+              <option value="easy">Dễ</option><option value="medium">Trung bình</option>
+              <option value="hard">Khó</option><option value="expert">Chuyên gia</option>
+            </Select>
+          </Field>
           <Field label="Tiêu đề" className="sm:col-span-2">
             <Input name="title" defaultValue={assessment.title} required />
           </Field>
@@ -608,6 +624,9 @@ export default function AssessmentPage() {
               max={600}
               defaultValue={assessment.durationMinutes}
             />
+          </Field>
+          <Field label="Hạn hoàn thành chấm điểm" hint="Đặt hạn để ghi nhận 5 Reputation khi chấm xong toàn bộ sinh viên đúng hạn.">
+            <Input name="gradingDueAt" type="datetime-local" defaultValue={assessment.gradingDueAt ? toLocalInput(assessment.gradingDueAt) : ""} />
           </Field>
           <Field label="Số lần làm tối đa">
             <Input

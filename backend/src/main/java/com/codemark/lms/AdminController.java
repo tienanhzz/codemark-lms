@@ -15,11 +15,13 @@ class AdminController {
   private final Store store;
   private final Access access;
   private final Views views;
+  private final RankService rank;
 
-  AdminController(Store s, Access a, Views v) {
+  AdminController(Store s, Access a, Views v, RankService rank) {
     store = s;
     access = a;
     views = v;
+    this.rank = rank;
   }
 
   @GetMapping("/users")
@@ -63,9 +65,12 @@ class AdminController {
   @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
   Object create(HttpServletRequest r, @RequestBody Map<String, Object> b) {
     User actor = access.admin(r);
+    store.lock(store.all(RankPolicy.class).get(0));
+    var before=rank.board(actor,null);
     User u = new User();
     userFields(u, b, true);
     store.save(u);
+    rank.announceChanges(before,actor);
     access.audit(actor, "user_created", r.getRemoteAddr(), "userId", u.id);
     return Views.user(u);
   }
@@ -97,10 +102,13 @@ class AdminController {
   @PatchMapping("/users/{id}")
   Object edit(HttpServletRequest r, @PathVariable long id, @RequestBody Map<String, Object> b) {
     User actor = access.admin(r);
+    store.lock(store.all(RankPolicy.class).get(0));
+    var before=rank.board(actor,null);
     User u = store.get(User.class, id);
     if (actor.id.equals(id))
       require(text(b, "role", u.role).equals("admin"), "cannot_demote_self", 409);
     userFields(u, b, false);
+    rank.announceChanges(before,actor);
     access.audit(actor, "user_updated", r.getRemoteAddr(), "userId", id);
     return Views.user(u);
   }
@@ -108,12 +116,15 @@ class AdminController {
   @DeleteMapping("/users/{id}")
   Object remove(HttpServletRequest r, @PathVariable long id) {
     User actor = access.admin(r);
+    store.lock(store.all(RankPolicy.class).get(0));
+    var before=rank.board(actor,null);
     require(!actor.id.equals(id), "cannot_delete_self", 409);
     User u = store.get(User.class, id);
     require(store.list(Course.class, "where e.owner=?1", u).isEmpty(), "user_owns_courses", 409);
     store.list(Enrollment.class, "where e.user=?1", u).forEach(store::delete);
     store.delete(u);
     store.flush();
+    rank.announceChanges(before,actor);
     access.audit(actor, "user_deleted", r.getRemoteAddr(), "userId", id);
     return map("ok", true);
   }

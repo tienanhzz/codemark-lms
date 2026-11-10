@@ -30,6 +30,7 @@ export type Course = {
   startDate: string;
   endDate: string;
   published: boolean;
+  practiceCadence: "daily" | "weekly";
   role: CourseRole;
   meetings?: Meeting[];
   studentCount?: number;
@@ -53,6 +54,7 @@ export type Lesson = {
   position: number;
   tagIds: string[];
   published: boolean;
+  advancedMaterial?: boolean;
   createdAt: string;
 };
 
@@ -69,6 +71,8 @@ export type DiscussionPost = {
   id: number;
   courseId: number;
   parentId: number | null;
+  bestAnswerId?: number | null;
+  bestAnswer?: boolean;
   body: string;
   author: User | null;
   createdAt: string;
@@ -152,11 +156,14 @@ export type Assessment = {
   kind: string;
   opensAt: string;
   closesAt: string;
+  gradingDueAt?: string | null;
   durationMinutes: number;
   maxAttempts: number;
   rankWeight: number;
+  difficulty: "easy" | "medium" | "hard" | "expert";
   published: boolean;
   createdAt: string;
+  practiceCadence: "daily" | "weekly";
   role: CourseRole;
   ipAllowlist?: string[];
   questionCount?: number;
@@ -175,6 +182,10 @@ export type Attempt = {
   status: "in_progress" | "submitted" | string;
   score: number | null;
   maxScore: number;
+  teacherFeedback?: string;
+  inlineFeedback?: Record<string, string>;
+  gradedBy?: number | null;
+  gradedAt?: string | null;
   currentQuestion: number | null;
   answers?: Record<string, string | null>;
   flaggedQuestions?: number[];

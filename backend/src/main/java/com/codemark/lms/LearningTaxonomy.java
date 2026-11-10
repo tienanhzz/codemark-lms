@@ -27,6 +27,7 @@ class LearningTag extends BaseEntity {
 }
 
 @Component
+@org.springframework.core.annotation.Order(1)
 class LearningTaxonomyBootstrap implements ApplicationRunner {
   final Store store;
   final ObjectMapper json;

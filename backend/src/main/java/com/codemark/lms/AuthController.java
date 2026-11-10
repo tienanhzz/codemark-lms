@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.*;
 @Transactional
 class AuthController {
   private final Access access;
+  private final RankService rank;
 
-  AuthController(Access a) {
+  AuthController(Access a, RankService rank) {
     access = a;
+    this.rank = rank;
   }
 
   @GetMapping("/health")
@@ -21,7 +23,10 @@ class AuthController {
 
   @PostMapping("/api/auth/login")
   Object login(HttpServletRequest r, @RequestBody Map<String, Object> b) {
-    return access.login(r, b);
+    var result=access.login(r, b);
+    User user=access.authenticate(r.getSession(false),r.getRemoteAddr());
+    if(user.role.equals("student")) rank.awardAction(user,null,"daily_login",0,user,java.time.Instant.now());
+    return result;
   }
 
   @GetMapping("/api/auth/me")

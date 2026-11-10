@@ -98,6 +98,7 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
           title: form.get("title"),
           description: form.get("description"),
           term: form.get("term"),
+          practiceCadence: form.get("practiceCadence"),
           startDate: form.get("startDate"),
           endDate: form.get("endDate"),
           published: form.get("published") === "on",
@@ -340,6 +341,12 @@ export function CourseOverview({ course, role, user, refreshCourse }: CourseTabP
         }
       >
         <form id="edit-course-form" onSubmit={saveCourse} className="grid gap-3 sm:grid-cols-2">
+          <Field label="Lịch bài tập" hint="Tối đa một bài tập mỗi ngày/tuần theo giờ Việt Nam. Tuần bắt đầu thứ Hai.">
+            <Select name="practiceCadence" defaultValue={course.practiceCadence || "weekly"}>
+              <option value="daily">Hằng ngày</option>
+              <option value="weekly">Hằng tuần</option>
+            </Select>
+          </Field>
           <Field label="Mã">
             <Input value={course.code} disabled />
           </Field>

@@ -21,14 +21,16 @@ class AttendanceController {
   private final Views views;
   private final AttendanceTokens tokens;
   private final Path uploads;
+  private final RankService rank;
 
   AttendanceController(
-      Store s, Access a, Views v, AttendanceTokens t, @Value("${codemark.upload-dir}") String dir) {
+      Store s, Access a, Views v, AttendanceTokens t, @Value("${codemark.upload-dir}") String dir, RankService rank) {
     store = s;
     access = a;
     views = v;
     tokens = t;
     uploads = Path.of(dir).toAbsolutePath().normalize();
+    this.rank = rank;
   }
 
   Map<String, Object> session(AttendanceSession s, User u, boolean details) {
@@ -154,6 +156,7 @@ class AttendanceController {
     record.user = u;
     record.ip = r.getRemoteAddr();
     store.save(record);
+    if(u.role.equals("student")) rank.awardAction(u,s.course,"attendance",s.id,u,Instant.now());
     access.audit(u, "attendance_checkin", r.getRemoteAddr(), "sessionId", s.id);
     return map(
         "id",

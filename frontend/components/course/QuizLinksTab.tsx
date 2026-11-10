@@ -1,7 +1,7 @@
 "use client";
 import { FormEvent, useEffect, useState } from "react";
 import { api, errorMessage } from "../../lib/api";
-import { Alert, Button, Card, Field, Input, Textarea } from "../ui";
+import { Alert, Button, Card, Field, Input, Select, Textarea } from "../ui";
 import { CourseTabProps, isStaff } from "./types";
 type Quiz = {
     id: number;
@@ -9,6 +9,8 @@ type Quiz = {
     url: string;
     description: string;
     dueAt: string;
+    opensAt: string;
+    difficulty: string;
     maxScore: number;
     results: {
         id: number;
@@ -44,11 +46,16 @@ export function QuizLinksTab({ course, role }: CourseTabProps) {
     finally {
         setBusy(false);
     } }
-    async function add(e: FormEvent<HTMLFormElement>) { e.preventDefault(); const f = new FormData(e.currentTarget); await act(`/api/courses/${course.id}/quiz-links`, { title: f.get("title"), url: f.get("url"), description: f.get("description"), dueAt: new Date(String(f.get("dueAt"))).toISOString(), maxScore: Number(f.get("maxScore")) }); }
+    async function add(e: FormEvent<HTMLFormElement>) { e.preventDefault(); const f = new FormData(e.currentTarget); await act(`/api/courses/${course.id}/quiz-links`, { title: f.get("title"), url: f.get("url"), description: f.get("description"), opensAt: new Date(String(f.get("opensAt"))).toISOString(), difficulty: f.get("difficulty"), dueAt: new Date(String(f.get("dueAt"))).toISOString(), maxScore: Number(f.get("maxScore")) }); }
     return <div className="space-y-4">{message && <Alert>{message}</Alert>}{staff && <>
         <Button onClick={() => setCreate(!create)}>{create ? "Quay lại" : "Thêm quiz link"}</Button>{create && <Card title="Gán quiz cho lớp">
             <p className="mb-4 text-sm">Yêu cầu sinh viên dùng mã 10 chữ số làm tên trong Wayground/Kahoot/Google Forms. Điểm chỉ cộng sau khi xác nhận.</p>
             <form className="space-y-3" onSubmit={add}>
+            <Field label="Mở lúc" hint="Quiz dùng chung lịch bài tập của khóa học."><Input name="opensAt" type="datetime-local" required /></Field>
+            <Field label="Độ khó" hint="Đạt từ 50% nhận EXP một lần"><Select name="difficulty" defaultValue="easy">
+              <option value="easy">Dễ</option><option value="medium">Trung bình</option>
+              <option value="hard">Khó</option><option value="expert">Chuyên gia</option>
+            </Select></Field>
             <Field label="Tiêu đề">
             <Input name="title" required/>
             </Field>

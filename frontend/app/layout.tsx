@@ -17,8 +17,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi">
-      <body className="bg-slate-100 text-slate-800 antialiased">
+    <html lang="vi" suppressHydrationWarning>
+      <body className="bg-slate-100 text-slate-800 antialiased" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

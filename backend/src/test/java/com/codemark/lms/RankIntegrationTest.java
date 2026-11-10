@@ -21,6 +21,10 @@ class RankIntegrationTest {
       .andExpect(status().isOk()).andReturn().getRequest().getSession();
   }
   com.fasterxml.jackson.databind.JsonNode postJson(String url,Object body,org.springframework.mock.web.MockHttpSession session) throws Exception {
+    if ((url.endsWith("/assessments") || url.endsWith("/quiz-links")) && body instanceof java.util.Map<?,?> original) {
+      var scheduled = new java.util.HashMap<String,Object>(); original.forEach((k,v)->scheduled.put(k.toString(),v));
+      scheduled.putIfAbsent("opensAt", java.time.Instant.now().minusSeconds(8L*86400).toString()); body=scheduled;
+    }
     return json.readTree(mvc.perform(post(url).session(session).contentType("application/json").content(json.writeValueAsBytes(body))).andExpect(status().is2xxSuccessful()).andReturn().getResponse().getContentAsString());
   }
   @Test void fullRankQuizBulkAndPermissions() throws Exception {
@@ -39,18 +43,19 @@ class RankIntegrationTest {
     var season=postJson("/api/rank/seasons",Api.map("name","Mùa kiểm thử","startsAt",java.time.Instant.now().minusSeconds(3600).toString(),"endsAt",java.time.Instant.now().plusSeconds(86400).toString()),admin);
     var courses=json.readTree(mvc.perform(get("/api/courses").session(teacher)).andReturn().getResponse().getContentAsString());
     long course=courses.get("courses").get(0).get("id").asLong();
+    new org.springframework.transaction.support.TransactionTemplate(manager).execute(status->{store.get(Course.class,course).published=true; return null;});
     var body=Api.map("title","Quiz ngoài","url","https://wayground.com/join","maxScore",10,"dueAt",java.time.Instant.now().plusSeconds(3600).toString());
     mvc.perform(post("/api/courses/"+course+"/quiz-links").session(student).contentType("application/json").content(json.writeValueAsBytes(body))).andExpect(status().isForbidden());
     long quiz=postJson("/api/courses/"+course+"/quiz-links",body,teacher).get("id").asLong();
     mvc.perform(patch("/api/courses/"+course).session(teacher).contentType("application/json").content("{\"title\":\"Lớp đã sửa\"}")).andExpect(status().isOk());
     mvc.perform(get("/api/courses/"+course+"/quiz-links").session(teacher)).andExpect(jsonPath("$.quizzes.length()").value(1));
     postJson("/api/quiz-links/"+quiz+"/complete",Api.map(),student);
-    var before=json.readTree(mvc.perform(get("/api/rank/leaderboard").session(student)).andReturn().getResponse().getContentAsString());
+    var before=json.readTree(mvc.perform(get("/api/rank/leaderboard").param("courseId",String.valueOf(course)).session(student)).andReturn().getResponse().getContentAsString());
     org.junit.jupiter.api.Assertions.assertEquals(0,before.get("mine").get("points").asDouble());
     for(int score:new int[]{8,8,9,7}) postJson("/api/quiz-links/"+quiz+"/scores",Api.map("studentId","2025000001","score",score),teacher);
     postJson("/api/quiz-links/"+quiz+"/import",Api.map("csv","studentId,score\n2025000001,9\nwrong,8\n"),teacher);
-    var after=json.readTree(mvc.perform(get("/api/rank/leaderboard").session(student)).andReturn().getResponse().getContentAsString());
-    org.junit.jupiter.api.Assertions.assertEquals(90,after.get("mine").get("points").asDouble());
+    var after=json.readTree(mvc.perform(get("/api/rank/leaderboard").param("courseId",String.valueOf(course)).session(student)).andReturn().getResponse().getContentAsString());
+    org.junit.jupiter.api.Assertions.assertEquals(4,after.get("mine").get("points").asDouble());
     // Exercise the real automatic grading path for both assignment and exam sources.
     new org.springframework.transaction.support.TransactionTemplate(manager).execute(status->{
       User u=store.list(User.class,"where e.studentId=?1","2025000001").get(0);
@@ -62,13 +67,27 @@ class RankIntegrationTest {
       }
       return null;
     });
-    var finalBoard=json.readTree(mvc.perform(get("/api/rank/leaderboard").session(student)).andReturn().getResponse().getContentAsString());
-    org.junit.jupiter.api.Assertions.assertEquals(390,finalBoard.get("mine").get("points").asDouble());
-    org.junit.jupiter.api.Assertions.assertEquals("Silver",finalBoard.get("mine").get("tier").asText());
+    var finalBoard=json.readTree(mvc.perform(get("/api/rank/leaderboard").param("courseId",String.valueOf(course)).session(student)).andReturn().getResponse().getContentAsString());
+    org.junit.jupiter.api.Assertions.assertEquals(18,finalBoard.get("mine").get("points").asDouble());
+    org.junit.jupiter.api.Assertions.assertEquals("Master",finalBoard.get("mine").get("tier").asText());
+    new org.springframework.transaction.support.TransactionTemplate(manager).execute(status->{ new RankService(store).announceChanges(java.util.List.of(),store.list(User.class,"where e.role='admin'").get(0)); return null;});
+    var feed=json.readTree(mvc.perform(get("/api/home/announcements")).andReturn().getResponse().getContentAsString());
+    long systemNotice=feed.get("items").get(0).get("id").asLong();
+    org.junit.jupiter.api.Assertions.assertEquals("system",feed.get("items").get(0).get("authorRole").asText());
+    mvc.perform(put("/api/home/announcements/"+systemNotice).session(admin).contentType("application/json")
+        .content("{\"title\":\"changed\",\"body\":\"changed\"}")).andExpect(status().isForbidden());
+    mvc.perform(delete("/api/home/announcements/"+systemNotice).session(admin)).andExpect(status().isForbidden());
+    long champion=finalBoard.get("mine").get("userId").asLong();
+    mvc.perform(patch("/api/users/"+champion).session(admin).contentType("application/json")
+        .content("{\"role\":\"teacher\"}")).andExpect(status().isOk());
+    var rosterFeed=json.readTree(mvc.perform(get("/api/home/announcements")).andReturn().getResponse().getContentAsString());
+    org.junit.jupiter.api.Assertions.assertNotEquals(systemNotice,rosterFeed.get("items").get(0).get("id").asLong());
+    mvc.perform(patch("/api/users/"+champion).session(admin).contentType("application/json")
+        .content("{\"role\":\"student\"}")).andExpect(status().isOk());
     mvc.perform(put("/api/rank/tiers").session(admin).contentType("application/json").content("{\"tiers\":[{\"name\":\"Iron\",\"threshold\":10}]}" )).andExpect(status().isBadRequest());
-    postJson("/api/rank/adjustments",Api.map("studentId","2025000001","points",-10,"reason","Điều chỉnh có lý do"),admin);
+    postJson("/api/rank/adjustments",Api.map("courseId",course,"studentId","2025000001","points",-10,"reason","Điều chỉnh có lý do"),admin);
     postJson("/api/rank/seasons",Api.map("name","Mùa mới","startsAt",java.time.Instant.now().minusSeconds(60).toString(),"endsAt",java.time.Instant.now().plusSeconds(3600).toString()),admin);
-    var reset=json.readTree(mvc.perform(get("/api/rank/leaderboard").session(student)).andReturn().getResponse().getContentAsString());
+    var reset=json.readTree(mvc.perform(get("/api/rank/leaderboard").param("courseId",String.valueOf(course)).session(student)).andReturn().getResponse().getContentAsString());
     org.junit.jupiter.api.Assertions.assertEquals(0,reset.get("mine").get("points").asDouble());
     mvc.perform(delete("/api/courses/"+course).session(teacher)).andExpect(status().isOk());
   }

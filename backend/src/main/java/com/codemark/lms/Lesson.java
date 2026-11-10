@@ -24,6 +24,10 @@ class Lesson extends BaseEntity {
 
   int position;
   boolean published = true;
+  @Column(nullable = false)
+  @org.hibernate.annotations.ColumnDefault("false")
+  boolean advancedMaterial;
+  Long createdById;
 
   @PostLoad void normalizeTags() { if (tagIds == null) tagIds = new ArrayList<>(); }
 }

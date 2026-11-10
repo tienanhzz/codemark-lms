@@ -108,7 +108,12 @@ class LmsIntegrationTest {
             .getContentAsString());
   }
 
+  static int practiceFixture;
   JsonNode postJson(String path, Object body, MockHttpSession session) throws Exception {
+    if ((path.endsWith("/assessments") || path.endsWith("/quiz-links")) && body instanceof java.util.Map<?,?> original) {
+      var scheduled = new java.util.HashMap<String,Object>(); original.forEach((k,v)->scheduled.put(k.toString(),v));
+      scheduled.putIfAbsent("opensAt", java.time.Instant.now().minusSeconds((365L+14L*practiceFixture++)*86400).toString()); body=scheduled;
+    }
     return json.readTree(
         mvc.perform(
                 post(path)

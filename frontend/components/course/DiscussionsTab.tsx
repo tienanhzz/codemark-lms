@@ -11,10 +11,19 @@ import {
   Button,
   Card,
   EmptyState,
+  Field,
+  Select,
   Spinner,
   Textarea,
 } from "../ui";
 import { isStaff, type CourseTabProps } from "./types";
+
+type PeerReview = {
+  id: number; attemptId: number; assessmentTitle: string; body: string;
+  status: "pending" | "approved" | "rejected";
+  reviewer: { id: number; name: string }; student: { id: number; name: string };
+};
+type ReviewTarget = { id: number; assessmentTitle: string; student: { id: number; name: string } };
 
 export function DiscussionsTab({ course, role, user }: CourseTabProps) {
   const staff = isStaff(role);
@@ -25,14 +34,22 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
   const [replyTo, setReplyTo] = useState<number | null>(null);
   const [replyBody, setReplyBody] = useState("");
   const [saving, setSaving] = useState(false);
+  const [reviews, setReviews] = useState<PeerReview[]>([]);
+  const [targets, setTargets] = useState<ReviewTarget[]>([]);
+  const [reviewBody, setReviewBody] = useState("");
+  const [reviewTarget, setReviewTarget] = useState("");
+  const moderator = staff && (user.role === "teacher" || user.role === "admin");
 
   async function load() {
     setLoading(true);
     try {
-      const data = await api<{ posts: DiscussionPost[] }>(
-        `/api/courses/${course.id}/discussions`,
-      );
+      const [data, reviewData] = await Promise.all([
+        api<{ posts: DiscussionPost[] }>(`/api/courses/${course.id}/discussions`),
+        api<{ reviews: PeerReview[]; targets: ReviewTarget[] }>(`/api/courses/${course.id}/peer-reviews`),
+      ]);
       setPosts(data.posts);
+      setReviews(reviewData.reviews || []);
+      setTargets(reviewData.targets || []);
     } catch (err) {
       setError(errorMessage(err));
     } finally {
@@ -104,6 +121,30 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
     }
   }
 
+  async function acceptAnswer(answer: DiscussionPost) {
+    if (!await confirmInline("Chọn câu trả lời hữu ích nhất? Mỗi câu hỏi chỉ chọn một lần để bảo đảm điểm thưởng công bằng.")) return;
+    setSaving(true); setError("");
+    try { await api(`/api/discussions/${answer.id}/best-answer`, { method: "POST", body: {} }); await load(); }
+    catch (err) { setError(errorMessage(err)); }
+    finally { setSaving(false); }
+  }
+
+  async function submitReview(event: FormEvent) {
+    event.preventDefault(); setSaving(true); setError("");
+    try {
+      await api(`/api/courses/${course.id}/peer-reviews`, { method: "POST", body: { attemptId: Number(reviewTarget), body: reviewBody } });
+      setReviewBody(""); setReviewTarget(""); await load();
+    } catch (err) { setError(errorMessage(err)); }
+    finally { setSaving(false); }
+  }
+
+  async function decideReview(id: number, status: "approved" | "rejected") {
+    setSaving(true); setError("");
+    try { await api(`/api/peer-reviews/${id}`, { method: "PATCH", body: { status } }); await load(); }
+    catch (err) { setError(errorMessage(err)); }
+    finally { setSaving(false); }
+  }
+
   if (loading) return <Spinner label="Đang tải thảo luận…" />;
 
   function renderPost(post: DiscussionPost, nested = false) {
@@ -112,7 +153,7 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
         key={post.id}
         className={nested ? "ml-8 mt-2 border-l-2 border-slate-100 pl-3" : "mt-3"}
       >
-        <div className="rounded-md border border-slate-100 p-3">
+        <div className={`rounded-md border p-3 ${post.bestAnswer ? "border-amber-300 bg-amber-50" : "border-slate-100"}`}>
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-start gap-3">
               <Avatar name={post.author?.name} role={post.author?.role} />
@@ -124,9 +165,11 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
                   </span>
                 </p>
                 <p className="prose-lesson mt-1 text-sm text-slate-600">{post.body}</p>
+                {post.bestAnswer && <p className="mt-2 text-xs font-bold text-amber-800"><i className="fa-solid fa-award mr-1" /> Câu trả lời hữu ích nhất · +7 EXP</p>}
               </div>
             </div>
             <div className="flex items-center gap-1">
+              {moderator && nested && !post.bestAnswer && post.author?.role === "student" && posts.some(root => root.id === post.parentId && !root.bestAnswerId && root.author?.role === "student" && root.author?.id !== post.author?.id) && <Button size="sm" variant="secondary" disabled={saving} onClick={() => void acceptAnswer(post)}>Hữu ích nhất</Button>}
               {!nested && (
                 <Button
                   size="sm"
@@ -194,6 +237,25 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
             description="Hãy bắt đầu cuộc thảo luận."
           />
         )}
+      </Card>
+      <Card title="Nhận xét chéo" subtitle="Review chi tiết được giảng viên duyệt nhận 6 EXP, một lần cho mỗi bài làm.">
+        {user.role === "student" && !staff && <form onSubmit={submitReview} className="mb-5 space-y-3">
+          <Field label="Bài làm của bạn cùng lớp" hint="Chỉ xem mã bài đã nộp; hãy nhận nội dung bài trực tiếp từ bạn học để review.">
+            <Select value={reviewTarget} onChange={event => setReviewTarget(event.target.value)} required>
+              <option value="">Chọn bài làm</option>{targets.map(target => <option key={target.id} value={target.id}>#{target.id} · {target.student.name} · {target.assessmentTitle}</option>)}
+            </Select>
+          </Field>
+          <Field label="Nhận xét và đề xuất cải thiện" hint={`${reviewBody.trim().length}/200 ký tự tối thiểu. Nêu lỗi, giải thích và gợi ý sửa cụ thể.`}>
+            <Textarea value={reviewBody} onChange={event => setReviewBody(event.target.value)} minLength={200} maxLength={10000} rows={5} required />
+          </Field>
+          <Button type="submit" loading={saving} disabled={!reviewTarget || reviewBody.trim().length < 200}>Gửi giảng viên duyệt</Button>
+        </form>}
+        <div className="space-y-3">{reviews.map(review => <article key={review.id} className="rounded-md border border-slate-200 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-semibold">{review.reviewer.name} → {review.student.name}</p><span className="text-xs font-medium text-slate-500">{review.status === "approved" ? "Đã duyệt · +6 EXP" : review.status === "rejected" ? "Chưa đạt yêu cầu" : "Chờ giảng viên duyệt"}</span></div>
+          <p className="mt-1 text-xs text-slate-500">Bài #{review.attemptId} · {review.assessmentTitle}</p>
+          <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-slate-600">{review.body}</p>
+          {moderator && review.status === "pending" && <div className="mt-3 flex gap-2"><Button size="sm" disabled={saving} onClick={() => void decideReview(review.id, "approved")}>Duyệt chất lượng</Button><Button size="sm" variant="secondary" disabled={saving} onClick={() => void decideReview(review.id, "rejected")}>Chưa đạt</Button></div>}
+        </article>)}{!reviews.length && <p className="py-4 text-sm text-slate-500">Chưa có nhận xét chéo.</p>}</div>
       </Card>
     </div>
   );

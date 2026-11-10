@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@org.springframework.core.annotation.Order(0)
 class RankBootstrap implements ApplicationRunner {
   private final Store store;
   private final Access access;

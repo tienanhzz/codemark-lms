@@ -26,8 +26,12 @@ class Assessment extends BaseEntity {
   @Column(nullable=false)
   @org.hibernate.annotations.ColumnDefault("1")
   double rankWeight = 1;
+  @Column(nullable=false)
+  @org.hibernate.annotations.ColumnDefault("'easy'")
+  String difficulty = "easy";
   Instant opensAt;
   Instant closesAt;
+  Instant gradingDueAt;
   int durationMinutes = 60;
   int maxAttempts = 1;
   boolean published;
