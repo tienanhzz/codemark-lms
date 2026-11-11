@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "../../../components/LanguageProvider";
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
@@ -16,6 +17,7 @@ import {
 } from "../../../components/ui";
 
 export default function AttendancePage() {
+  const { tr, locale } = useI18n();
   const [token, setToken] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -55,15 +57,15 @@ export default function AttendancePage() {
     <div className="mx-auto max-w-2xl">
       <PageHeader
         icon="fa-qrcode"
-        title="Điểm danh"
-        description="Quét mã QR của giảng viên hoặc dán mã điểm danh hiển thị bên cạnh."
+        title={tr("Điểm danh")}
+        description={tr("Quét mã QR của giảng viên hoặc dán mã điểm danh hiển thị bên cạnh.")}
       />
       {error && <Alert tone="danger" className="mb-3">{error}</Alert>}
       {success && <Alert tone="success" className="mb-3">{success}</Alert>}
 
-      <Card title="Nhập mã điểm danh" subtitle="Mã hết hạn sau 30 giây và không thể dùng lại">
+      <Card title={tr("Nhập mã điểm danh")} subtitle={tr("Mã hết hạn sau 30 giây và không thể dùng lại")}>
         <form onSubmit={checkIn} className="space-y-3">
-          <Field label="Mã điểm danh">
+          <Field label={tr("Mã điểm danh")}>
             <Input
               value={token}
               onChange={(event) => setToken(event.target.value)}
@@ -73,18 +75,17 @@ export default function AttendancePage() {
             />
           </Field>
           <Button type="submit" loading={busy} className="w-full">
-            <i className="fa-solid fa-check-to-slot" /> Điểm danh
-          </Button>
+            <i className="fa-solid fa-check-to-slot" />{" " + tr("Điểm danh")}</Button>
         </form>
       </Card>
 
       <Card
         className="mt-4"
-        title="Mở phiên"
-        subtitle="Các phiên đang nhận điểm danh trong lớp của bạn"
+        title={tr("Mở phiên")}
+        subtitle={tr("Các phiên đang nhận điểm danh trong lớp của bạn")}
       >
         {!dashboard ? (
-          <Spinner label="Đang tải phiên…" />
+          <Spinner label={tr("Đang tải phiên…")} />
         ) : dashboard.openAttendance.length ? (
           <div className="space-y-2">
             {dashboard.openAttendance.map((session) => {
@@ -100,24 +101,19 @@ export default function AttendancePage() {
                     <p className="font-medium text-slate-700">
                       {course?.code} — {course?.title}
                     </p>
-                    <p className="text-xs text-slate-500">
-                      Đóng lúc {formatDateTime(session.closesAt)}
+                    <p className="text-xs text-slate-500">{tr("Đóng lúc") + " "}{formatDateTime(session.closesAt, locale)}
                     </p>
                   </div>
                   <Link
                     href={`/courses/${session.courseId}`}
                     className="text-xs font-semibold text-teal-700"
-                  >
-                    Mở lớp học
-                  </Link>
+                  >{tr("Mở lớp học")}</Link>
                 </div>
               );
             })}
           </div>
         ) : (
-          <p className="py-4 text-center text-sm text-slate-500">
-            Hiện chưa có phiên điểm danh nào mở.
-          </p>
+          <p className="py-4 text-center text-sm text-slate-500">{tr("Hiện chưa có phiên điểm danh nào mở.")}</p>
         )}
       </Card>
     </div>

@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "../../../../components/LanguageProvider";
 
 import { useCallback, useEffect, useState } from "react";
 import { api, download, errorMessage } from "../../../../lib/api";
@@ -45,6 +46,7 @@ const KINDS = [
 ];
 
 export default function AuditPage() {
+  const { tr, locale } = useI18n();
   const [events, setEvents] = useState<AuditEvent[]>([]);
   const [total, setTotal] = useState(0);
   const [kind, setKind] = useState("");
@@ -77,13 +79,12 @@ export default function AuditPage() {
     <div>
       <PageHeader
         icon="fa-clipboard-list"
-        title="Nhật ký hoạt động"
-        description="Nhật ký bảo mật và hoạt động chỉ được thêm. Dữ liệu giám sát cần được lưu giữ theo quy định của trường."
+        title={tr("Nhật ký hoạt động")}
+        description={tr("Nhật ký bảo mật và hoạt động chỉ được thêm. Dữ liệu giám sát cần được lưu giữ theo quy định của trường.")}
         actions={
           <>
             <Button variant="secondary" onClick={load}>
-              <i className="fa-solid fa-rotate" /> Làm mới
-            </Button>
+              <i className="fa-solid fa-rotate" />{" " + tr("Làm mới")}</Button>
             <Button
               variant="secondary"
               onClick={() =>
@@ -92,8 +93,7 @@ export default function AuditPage() {
                 )
               }
             >
-              <i className="fa-solid fa-download" /> Xuất CSV
-            </Button>
+              <i className="fa-solid fa-download" />{" " + tr("Xuất CSV")}</Button>
           </>
         }
       />
@@ -107,7 +107,7 @@ export default function AuditPage() {
         >
           {KINDS.map((item) => (
             <option key={item || "all"} value={item}>
-              {item ? item.replaceAll("_", " ") : "All event kinds"}
+              {item ? item.replaceAll("_", " ") : tr("All event kinds")}
             </option>
           ))}
         </Select>
@@ -116,16 +116,16 @@ export default function AuditPage() {
           onChange={(event) => setLimit(event.target.value)}
           className="w-36"
         >
-          <option value="50">50 sự kiện</option>
-          <option value="100">100 sự kiện</option>
-          <option value="200">200 sự kiện</option>
+          <option value="50">{tr("50 sự kiện")}</option>
+          <option value="100">{tr("100 sự kiện")}</option>
+          <option value="200">{tr("200 sự kiện")}</option>
         </Select>
-        <span className="text-xs text-slate-500">{total} sự kiện phù hợp</span>
+        <span className="text-xs text-slate-500">{total}{" " + tr("sự kiện phù hợp")}</span>
       </div>
 
       <Card bodyClassName="p-0">
         {loading ? (
-          <Spinner label="Đang tải sự kiện nhật ký…" />
+          <Spinner label={tr("Đang tải sự kiện nhật ký…")} />
         ) : events.length ? (
           <div className="divide-y divide-slate-50">
             {events.map((event) => (
@@ -136,8 +136,8 @@ export default function AuditPage() {
                       {event.kind.replaceAll("_", " ")}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {formatDateTime(event.createdAt)} · người thực hiện {event.actorId ?? "system"} ·{" "}
-                      {event.ip || "unknown IP"}
+                      {formatDateTime(event.createdAt, locale)}{" " + tr("· người thực hiện") + " "}{event.actorId ?? tr("system")} ·{" "}
+                      {event.ip || tr("unknown IP")}
                     </p>
                   </div>
                   <Badge tone="info">#{event.id}</Badge>
@@ -150,7 +150,7 @@ export default function AuditPage() {
           </div>
         ) : (
           <div className="p-4">
-            <EmptyState icon="fa-clipboard-list" title="Chưa có sự kiện phù hợp nhật ký" />
+            <EmptyState icon="fa-clipboard-list" title={tr("Chưa có sự kiện phù hợp nhật ký")} />
           </div>
         )}
       </Card>

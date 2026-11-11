@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "../../../../components/LanguageProvider";
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -27,6 +28,7 @@ import { QuizLinksTab } from "../../../../components/course/QuizLinksTab";
 import { isStaff } from "../../../../components/course/types";
 
 export default function CoursePage() {
+  const { tr, locale } = useI18n();
   const params = useParams<{ id: string }>();
   const courseId = Number(params.id);
   const { user } = useAuth();
@@ -50,24 +52,24 @@ export default function CoursePage() {
     load();
   }, [load]);
 
-  if (loading) return <Spinner label="Đang tải lớp học…" />;
+  if (loading) return <Spinner label={tr("Đang tải lớp học…")} />;
   if (error) return <Alert tone="danger">{error}</Alert>;
   if (!course || !user) return null;
 
   const staff = isStaff(course.role);
   const tabs = [
-    { id: "quiz-links", label: "Quiz link", icon: "fa-link" },
-    { id: "overview", label: "Tổng quan", icon: "fa-circle-info" },
-    { id: "lessons", label: "Bài học", icon: "fa-book" },
-    { id: "announcements", label: "Thông báo", icon: "fa-bullhorn" },
-    { id: "discussions", label: "Thảo luận", icon: "fa-comments" },
-    { id: "assessments", label: "Bài tập và bài thi", icon: "fa-file-signature" },
-    { id: "attendance", label: "Điểm danh", icon: "fa-qrcode" },
-    { id: "leave", label: "Nghỉ phép", icon: "fa-envelope-open-text" },
+    { id: "quiz-links", label: tr("Quiz link"), icon: "fa-link" },
+    { id: "overview", label: tr("Tổng quan"), icon: "fa-circle-info" },
+    { id: "lessons", label: tr("Bài học"), icon: "fa-book" },
+    { id: "announcements", label: tr("Thông báo"), icon: "fa-bullhorn" },
+    { id: "discussions", label: tr("Thảo luận"), icon: "fa-comments" },
+    { id: "assessments", label: tr("Bài tập và bài thi"), icon: "fa-file-signature" },
+    { id: "attendance", label: tr("Điểm danh"), icon: "fa-qrcode" },
+    { id: "leave", label: tr("Nghỉ phép"), icon: "fa-envelope-open-text" },
     ...(staff
       ? [
-          { id: "roster", label: "Thành viên", icon: "fa-users" },
-          { id: "gradebook", label: "Bảng điểm", icon: "fa-table-list" },
+          { id: "roster", label: tr("Thành viên"), icon: "fa-users" },
+          { id: "gradebook", label: tr("Bảng điểm"), icon: "fa-table-list" },
         ]
       : []),
   ];
@@ -78,24 +80,23 @@ export default function CoursePage() {
     <div>
       <div className="mb-3">
         <Link href="/courses" className="text-xs font-medium text-slate-500 hover:text-teal-700">
-          <i className="fa-solid fa-arrow-left mr-1" /> Tất cả lớp học
-        </Link>
+          <i className="fa-solid fa-arrow-left mr-1" />{" " + tr("Tất cả lớp học")}</Link>
       </div>
       <PageHeader
         icon="fa-book-open"
         title={`${course.code} — ${course.title}`}
-        description={`${course.term} · ${formatDate(course.startDate)} to ${formatDate(
-          course.endDate,
-        )} · Owner: ${course.owner?.name || "—"}`}
+        description={tr("{0} · {1} to {2} · Owner: {3}", { 0: (course.term), 1: (formatDate(course.startDate, locale)), 2: (formatDate(
+          course.endDate, locale,
+        )), 3: (course.owner?.name || "—") })}
         actions={
           <>
             <Badge tone={course.role === "teacher" ? "teacher" : course.role || "student"}>
               {course.role}
             </Badge>
             {course.published ? (
-              <Badge tone="published">Đã công bố</Badge>
+              <Badge tone="published">{tr("Đã công bố")}</Badge>
             ) : (
-              <Badge tone="draft">Bản nháp</Badge>
+              <Badge tone="draft">{tr("Bản nháp")}</Badge>
             )}
           </>
         }

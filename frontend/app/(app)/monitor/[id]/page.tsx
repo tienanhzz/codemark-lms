@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "../../../../components/LanguageProvider";
+
 import { confirmInline } from "../../../../components/InlineConfirm";
 
 import Link from "next/link";
@@ -33,6 +35,7 @@ const VIOLATION_KINDS = new Set([
 ]);
 
 export default function MonitorPage() {
+  const { tr, locale } = useI18n();
   const params = useParams<{ id: string }>();
   const assessmentId = Number(params.id);
   const [assessment, setAssessment] = useState<Assessment | null>(null);
@@ -129,7 +132,7 @@ export default function MonitorPage() {
     });
   }
 
-  if (loading) return <Spinner label="Đang mở giám sát…" />;
+  if (loading) return <Spinner label={tr("Đang mở giám sát…")} />;
   if (error && !assessment) return <Alert tone="danger">{error}</Alert>;
   if (!assessment) return null;
 
@@ -140,18 +143,17 @@ export default function MonitorPage() {
           href={`/assessments/${assessmentId}`}
           className="text-xs font-medium text-slate-500 hover:text-teal-700"
         >
-          <i className="fa-solid fa-arrow-left mr-1" /> Quay lại bài kiểm tra
-        </Link>
+          <i className="fa-solid fa-arrow-left mr-1" />{" " + tr("Quay lại bài kiểm tra")}</Link>
       </div>
       <PageHeader
         icon="fa-desktop"
-        title={`Monitoring — ${assessment.title}`}
-        description="Theo dõi hoạt động, điều chỉnh thời gian và buộc nộp bài."
+        title={tr("Monitoring — {0}", { 0: (assessment.title) })}
+        description={tr("Theo dõi hoạt động, điều chỉnh thời gian và buộc nộp bài.")}
         actions={
           <>
             <Badge tone={connected ? "active" : "danger"}>
               <i className="fa-solid fa-circle text-[6px]" />
-              {connected ? "Live" : "Disconnected"}
+              {connected ? tr("Live") : tr("Disconnected")}
             </Badge>
             <Button
               variant="secondary"
@@ -163,8 +165,7 @@ export default function MonitorPage() {
                 ).catch((err) => setError(errorMessage(err)))
               }
             >
-              <i className="fa-solid fa-download" /> Xuất vi phạm
-            </Button>
+              <i className="fa-solid fa-download" />{" " + tr("Xuất vi phạm")}</Button>
           </>
         }
       />
@@ -173,14 +174,14 @@ export default function MonitorPage() {
       {notice && <Alert tone="success" className="mb-3">{notice}</Alert>}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon="fa-user-clock" label="Đang làm" value={active.length} tone="amber" />
-        <StatCard icon="fa-circle-check" label="Đã nộp" value={submitted.length} tone="emerald" />
-        <StatCard icon="fa-triangle-exclamation" label="Sự kiện giám sát" value={events.length} tone="rose" />
-        <StatCard icon="fa-eye" label="Dấu hiệu vi phạm" value={violations.length} tone="purple" />
+        <StatCard icon="fa-user-clock" label={tr("Đang làm")} value={active.length} tone="amber" />
+        <StatCard icon="fa-circle-check" label={tr("Đã nộp")} value={submitted.length} tone="emerald" />
+        <StatCard icon="fa-triangle-exclamation" label={tr("Sự kiện giám sát")} value={events.length} tone="rose" />
+        <StatCard icon="fa-eye" label={tr("Dấu hiệu vi phạm")} value={violations.length} tone="purple" />
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-3">
-        <Card className="xl:col-span-2" title="Lượt làm bài" subtitle="Chọn lượt làm để thao tác">
+        <Card className="xl:col-span-2" title={tr("Lượt làm bài")} subtitle={tr("Chọn lượt làm để thao tác")}>
           {attempts.length ? (
             <div className="space-y-2">
               {attempts.map((attempt) => {
@@ -200,12 +201,10 @@ export default function MonitorPage() {
                   >
                     <div>
                       <p className="text-sm font-semibold text-slate-700">
-                        {attempt.student?.name || `Lượt làm #${attempt.id}`}
+                        {attempt.student?.name || tr("Lượt làm #{0}", { 0: (attempt.id) })}
                       </p>
-                      <p className="text-xs text-slate-500">
-                        Q{attempt.currentQuestion ?? "—"} · hạn nộp{" "}
-                        {formatDateTime(attempt.deadline)} · {attemptEvents.length} sự kiện
-                      </p>
+                      <p className="text-xs text-slate-500">{tr("Q")}{attempt.currentQuestion ?? "—"}{" " + tr("· hạn nộp")}{" "}
+                        {formatDateTime(attempt.deadline, locale)} · {attemptEvents.length}{" " + tr("sự kiện")}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       {attempt.score !== null && (
@@ -222,16 +221,16 @@ export default function MonitorPage() {
               })}
             </div>
           ) : (
-            <EmptyState icon="fa-user-clock" title="Chưa có lượt làm bài" />
+            <EmptyState icon="fa-user-clock" title={tr("Chưa có lượt làm bài")} />
           )}
         </Card>
 
         <Card
-          title="Điều khiển bài thi"
+          title={tr("Điều khiển bài thi")}
           subtitle={
             selectedAttempt
-              ? `Target: ${selectedAttempt.student?.name || selectedAttempt.id}`
-              : "Select an attempt"
+              ? tr("Target: {0}", { 0: (selectedAttempt.student?.name || selectedAttempt.id) })
+              : tr("Select an attempt")
           }
         >
           <div className="space-y-3">
@@ -242,16 +241,14 @@ export default function MonitorPage() {
                 disabled={!selectedAttempt}
                 onClick={() => action("adjust_time", { seconds: 300 })}
               >
-                <i className="fa-solid fa-plus" /> 5 phút
-              </Button>
+                <i className="fa-solid fa-plus" />{" " + tr("5 phút")}</Button>
               <Button
                 size="sm"
                 variant="secondary"
                 disabled={!selectedAttempt}
                 onClick={() => action("adjust_time", { seconds: -300 })}
               >
-                <i className="fa-solid fa-minus" /> 5 phút
-              </Button>
+                <i className="fa-solid fa-minus" />{" " + tr("5 phút")}</Button>
             </div>
             <Button
               size="sm"
@@ -269,15 +266,14 @@ export default function MonitorPage() {
                 }
               }}
             >
-              <i className="fa-solid fa-stop" /> Buộc nộp bài
-            </Button>
+              <i className="fa-solid fa-stop" />{" " + tr("Buộc nộp bài")}</Button>
             <div className="border-t border-slate-100 pt-3">
-              <Field label="Thông báo chung / cá nhân">
+              <Field label={tr("Thông báo chung / cá nhân")}>
                 <Textarea
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
                   className="min-h-16"
-                  placeholder="Vui lòng ở lại trang làm bài."
+                  placeholder={tr("Vui lòng ở lại trang làm bài.")}
                 />
               </Field>
               <div className="mt-2 grid grid-cols-2 gap-2">
@@ -290,7 +286,7 @@ export default function MonitorPage() {
                   }}
                 >
                   <i className="fa-solid fa-bullhorn" />
-                  {selectedAttempt ? "Send to selected" : "Broadcast"}
+                  {selectedAttempt ? tr("Send to selected") : tr("Broadcast")}
                 </Button>
                 <Button
                   size="sm"
@@ -300,15 +296,11 @@ export default function MonitorPage() {
                     action("alert", { message }, false);
                     setMessage("");
                   }}
-                >
-                  Gửi cho tất cả
-                </Button>
+                >{tr("Gửi cho tất cả")}</Button>
               </div>
             </div>
             {!connected && (
-              <Alert tone="warning">
-                Mất kết nối trực tiếp. Hệ thống đang kết nối lại; thao tác tạm khóa.
-              </Alert>
+              <Alert tone="warning">{tr("Mất kết nối trực tiếp. Hệ thống đang kết nối lại; thao tác tạm khóa.")}</Alert>
             )}
           </div>
         </Card>
@@ -316,12 +308,10 @@ export default function MonitorPage() {
 
       <Card
         className="mt-5"
-        title="Giám sát trực tiếp"
-        subtitle="Sự kiện mới nhất ở trên. Các thao tác sao chép, dán, chuyển tab và mất tập trung được lưu."
+        title={tr("Giám sát trực tiếp")}
+        subtitle={tr("Sự kiện mới nhất ở trên. Các thao tác sao chép, dán, chuyển tab và mất tập trung được lưu.")}
         actions={
-          <Button variant="ghost" size="sm" onClick={() => setEvents([])}>
-            Xóa nội dung hiển thị
-          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setEvents([])}>{tr("Xóa nội dung hiển thị")}</Button>
         }
       >
         {events.length ? (
@@ -339,11 +329,10 @@ export default function MonitorPage() {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-semibold text-slate-700">
                     {event.kind.replaceAll("_", " ")}
-                    <span className="ml-2 font-normal text-slate-400">
-                      lượt làm #{event.attemptId}
+                    <span className="ml-2 font-normal text-slate-400">{tr("lượt làm #")}{event.attemptId}
                     </span>
                   </p>
-                  <span className="text-slate-400">{relativeTime(event.createdAt)}</span>
+                  <span className="text-slate-400">{relativeTime(event.createdAt, locale)}</span>
                 </div>
                 <pre className="mt-1 whitespace-pre-wrap text-[11px] text-slate-500">
                   {JSON.stringify(event.detail)}
@@ -354,8 +343,8 @@ export default function MonitorPage() {
         ) : (
           <EmptyState
             icon="fa-satellite-dish"
-            title="Đang chờ sự kiện"
-            description="Sự kiện tập trung, toàn màn hình, chuyển tab, sao chép và kết nối xuất hiện trực tiếp tại đây."
+            title={tr("Đang chờ sự kiện")}
+            description={tr("Sự kiện tập trung, toàn màn hình, chuyển tab, sao chép và kết nối xuất hiện trực tiếp tại đây.")}
           />
         )}
       </Card>

@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "../../../../components/LanguageProvider";
+
 import { confirmInline } from "../../../../components/InlineConfirm";
 
 import Link from "next/link";
@@ -26,6 +28,7 @@ type RunResult = {
 };
 
 export default function AttemptPage() {
+  const { tr, locale } = useI18n();
   const params = useParams<{ id: string }>();
   const attemptId = Number(params.id);
   const router = useRouter();
@@ -164,7 +167,7 @@ export default function AttemptPage() {
         );
         setNotice(
           `The teacher adjusted your deadline (${payload.seconds ?? 0}s). New deadline: ${formatDateTime(
-            payload.deadline,
+            payload.deadline, locale,
           )}.`,
         );
       },
@@ -321,35 +324,29 @@ export default function AttemptPage() {
     }
   }
 
-  if (loading) return <Spinner label="Đang tải lượt làm…" />;
+  if (loading) return <Spinner label={tr("Đang tải lượt làm…")} />;
   if (error && !attempt) return <Alert tone="danger">{error}</Alert>;
   if (!attempt) return null;
 
   if (attempt.status === "submitted") {
     return (
       <div className="mx-auto max-w-xl">
-        <Card title="Đã nộp bài" subtitle={`Submitted ${formatDateTime(attempt.submittedAt)}`}>
+        <Card title={tr("Đã nộp bài")} subtitle={tr("Submitted {0}", { 0: (formatDateTime(attempt.submittedAt, locale)) })}>
           <div className="text-center">
             <p className="text-4xl font-bold text-slate-800">
               {attempt.score ?? 0}
               <span className="text-lg text-slate-400"> / {attempt.maxScore}</span>
             </p>
-            <p className="mt-2 text-sm text-slate-500">
-              Bài được chấm trên máy chủ. Câu lập trình có thể cần thêm thời gian xử lý.
-            </p>
+            <p className="mt-2 text-sm text-slate-500">{tr("Bài được chấm trên máy chủ. Câu lập trình có thể cần thêm thời gian xử lý.")}</p>
             <div className="mt-5 flex justify-center gap-2">
               <Link
                 href={`/assessments/${attempt.assessmentId}`}
                 className="rounded-md bg-teal-700 px-4 py-2 text-sm font-medium text-white"
-              >
-                Quay lại bài kiểm tra
-              </Link>
+              >{tr("Quay lại bài kiểm tra")}</Link>
               <Link
                 href={`/courses/${attempt.assessment?.courseId || ""}`}
                 className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700"
-              >
-                Quay lại lớp học
-              </Link>
+              >{tr("Quay lại lớp học")}</Link>
             </div>
           </div>
         </Card>
@@ -367,12 +364,10 @@ export default function AttemptPage() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
         <div>
           <p className="text-sm font-semibold text-slate-800">
-            {attempt.assessment?.title || "Assessment attempt"}
+            {attempt.assessment?.title || tr("Assessment attempt")}
           </p>
-          <p className="text-xs text-slate-500">
-            Hạn nộp {formatDateTime(attempt.deadline)} · {answeredCount}/
-            {questions.length} đã trả lời · {attempt.flaggedQuestions?.length || 0} đã đánh dấu
-          </p>
+          <p className="text-xs text-slate-500">{tr("Hạn nộp") + " "}{formatDateTime(attempt.deadline, locale)} · {answeredCount}/
+            {questions.length}{" " + tr("đã trả lời ·") + " "}{attempt.flaggedQuestions?.length || 0}{" " + tr("đã đánh dấu")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span
@@ -396,7 +391,7 @@ export default function AttemptPage() {
             }
           >
             <i className={cn("fa-solid", fullscreen ? "fa-compress" : "fa-expand")} />
-            {fullscreen ? "Exit fullscreen" : "Fullscreen"}
+            {fullscreen ? tr("Exit fullscreen") : tr("Fullscreen")}
           </Button>
           <Button
             size="sm"
@@ -404,13 +399,12 @@ export default function AttemptPage() {
             loading={submitting}
             disabled={expired}
             onClick={async () => {
-              if (await confirmInline("Nộp bài này? Sau khi nộp bạn không thể thay đổi đáp án.")) {
+              if (await confirmInline(tr("Nộp bài này? Sau khi nộp bạn không thể thay đổi đáp án."))) {
                 submit(false);
               }
             }}
           >
-            <i className="fa-solid fa-paper-plane" /> Nộp
-          </Button>
+            <i className="fa-solid fa-paper-plane" />{" " + tr("Nộp")}</Button>
         </div>
       </div>
 
@@ -421,29 +415,25 @@ export default function AttemptPage() {
               <i className="fa-solid fa-bullhorn mr-2" />
               {alertMessage}
             </span>
-            <button onClick={() => setAlertMessage("")} className="text-xs underline">
-              Ẩn thông báo
-            </button>
+            <button onClick={() => setAlertMessage("")} className="text-xs underline">{tr("Ẩn thông báo")}</button>
           </div>
         </Alert>
       )}
       {error && <Alert tone="danger" className="mb-3">{error}</Alert>}
       {notice && <Alert tone="info" className="mb-3">{notice}</Alert>}
       {expired && (
-        <Alert tone="danger" className="mb-3">
-          Đã quá hạn trên máy chủ. Giảng viên có thể buộc nộp bài.
-        </Alert>
+        <Alert tone="danger" className="mb-3">{tr("Đã quá hạn trên máy chủ. Giảng viên có thể buộc nộp bài.")}</Alert>
       )}
 
       <div className="grid gap-4 lg:grid-cols-[220px_1fr]">
-        <Card title="Câu hỏi" bodyClassName="p-2">
+        <Card title={tr("Câu hỏi")} bodyClassName="p-2">
           <div className="grid grid-cols-5 gap-1 lg:grid-cols-4">
             {questions.map((item, itemIndex) => {
               const answered = (answers[String(item.id)] || "").trim().length > 0;
               return (
                 <button
                   key={item.id}
-                  aria-label={`Question ${itemIndex + 1}${attempt.flaggedQuestions?.includes(item.id) ? ", flagged for review" : ""}`}
+                  aria-label={tr("Question {0}{1}", { 0: (itemIndex + 1), 1: (attempt.flaggedQuestions?.includes(item.id) ? ", flagged for review" : "") })}
                   onClick={async () => {
                     setIndex(itemIndex);
                     setRunResults(null);
@@ -464,23 +454,17 @@ export default function AttemptPage() {
             })}
           </div>
           <div className="mt-3 space-y-1 border-t border-slate-100 p-2 text-[11px] text-slate-500">
-            <p><i className="fa-solid fa-flag mr-1 text-amber-500" /> Đánh dấu để xem lại (không ảnh hưởng điểm)</p>
+            <p><i className="fa-solid fa-flag mr-1 text-amber-500" />{" " + tr("Đánh dấu để xem lại (không ảnh hưởng điểm)")}</p>
             <p>
-              <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-400" />
-              Đã trả lời
-            </p>
+              <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-400" />{tr("Đã trả lời")}</p>
             <p>
-              <span className="mr-1 inline-block h-2 w-2 rounded-full bg-slate-300" />
-              Chưa trả lời
-            </p>
+              <span className="mr-1 inline-block h-2 w-2 rounded-full bg-slate-300" />{tr("Chưa trả lời")}</p>
           </div>
         </Card>
 
         <Card
-          title={`Question ${index + 1} of ${questions.length}`}
-          subtitle={`${question?.points ?? 0} điểm · ${question?.kind || ""}${
-            question?.language ? ` · ${question.language}` : ""
-          }`}
+          title={tr("Question {0} of {1}", { 0: (index + 1), 1: (questions.length) })}
+          subtitle={tr("{0} điểm · {1}{2}", { 0: (question?.points ?? 0), 1: (question?.kind || ""), 2: (question?.language ? ` · ${question.language}` : "") })}
         >
           {question ? (
             <div className="space-y-4">
@@ -488,7 +472,7 @@ export default function AttemptPage() {
                 disabled={expired || submitting} aria-pressed={attempt.flaggedQuestions?.includes(question.id) || false}
                 onClick={() => toggleFlag(question.id)}>
                 <i className="fa-solid fa-flag text-amber-500" />
-                {attempt.flaggedQuestions?.includes(question.id) ? "Remove flag / Bỏ cờ" : "Flag for review / Gắn cờ"}
+                {attempt.flaggedQuestions?.includes(question.id) ? tr("Remove flag / Bỏ cờ") : tr("Flag for review / Gắn cờ")}
               </Button>
               <p className="prose-lesson text-sm text-slate-700">{question.prompt}</p>
 
@@ -525,7 +509,7 @@ export default function AttemptPage() {
                 <Textarea
                   value={answers[String(question.id)] || ""}
                   onChange={(event) => updateAnswer(question.id, event.target.value)}
-                  placeholder="Câu trả lời của bạn…"
+                  placeholder={tr("Câu trả lời của bạn…")}
                 />
               )}
 
@@ -535,17 +519,17 @@ export default function AttemptPage() {
                     value={answers[String(question.id)] || ""}
                     onChange={(event) => updateAnswer(question.id, event.target.value)}
                     className="min-h-64 font-mono text-xs"
-                    placeholder={`Write your ${question.language || "code"} solution…`}
+                    placeholder={tr("Write your {0} solution…", { 0: (question.language || "code") })}
                     spellCheck={false}
                   />
                   {question.testCases && question.testCases.length > 0 && (
                     <div className="space-y-1 rounded-md border border-slate-100 bg-slate-50 p-2 text-xs">
-                      <p className="font-semibold text-slate-600">Bộ kiểm thử công khai</p>
+                      <p className="font-semibold text-slate-600">{tr("Bộ kiểm thử công khai")}</p>
                       {question.testCases.map((testCase, caseIndex) => (
                         <div key={caseIndex} className="rounded bg-white p-2">
-                          <p className="text-slate-500">Đầu vào:</p>
-                          <pre className="whitespace-pre-wrap">{testCase.input || "(empty)"}</pre>
-                          <p className="text-slate-500">Kết quả mong đợi:</p>
+                          <p className="text-slate-500">{tr("Đầu vào:")}</p>
+                          <pre className="whitespace-pre-wrap">{testCase.input || tr("(empty)")}</pre>
+                          <p className="text-slate-500">{tr("Kết quả mong đợi:")}</p>
                           <pre className="whitespace-pre-wrap">
                             {testCase.expectedOutput}
                           </pre>
@@ -559,20 +543,18 @@ export default function AttemptPage() {
                     loading={running}
                     onClick={runSample}
                   >
-                    <i className="fa-solid fa-play" /> Chạy thử mẫu công khai
-                  </Button>
+                    <i className="fa-solid fa-play" />{" " + tr("Chạy thử mẫu công khai")}</Button>
                   {runResults && (
                     <div className="space-y-1">
                       {runResults.length === 0 && (
-                        <Alert tone="info">Câu hỏi này chưa có bộ kiểm thử công khai.</Alert>
+                        <Alert tone="info">{tr("Câu hỏi này chưa có bộ kiểm thử công khai.")}</Alert>
                       )}
                       {runResults.map((result) => (
                         <Alert
                           key={result.testCaseId}
                           tone={result.passed ? "success" : "danger"}
-                        >
-                          Bộ kiểm thử #{result.testCaseId}:{" "}
-                          {result.passed ? "passed" : result.error || "failed"}
+                        >{tr("Bộ kiểm thử #")}{result.testCaseId}:{" "}
+                          {result.passed ? tr("passed") : result.error || tr("failed")}
                           {!result.passed && result.stderr && (
                             <pre className="mt-1 max-h-32 overflow-auto whitespace-pre-wrap text-xs">
                               {result.stderr}
@@ -594,16 +576,14 @@ export default function AttemptPage() {
                     setRunResults(null);
                   }}
                 >
-                  <i className="fa-solid fa-arrow-left" /> Trước
-                </Button>
+                  <i className="fa-solid fa-arrow-left" />{" " + tr("Trước")}</Button>
                 {index < questions.length - 1 ? (
                   <Button
                     onClick={async () => {
                       setIndex((value) => Math.min(questions.length - 1, value + 1));
                       setRunResults(null);
                     }}
-                  >
-                    Tiếp <i className="fa-solid fa-arrow-right" />
+                  >{tr("Tiếp") + " "}<i className="fa-solid fa-arrow-right" />
                   </Button>
                 ) : (
                   <Button
@@ -611,16 +591,15 @@ export default function AttemptPage() {
                     loading={submitting}
                     disabled={expired}
                     onClick={async () => {
-                      if (await confirmInline("Nộp bài này?")) submit(false);
+                      if (await confirmInline(tr("Nộp bài này?"))) submit(false);
                     }}
                   >
-                    <i className="fa-solid fa-paper-plane" /> Nộp bài
-                  </Button>
+                    <i className="fa-solid fa-paper-plane" />{" " + tr("Nộp bài")}</Button>
                 )}
               </div>
             </div>
           ) : (
-            <Alert tone="info">Bài kiểm tra này chưa có câu hỏi.</Alert>
+            <Alert tone="info">{tr("Bài kiểm tra này chưa có câu hỏi.")}</Alert>
           )}
         </Card>
       </div>
@@ -629,13 +608,11 @@ export default function AttemptPage() {
         <Button
           variant="ghost"
           onClick={async () => {
-            if (await confirmInline("Rời trang này? Các đáp án đã lưu vẫn được giữ trên máy chủ.")) {
+            if (await confirmInline(tr("Rời trang này? Các đáp án đã lưu vẫn được giữ trên máy chủ."))) {
               router.push(`/assessments/${attempt.assessmentId}`);
             }
           }}
-        >
-          Rời bài làm
-        </Button>
+        >{tr("Rời bài làm")}</Button>
       </div>
     </div>
   );

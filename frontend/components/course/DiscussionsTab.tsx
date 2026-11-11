@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "../LanguageProvider";
+
 import { confirmInline } from "../InlineConfirm";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
@@ -17,6 +19,7 @@ import {
 import { isStaff, type CourseTabProps } from "./types";
 
 export function DiscussionsTab({ course, role, user }: CourseTabProps) {
+  const { tr, language, locale } = useI18n();
   const staff = isStaff(role);
   const [posts, setPosts] = useState<DiscussionPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,7 +98,7 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
   }
 
   async function remove(post: DiscussionPost) {
-    if (!await confirmInline("Xóa bài thảo luận này?")) return;
+    if (!await confirmInline(tr("Xóa bài thảo luận này?"))) return;
     try {
       await api(`/api/discussions/${post.id}`, { method: "DELETE" });
       await load();
@@ -104,7 +107,7 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
     }
   }
 
-  if (loading) return <Spinner label="Đang tải thảo luận…" />;
+  if (loading) return <Spinner label={tr("Đang tải thảo luận…")} />;
 
   function renderPost(post: DiscussionPost, nested = false) {
     return (
@@ -118,9 +121,9 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
               <Avatar name={post.author?.name} role={post.author?.role} />
               <div>
                 <p className="text-sm font-semibold text-slate-700">
-                  {post.author?.name || "Unknown"}{" "}
+                  {post.author?.name || tr("Unknown")}{" "}
                   <span className="text-[11px] font-normal text-slate-400">
-                    {roleLabel(post.author?.role)} · {formatDateTime(post.createdAt)}
+                    {roleLabel(post.author?.role, language)} · {formatDateTime(post.createdAt, locale)}
                   </span>
                 </p>
                 <p className="prose-lesson mt-1 text-sm text-slate-600">{post.body}</p>
@@ -136,8 +139,7 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
                     setReplyBody("");
                   }}
                 >
-                  <i className="fa-solid fa-reply" /> Trả lời
-                </Button>
+                  <i className="fa-solid fa-reply" />{" " + tr("Trả lời")}</Button>
               )}
               {(staff || post.author?.id === user.id) && (
                 <Button size="sm" variant="ghost" onClick={() => remove(post)}>
@@ -153,16 +155,12 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
             <Textarea
               value={replyBody}
               onChange={(event) => setReplyBody(event.target.value)}
-              placeholder="Viết trả lời…"
+              placeholder={tr("Viết trả lời…")}
               className="min-h-16 flex-1"
             />
             <div className="flex flex-col gap-1">
-              <Button size="sm" loading={saving} onClick={() => reply(post.id)}>
-                Gửi
-              </Button>
-              <Button size="sm" variant="secondary" onClick={() => setReplyTo(null)}>
-                Hủy
-              </Button>
+              <Button size="sm" loading={saving} onClick={() => reply(post.id)}>{tr("Gửi")}</Button>
+              <Button size="sm" variant="secondary" onClick={() => setReplyTo(null)}>{tr("Hủy")}</Button>
             </div>
           </div>
         )}
@@ -173,25 +171,24 @@ export function DiscussionsTab({ course, role, user }: CourseTabProps) {
   return (
     <div className="space-y-4">
       {error && <Alert tone="danger">{error}</Alert>}
-      <Card title="Thảo luận" subtitle="Đặt câu hỏi và trả lời bạn cùng lớp">
+      <Card title={tr("Thảo luận")} subtitle={tr("Đặt câu hỏi và trả lời bạn cùng lớp")}>
         <form onSubmit={post} className="flex flex-col gap-2 sm:flex-row">
           <Textarea
             value={body}
             onChange={(event) => setBody(event.target.value)}
-            placeholder="Bắt đầu thảo luận…"
+            placeholder={tr("Bắt đầu thảo luận…")}
             className="min-h-16 flex-1"
           />
           <Button type="submit" loading={saving} className="sm:self-end">
-            <i className="fa-solid fa-paper-plane" /> Đăng
-          </Button>
+            <i className="fa-solid fa-paper-plane" />{" " + tr("Đăng")}</Button>
         </form>
         {roots.length ? (
           <div>{roots.map((post) => renderPost(post))}</div>
         ) : (
           <EmptyState
             icon="fa-comments"
-            title="Chưa có thảo luận"
-            description="Hãy bắt đầu cuộc thảo luận."
+            title={tr("Chưa có thảo luận")}
+            description={tr("Hãy bắt đầu cuộc thảo luận.")}
           />
         )}
       </Card>

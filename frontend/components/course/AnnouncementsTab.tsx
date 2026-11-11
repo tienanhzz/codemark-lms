@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "../LanguageProvider";
+
 import { confirmInline } from "../InlineConfirm";
 
 import { FormEvent, useEffect, useState } from "react";
@@ -20,6 +22,7 @@ import {
 import { isStaff, type CourseTabProps } from "./types";
 
 export function AnnouncementsTab({ course, role, user }: CourseTabProps) {
+  const { tr, language, locale } = useI18n();
   const staff = isStaff(role);
   const [items, setItems] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +68,7 @@ export function AnnouncementsTab({ course, role, user }: CourseTabProps) {
   }
 
   async function remove(item: Announcement) {
-    if (!await confirmInline("Xóa thông báo này?")) return;
+    if (!await confirmInline(tr("Xóa thông báo này?"))) return;
     try {
       await api(`/api/announcements/${item.id}`, { method: "DELETE" });
       await load();
@@ -74,19 +77,18 @@ export function AnnouncementsTab({ course, role, user }: CourseTabProps) {
     }
   }
 
-  if (loading) return <Spinner label="Đang tải thông báo…" />;
+  if (loading) return <Spinner label={tr("Đang tải thông báo…")} />;
 
   return (
     <div className="space-y-4">
       {error && <Alert tone="danger">{error}</Alert>}
       <Card
-        title="Thông báo"
-        subtitle="Thông báo cho toàn lớp"
+        title={tr("Thông báo")}
+        subtitle={tr("Thông báo cho toàn lớp")}
         actions={
           staff ? (
             <Button size="sm" onClick={() => setOpen(true)}>
-              <i className="fa-solid fa-bullhorn" /> Thêm thông báo
-            </Button>
+              <i className="fa-solid fa-bullhorn" />{" " + tr("Thêm thông báo")}</Button>
           ) : undefined
         }
       >
@@ -100,8 +102,8 @@ export function AnnouncementsTab({ course, role, user }: CourseTabProps) {
                     <div>
                       <p className="text-sm font-semibold text-slate-700">{item.title}</p>
                       <p className="text-[11px] text-slate-400">
-                        {item.author?.name || "Staff"} ·{" "}
-                        {roleLabel(item.author?.role)} · {formatDateTime(item.createdAt)}
+                        {item.author?.name || tr("Staff")} ·{" "}
+                        {roleLabel(item.author?.role, language)} · {formatDateTime(item.createdAt, locale)}
                       </p>
                     </div>
                   </div>
@@ -116,30 +118,26 @@ export function AnnouncementsTab({ course, role, user }: CourseTabProps) {
             ))}
           </div>
         ) : (
-          <EmptyState icon="fa-bullhorn" title="Chưa có thông báo" />
+          <EmptyState icon="fa-bullhorn" title={tr("Chưa có thông báo")} />
         )}
       </Card>
 
       <Drawer
         open={open}
         onClose={() => setOpen(false)}
-        title="Thêm thông báo"
+        title={tr("Thêm thông báo")}
         footer={
           <>
-            <Button variant="secondary" onClick={() => setOpen(false)}>
-              Hủy
-            </Button>
-            <Button type="submit" form="announcement-form" loading={saving}>
-              Công bố
-            </Button>
+            <Button variant="secondary" onClick={() => setOpen(false)}>{tr("Hủy")}</Button>
+            <Button type="submit" form="announcement-form" loading={saving}>{tr("Công bố")}</Button>
           </>
         }
       >
         <form id="announcement-form" onSubmit={save} className="space-y-3">
-          <Field label="Tiêu đề">
+          <Field label={tr("Tiêu đề")}>
             <Input name="title" required />
           </Field>
-          <Field label="Nội dung">
+          <Field label={tr("Nội dung")}>
             <Textarea name="body" className="min-h-40" />
           </Field>
         </form>

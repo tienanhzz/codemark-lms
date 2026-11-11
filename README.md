@@ -4,6 +4,8 @@
 
 ### Trang chủ, băng chuyền ảnh và thông báo công khai
 
+Chỉ bố trí lại khung đầu trang thành hai hàng: logo bên trái, tài khoản hoặc nút Đăng nhập bên phải, thanh truy cập nhanh và chuông thông báo bên dưới. Giữ giao diện trắng, xám nhạt và xanh teal của CodeMark cùng luồng đăng nhập ban đầu. Sidebar, nội dung trang chủ, băng chuyền và bảng tin giữ nguyên.
+
 Cập nhật giao diện: bỏ bộ đếm và nút chuyển ảnh, dùng favicon web ở đầu sidebar. Trang đăng nhập căn giữa trên nền đơn giản; mục **Quên mật khẩu?** và **Cần hỗ trợ?** mở hướng dẫn dưới form. Việc cấp lại mật khẩu vẫn do quản trị viên thực hiện sau khi xác minh, chưa có luồng tự khôi phục.
 
 Mở `/` để xem trang chủ mới. Admin/giảng viên đăng thông báo bằng **Trang chủ → Đăng thông báo**; khách và sinh viên chỉ xem. Sidebar desktop thu gọn thành icon, mở khi rê chuột hoặc dùng bàn phím. Sau đăng nhập về trang chủ, riêng tài khoản bắt đổi mật khẩu vẫn về form đổi mật khẩu.
@@ -83,7 +85,13 @@ In another terminal at the project root:
 npm run dev:frontend
 ```
 
-For a production frontend build, run `npm run build:frontend`, followed by `npm run start --workspace=frontend`. Stop the frontend development server before building to avoid concurrent writes to `.next`.
+For a production frontend build, run `npm run build:frontend`, followed by `npm run start --workspace=frontend`. Development output is stored in `frontend/.next-dev/`; production build/start use `frontend/.next/`, so a production build does not overwrite chunks used by the development server. Stop the development server before starting production on the same port 3000.
+
+### Sửa lỗi thiếu module `./949.js` hoặc chunk Next.js
+
+Lỗi này xảy ra khi phiên dev và lệnh build cùng ghi vào `.next`, khiến runtime tham chiếu các chunk đã bị thay thế. Cấu hình hiện tại đã tách thư mục dev và production để tránh xung đột này. Sau khi cập nhật, dừng phiên frontend cũ bằng **Ctrl+C** rồi chạy lại `npm.cmd run dev:frontend` (hoặc `npm.cmd run dev` nếu cần khởi động cả backend). Tải lại trang để nhận các chunk mới. Giao diện và dữ liệu ứng dụng không thay đổi.
+
+Đã kiểm tra: build production khi dev đang chạy; truy cập `/`, `/login`, `/courses` và 16 tài nguyên JavaScript/CSS trước, trong và sau build; chạy thử production trên cổng tạm riêng. Các trang và tài nguyên đều trả HTTP 200, tài nguyên dev cũ vẫn truy cập được sau build. Kiểm tra TypeScript cũng thành công.
 
 ## LAN access
 
@@ -182,6 +190,10 @@ GitHub Actions builds and tests the Java backend and builds the Next.js frontend
 
 ## Limitations
 
+### Cảnh báo hydration tại `<html class="mdl-js">`
+
+Nếu trình duyệt hoặc tiện ích chèn thuộc tính lên thẻ `<html>` trước khi React khởi tạo, React có thể báo thuộc tính HTML máy chủ và trình duyệt không khớp. Lớp `mdl-js` trong ảnh lỗi không có trong mã dự án hoặc HTML máy chủ trả về. `frontend/app/layout.tsx` dùng `suppressHydrationWarning` riêng trên thẻ `<html>` để chấp nhận thay đổi thuộc tính gốc từ bên ngoài; các thành phần bên trong vẫn được kiểm tra hydration. Giao diện, SSR và luồng đăng nhập giữ nguyên.
+
 ### Thông báo bắt buộc đổi mật khẩu lần đầu
 
 - Khi tài khoản có cờ `mustChangePassword`, trang Tài khoản hiển thị lời nhắc ngay trên form đổi mật khẩu.
@@ -199,6 +211,13 @@ GitHub Actions builds and tests the Java backend and builds the Next.js frontend
 - H2 is intended for the single-host demo configuration.
 - Internet deployment requires appropriate HTTPS, reverse proxy, credential and operational configuration.
 - Exam monitoring records events inside the application page and cannot guarantee prevention of cheating.
+
+## Ngôn ngữ giao diện
+
+- Chọn **Tiếng Việt** hoặc **English** tại nút ngôn ngữ trên thanh đầu trang hoặc trang đăng nhập. Lựa chọn được lưu trong cookie `codemark-language` trong một năm và dùng ngay khi máy chủ dựng trang; mặc định là tiếng Việt.
+- Thay đổi ngôn ngữ cập nhật các nhãn, hướng dẫn, thông báo lỗi, lịch, ngày giờ và bảng xếp hạng mà không tải lại trang hoặc đặt lại dữ liệu đang nhập. Nội dung lớp học, tên người dùng, bài làm và thông báo do người dùng nhập được giữ nguyên.
+- Bản dịch giao diện nằm trong `frontend/locales/en.json` và `frontend/locales/vi.json`. Nhãn tiếng Việt là văn bản gốc; từ điển tiếng Việt cũng chuẩn hóa những nhãn trước đây viết bằng tiếng Anh. Thêm bản dịch bằng `tr()` từ `useI18n()`; dùng tham số `{0}`, `{1}` cho dữ liệu động, không dịch mã API hay giá trị gửi lên máy chủ.
+- Chạy `npm run test:i18n` để kiểm tra bản dịch, tham số, thông báo lỗi và định dạng theo ngôn ngữ; chạy `npm run build:frontend` để kiểm tra bản build. Kiểm tra thao tác: đổi Việt → Anh → Việt, chuyển trang và tải lại để kiểm tra lựa chọn được giữ; nhập một phần biểu mẫu rồi đổi ngôn ngữ để kiểm tra dữ liệu nhập vẫn còn.
 
 ## References
 

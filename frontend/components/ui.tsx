@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "./LanguageProvider";
 
 import {
   ButtonHTMLAttributes,
@@ -35,6 +36,7 @@ export function Button({
   size?: "sm" | "md";
   loading?: boolean;
 }) {
+  const { tr } = useI18n();
   return (
     <button
       {...props}
@@ -47,7 +49,7 @@ export function Button({
       )}
     >
       {loading && <i className="fa-solid fa-circle-notch animate-spin" />}
-      {typeof children === "string" ? ({admin:"Quản trị viên",teacher:"Giảng viên",ta:"Trợ giảng",student:"Sinh viên",pending:"Chờ duyệt",approved:"Đã duyệt",rejected:"Đã từ chối",quiz:"Bài tập",exam:"Bài thi",assignment:"Bài tập",submitted:"Đã nộp",in_progress:"Đang làm",code:"Lập trình",mcq:"Trắc nghiệm",short:"Trả lời ngắn",draft:"Bản nháp",published:"Đã công bố"} as Record<string,string>)[children] || children : children}
+      {typeof children === "string" ? ({admin:tr("Quản trị viên"),teacher:tr("Giảng viên"),ta:tr("Trợ giảng"),student:tr("Sinh viên"),pending:tr("Chờ duyệt"),approved:tr("Đã duyệt"),rejected:tr("Đã từ chối"),quiz:tr("Bài tập"),exam:tr("Bài thi"),assignment:tr("Bài tập"),submitted:tr("Đã nộp"),in_progress:tr("Đang làm"),code:tr("Lập trình"),mcq:tr("Trắc nghiệm"),short:tr("Trả lời ngắn"),draft:tr("Bản nháp"),published:tr("Đã công bố")} as Record<string,string>)[children] || children : children}
     </button>
   );
 }
@@ -163,6 +165,7 @@ export function Badge({
   tone?: string;
   className?: string;
 }) {
+  const { tr } = useI18n();
   return (
     <span
       className={cn(
@@ -171,7 +174,7 @@ export function Badge({
         className,
       )}
     >
-      {typeof children === "string" ? ({admin:"Quản trị viên",teacher:"Giảng viên",ta:"Trợ giảng",student:"Sinh viên",pending:"Chờ duyệt",approved:"Đã duyệt",rejected:"Đã từ chối",quiz:"Bài tập",exam:"Bài thi",assignment:"Bài tập",submitted:"Đã nộp",in_progress:"Đang làm",code:"Lập trình",mcq:"Trắc nghiệm",short:"Trả lời ngắn",draft:"Bản nháp",published:"Đã công bố"} as Record<string,string>)[children] || children : children}
+      {typeof children === "string" ? ({admin:tr("Quản trị viên"),teacher:tr("Giảng viên"),ta:tr("Trợ giảng"),student:tr("Sinh viên"),pending:tr("Chờ duyệt"),approved:tr("Đã duyệt"),rejected:tr("Đã từ chối"),quiz:tr("Bài tập"),exam:tr("Bài thi"),assignment:tr("Bài tập"),submitted:tr("Đã nộp"),in_progress:tr("Đang làm"),code:tr("Lập trình"),mcq:tr("Trắc nghiệm"),short:tr("Trả lời ngắn"),draft:tr("Bản nháp"),published:tr("Đã công bố")} as Record<string,string>)[children] || children : children}
     </span>
   );
 }
@@ -185,6 +188,7 @@ export function Alert({
   children: ReactNode;
   className?: string;
 }) {
+  const { tr } = useI18n();
   const tones = {
     info: "border-teal-200 bg-teal-50 text-teal-800",
     danger: "border-rose-200 bg-rose-50 text-rose-800",
@@ -193,16 +197,17 @@ export function Alert({
   };
   return (
     <div className={cn("rounded-md border px-3 py-2 text-sm", tones[tone], className)}>
-      {children}
+      {typeof children === "string" ? tr(children) : children}
     </div>
   );
 }
 
-export function Spinner({ label = "Loading" }: { label?: string }) {
+export function Spinner({ label = "Đang tải…" }: { label?: string }) {
+  const { tr } = useI18n();
   return (
     <div className="flex items-center justify-center gap-3 py-10 text-sm text-slate-500">
       <i className="fa-solid fa-circle-notch animate-spin" />
-      {label}
+      {tr(label)}
     </div>
   );
 }
@@ -287,6 +292,7 @@ export function Drawer({
   width?: string;
   mode?: "drawer" | "page";
 }) {
+  const { tr } = useI18n();
   useEffect(() => {
     if (!open || mode !== "page") return;
     document.getElementById("drawer-root")?.scrollIntoView({block:"start"});
@@ -317,10 +323,8 @@ export function Drawer({
           <button
             onClick={onClose}
             className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-            aria-label="Đóng"
-          >
-            Quay lại
-          </button>
+            aria-label={tr("Đóng")}
+          >{tr("Quay lại")}</button>
         </header>
         <div className="p-4">{children}</div>
         {footer && (
@@ -344,6 +348,7 @@ export function Tabs({
   active: string;
   onChange: (id: string) => void;
 }) {
+  const { tr } = useI18n();
   return (
     <div className="flex flex-wrap gap-1 rounded-xl border border-slate-200/80 bg-white p-1.5">
       {tabs.map((tab) => (
@@ -359,7 +364,7 @@ export function Tabs({
           )}
         >
           {tab.icon && <i className={cn("fa-solid", tab.icon)} />}
-          {tab.label}
+          {tr(tab.label)}
         </button>
       ))}
     </div>

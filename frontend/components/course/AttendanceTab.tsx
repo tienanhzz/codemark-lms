@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "../LanguageProvider";
+
 import { confirmInline } from "../InlineConfirm";
 
 import { QRCodeSVG } from "qrcode.react";
@@ -20,6 +22,7 @@ import {
 import { isStaff, type CourseTabProps } from "./types";
 
 export function AttendanceTab({ course, role }: CourseTabProps) {
+  const { tr, locale } = useI18n();
   const staff = isStaff(role);
   const [sessions, setSessions] = useState<AttendanceSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -105,7 +108,7 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
   }
 
   async function closeSession(session: AttendanceSession) {
-    if (!await confirmInline("Đóng phiên điểm danh này?")) return;
+    if (!await confirmInline(tr("Đóng phiên điểm danh này?"))) return;
     try {
       await api(`/api/attendance-sessions/${session.id}/close`, { method: "POST" });
       if (qrSessionId === session.id) setQrSessionId(null);
@@ -138,7 +141,7 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
     [sessions, qrSessionId],
   );
 
-  if (loading) return <Spinner label="Đang tải điểm danh…" />;
+  if (loading) return <Spinner label={tr("Đang tải điểm danh…")} />;
 
   return (
     <div className="space-y-4">
@@ -146,12 +149,12 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
       {notice && <Alert tone="success">{notice}</Alert>}
 
       {staff && (
-        <Card title="Bắt đầu điểm danh" subtitle="Mở phiên điểm danh bằng mã QR có thời hạn">
+        <Card title={tr("Bắt đầu điểm danh")} subtitle={tr("Mở phiên điểm danh bằng mã QR có thời hạn")}>
           <form
             onSubmit={openSession}
             className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4"
           >
-            <Field label="Thời gian (phút)">
+            <Field label={tr("Thời gian (phút)")}>
               <Input
                 name="durationMinutes"
                 type="number"
@@ -160,24 +163,23 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
                 defaultValue={10}
               />
             </Field>
-            <Field label="Giới hạn mạng con" hint="CIDR không bắt buộc, ví dụ 192.168.1.0/24">
-              <Input name="subnet" placeholder="Mọi mạng được phép" />
+            <Field label={tr("Giới hạn mạng con")} hint={tr("CIDR không bắt buộc, ví dụ 192.168.1.0/24")}>
+              <Input name="subnet" placeholder={tr("Mọi mạng được phép")} />
             </Field>
             <div className="flex items-end">
               <Button type="submit" loading={saving} className="w-full">
-                <i className="fa-solid fa-qrcode" /> Mở phiên
-              </Button>
+                <i className="fa-solid fa-qrcode" />{" " + tr("Mở phiên")}</Button>
             </div>
           </form>
         </Card>
       )}
 
       <Card
-        title="Danh sách điểm danh"
+        title={tr("Danh sách điểm danh")}
         subtitle={
           staff
-            ? "Every session, its lượt points danh and QR rotation"
-            : "Check in to open sessions and review your history"
+            ? tr("Every session, its lượt points danh and QR rotation")
+            : tr("Check in to open sessions and review your history")
         }
       >
         {sessions.length ? (
@@ -187,18 +189,17 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold text-slate-700">
-                      {formatDateTime(session.opensAt)} → {formatDateTime(session.closesAt)}
+                      {formatDateTime(session.opensAt, locale)} → {formatDateTime(session.closesAt, locale)}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {session.checkedIn} đã điểm danh
-                      {session.subnet ? ` · subnet ${session.subnet}` : " · any network"}
+                      {session.checkedIn}{" " + tr("đã điểm danh")}{session.subnet ? tr(" · subnet {0}", { 0: (session.subnet) }) : tr(" · any network")}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     {session.active ? (
-                      <Badge tone="active">Đang hoạt động</Badge>
+                      <Badge tone="active">{tr("Đang hoạt động")}</Badge>
                     ) : (
-                      <Badge tone="closed">Đã đóng</Badge>
+                      <Badge tone="closed">{tr("Đã đóng")}</Badge>
                     )}
                     {staff ? (
                       <>
@@ -214,14 +215,12 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
                             size="sm"
                             variant="danger"
                             onClick={() => closeSession(session)}
-                          >
-                            Đóng
-                          </Button>
+                          >{tr("Đóng")}</Button>
                         )}
                       </>
                     ) : session.active ? (
                       session.mine ? (
-                        <Badge tone="approved">Đã điểm danh</Badge>
+                        <Badge tone="approved">{tr("Đã điểm danh")}</Badge>
                       ) : (
                         <Button
                           size="sm"
@@ -230,12 +229,11 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
                             setToken(session.token || "");
                           }}
                         >
-                          <i className="fa-solid fa-check" /> Điểm danh
-                        </Button>
+                          <i className="fa-solid fa-check" />{" " + tr("Điểm danh")}</Button>
                       )
                     ) : (
                       <Badge tone={session.mine ? "approved" : "danger"}>
-                        {session.mine ? "Đã points danh" : "Missed"}
+                        {session.mine ? tr("Đã points danh") : tr("Missed")}
                       </Badge>
                     )}
                   </div>
@@ -244,7 +242,7 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
                   <div className="mt-2 flex flex-wrap gap-1">
                     {session.records.map((record) => (
                       <Badge key={record.id} tone="info">
-                        {record.user?.name || "Student"}
+                        {record.user?.name || tr("Student")}
                       </Badge>
                     ))}
                   </div>
@@ -255,11 +253,11 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
         ) : (
           <EmptyState
             icon="fa-qrcode"
-            title="Chưa có phiên điểm danh"
+            title={tr("Chưa có phiên điểm danh")}
             description={
               staff
-                ? "Open a session to generate a rotating QR token."
-                : "There are no attendance sessions for this course yet."
+                ? tr("Open a session to generate a rotating QR token.")
+                : tr("There are no attendance sessions for this course yet.")
             }
           />
         )}
@@ -268,16 +266,12 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
       <Drawer
         open={qrSessionId !== null}
         onClose={() => setQrSessionId(null)}
-        title="QR điểm danh"
+        title={tr("QR điểm danh")}
         footer={
           <>
-            <Button variant="secondary" onClick={() => setQrSessionId(null)}>
-              Đóng
-            </Button>
+            <Button variant="secondary" onClick={() => setQrSessionId(null)}>{tr("Đóng")}</Button>
             {activeSession?.active && (
-              <Button variant="danger" onClick={() => closeSession(activeSession)}>
-                Kết thúc phiên
-              </Button>
+              <Button variant="danger" onClick={() => closeSession(activeSession)}>{tr("Kết thúc phiên")}</Button>
             )}
           </>
         }
@@ -288,20 +282,18 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
               {qrData.token ? (
                 <QRCodeSVG value={qrData.token} size={220} level="M" />
               ) : (
-                <p className="py-16 text-sm text-slate-500">Phiên đã đóng.</p>
+                <p className="py-16 text-sm text-slate-500">{tr("Phiên đã đóng.")}</p>
               )}
             </div>
-            <p className="text-xs text-slate-500">
-              Mã sẽ đổi sau{" "}
-              <span className="font-bold text-slate-700">{secondsLeft}s</span>. Sinh viên phải đăng nhập và dùng địa chỉ mạng được phép.
-            </p>
+            <p className="text-xs text-slate-500">{tr("Mã sẽ đổi sau")}{" "}
+              <span className="font-bold text-slate-700">{secondsLeft}{tr("s")}</span>{tr(". Sinh viên phải đăng nhập và dùng địa chỉ mạng được phép.")}</p>
             {qrData.token && (
               <code className="max-w-full break-all rounded bg-slate-100 p-2 text-[10px] text-slate-600">
                 {qrData.token}
               </code>
             )}
             <p className="text-xs text-slate-500">
-              {qrData.checkedIn} lượt điểm danh · đóng lúc {formatDateTime(qrData.closesAt)}
+              {qrData.checkedIn}{" " + tr("lượt điểm danh · đóng lúc") + " "}{formatDateTime(qrData.closesAt, locale)}
             </p>
             {qrData.records && qrData.records.length > 0 && (
               <div className="w-full space-y-1 text-left">
@@ -312,7 +304,7 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
                   >
                     <span>{record.user?.name}</span>
                     <span className="text-slate-400">
-                      {formatDateTime(record.checkedInAt)}
+                      {formatDateTime(record.checkedInAt, locale)}
                     </span>
                   </div>
                 ))}
@@ -320,30 +312,25 @@ export function AttendanceTab({ course, role }: CourseTabProps) {
             )}
           </div>
         ) : (
-          <Spinner label="Đang làm mới mã…" />
+          <Spinner label={tr("Đang làm mới mã…")} />
         )}
       </Drawer>
 
       <Drawer
         open={checkInSession !== null}
         onClose={() => setCheckInSession(null)}
-        title="Điểm danh"
+        title={tr("Điểm danh")}
         footer={
           <>
-            <Button variant="secondary" onClick={() => setCheckInSession(null)}>
-              Hủy
-            </Button>
+            <Button variant="secondary" onClick={() => setCheckInSession(null)}>{tr("Hủy")}</Button>
             <Button type="submit" form="checkin-form" loading={saving}>
-              <i className="fa-solid fa-check" /> Điểm danh
-            </Button>
+              <i className="fa-solid fa-check" />{" " + tr("Điểm danh")}</Button>
           </>
         }
       >
         <form id="checkin-form" onSubmit={checkIn} className="space-y-3">
-          <Alert tone="info">
-            Quét QR của giảng viên hoặc dán mã đi kèm. Mã hết hạn sau 30 giây và không thể dùng lại.
-          </Alert>
-          <Field label="Mã điểm danh">
+          <Alert tone="info">{tr("Quét QR của giảng viên hoặc dán mã đi kèm. Mã hết hạn sau 30 giây và không thể dùng lại.")}</Alert>
+          <Field label={tr("Mã điểm danh")}>
             <Input
               value={token}
               onChange={(event) => setToken(event.target.value)}

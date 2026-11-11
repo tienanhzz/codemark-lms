@@ -38,6 +38,7 @@ instance/
 uploads/
 node_modules/
 frontend/.next/
+frontend/.next-dev/
 
 .pytest_cache/
 .idea/

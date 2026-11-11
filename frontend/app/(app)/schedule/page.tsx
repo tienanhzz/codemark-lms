@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "../../../components/LanguageProvider";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -28,6 +29,7 @@ function colorFor(courseId: number) {
 }
 
 export default function SchedulePage() {
+  const { tr, locale } = useI18n();
   const [meetings, setMeetings] = useState<ScheduleMeeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -50,22 +52,22 @@ export default function SchedulePage() {
     [meetings],
   );
 
-  if (loading) return <Spinner label="Đang tải thời khóa biểu…" />;
+  if (loading) return <Spinner label={tr("Đang tải thời khóa biểu…")} />;
   if (error) return <Alert tone="danger">{error}</Alert>;
 
   return (
     <div>
       <PageHeader
         icon="fa-calendar-days"
-        title="Lịch học tuần"
-        description="Các lớp, giờ học và địa điểm trong tuần."
+        title={tr("Lịch học tuần")}
+        description={tr("Các lớp, giờ học và địa điểm trong tuần.")}
       />
 
       {meetings.length === 0 ? (
         <EmptyState
           icon="fa-calendar-xmark"
-          title="Chưa có lịch học"
-          description="Lịch học sẽ xuất hiện khi giảng viên thêm buổi học."
+          title={tr("Chưa có lịch học")}
+          description={tr("Lịch học sẽ xuất hiện khi giảng viên thêm buổi học.")}
         />
       ) : (
         <>
@@ -86,7 +88,7 @@ export default function SchedulePage() {
                       : "border-slate-100 bg-slate-50 text-slate-500",
                   )}
                 >
-                  {day}
+                  {tr(day)}
                   <span className="text-[10px] font-normal">
                     {byDay[index].length}
                   </span>
@@ -111,16 +113,14 @@ export default function SchedulePage() {
                       </Link>
                     ))
                   ) : (
-                    <p className="px-1 py-4 text-center text-[11px] text-slate-300">
-                      Chưa có lớp học
-                    </p>
+                    <p className="px-1 py-4 text-center text-[11px] text-slate-300">{tr("Chưa có lớp học")}</p>
                   )}
                 </div>
               </div>
             ))}
           </div>
 
-          <Card className="mt-5" title="Học kỳ của lớp" subtitle="Thời gian áp dụng lịch cho từng lớp">
+          <Card className="mt-5" title={tr("Học kỳ của lớp")} subtitle={tr("Thời gian áp dụng lịch cho từng lớp")}>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from(new Map(meetings.map((m) => [m.courseId, m])).values()).map(
                 (meeting) => (
@@ -136,7 +136,7 @@ export default function SchedulePage() {
                     </div>
                     <p className="mt-1 truncate text-xs text-slate-500">{meeting.title}</p>
                     <p className="mt-2 text-xs text-slate-500">
-                      {formatDate(meeting.startDate)} – {formatDate(meeting.endDate)}
+                      {formatDate(meeting.startDate, locale)} – {formatDate(meeting.endDate, locale)}
                     </p>
                   </div>
                 ),

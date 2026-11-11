@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "../../../../components/LanguageProvider";
+
 import { confirmInline } from "../../../../components/InlineConfirm";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
@@ -23,6 +25,7 @@ type NetworkRow = {
 };
 
 export default function BlacklistPage() {
+  const { tr, locale } = useI18n();
   const [networks, setNetworks] = useState<NetworkRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -80,31 +83,30 @@ export default function BlacklistPage() {
     <div>
       <PageHeader
         icon="fa-ban"
-        title="Danh sách IP bị chặn toàn hệ thống"
-        description="Địa chỉ IP và dải CIDR trong danh sách không thể đăng nhập hoặc kết nối hệ thống."
+        title={tr("Danh sách IP bị chặn toàn hệ thống")}
+        description={tr("Địa chỉ IP và dải CIDR trong danh sách không thể đăng nhập hoặc kết nối hệ thống.")}
       />
       {error && <Alert tone="danger" className="mb-3">{error}</Alert>}
       {notice && <Alert tone="success" className="mb-3">{notice}</Alert>}
 
-      <Card title="Thêm địa chỉ mạng" subtitle="Nhập địa chỉ IP hoặc dải CIDR">
+      <Card title={tr("Thêm địa chỉ mạng")} subtitle={tr("Nhập địa chỉ IP hoặc dải CIDR")}>
         <form onSubmit={add} className="grid gap-3 sm:grid-cols-3">
-          <Field label="IP hoặc CIDR">
+          <Field label={tr("IP hoặc CIDR")}>
             <Input name="network" required placeholder="203.0.113.0/24" />
           </Field>
-          <Field label="Lý do">
-            <Input name="reason" placeholder="Lý do chặn…" maxLength={250} />
+          <Field label={tr("Lý do")}>
+            <Input name="reason" placeholder={tr("Lý do chặn…")} maxLength={250} />
           </Field>
           <div className="flex items-end">
             <Button type="submit" variant="danger" loading={saving} className="w-full">
-              <i className="fa-solid fa-ban" /> Chặn địa chỉ mạng
-            </Button>
+              <i className="fa-solid fa-ban" />{" " + tr("Chặn địa chỉ mạng")}</Button>
           </div>
         </form>
       </Card>
 
-      <Card className="mt-4" title="Địa chỉ mạng bị chặn" bodyClassName="p-0">
+      <Card className="mt-4" title={tr("Địa chỉ mạng bị chặn")} bodyClassName="p-0">
         {loading ? (
-          <Spinner label="Đang tải danh sách chặn…" />
+          <Spinner label={tr("Đang tải danh sách chặn…")} />
         ) : networks.length ? (
           <div className="divide-y divide-slate-50">
             {networks.map((row) => (
@@ -117,13 +119,12 @@ export default function BlacklistPage() {
                     {row.network}
                   </p>
                   <p className="text-xs text-slate-500">
-                    {row.reason || "No reason recorded"} · thêm lúc{" "}
-                    {formatDateTime(row.createdAt)}
+                    {row.reason || tr("No reason recorded")}{" " + tr("· thêm lúc")}{" "}
+                    {formatDateTime(row.createdAt, locale)}
                   </p>
                 </div>
                 <Button size="sm" variant="secondary" onClick={() => remove(row)}>
-                  <i className="fa-solid fa-trash text-rose-500" /> Gỡ bỏ
-                </Button>
+                  <i className="fa-solid fa-trash text-rose-500" />{" " + tr("Gỡ bỏ")}</Button>
               </div>
             ))}
           </div>
@@ -131,8 +132,8 @@ export default function BlacklistPage() {
           <div className="p-4">
             <EmptyState
               icon="fa-shield-halved"
-              title="Chưa có địa chỉ mạng bị chặn"
-              description="Dùng danh sách này để chặn địa chỉ mạng trên toàn hệ thống."
+              title={tr("Chưa có địa chỉ mạng bị chặn")}
+              description={tr("Dùng danh sách này để chặn địa chỉ mạng trên toàn hệ thống.")}
             />
           </div>
         )}

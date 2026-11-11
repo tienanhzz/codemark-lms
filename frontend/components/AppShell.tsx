@@ -1,15 +1,16 @@
 "use client";
+import { useI18n } from "./LanguageProvider";
 
 import { Leaderboard } from "./Leaderboard";
 import { io } from "../lib/realtime";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { MouseEvent, ReactNode, useEffect, useState } from "react";
 import { SOCKET_URL, api } from "../lib/api";
-import { cn, roleLabel } from "../lib/format";
+import { cn } from "../lib/format";
 import type { Role } from "../lib/types";
 import { useAuth } from "./AuthProvider";
-import { Avatar, Button } from "./ui";
+import { WorkspaceHeader } from "./WorkspaceHeader";
 
 const ALL: Role[] = ["admin", "teacher", "ta", "student"];
 
@@ -37,7 +38,8 @@ const NAV: Array<{
 ];
 
 export function AppShell({ children, publicPage = false }: { children: ReactNode; publicPage?: boolean }) {
-  const { user, loading, logout, remindPasswordChange } = useAuth();
+  const { tr } = useI18n();
+  const { user, loading, remindPasswordChange } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -75,18 +77,16 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
     return (
       <div className="grid min-h-screen place-items-center bg-slate-100 text-slate-500">
         <div className="flex items-center gap-3 text-sm">
-          <i className="fa-solid fa-circle-notch animate-spin" />
-          Đang khôi phục phiên…
-        </div>
+          <i className="fa-solid fa-circle-notch animate-spin" />{tr("Đang khôi phục phiên…")}</div>
       </div>
     );
   }
   if (!user && !publicPage) return null;
 
   const items = user ? NAV.filter((item) => item.roles.includes(user.role)) : [
-    { href: "/", label: "Trang chủ", icon: "fa-house", roles: ALL },
-    { href: "/#announcements", label: "Thông báo", icon: "fa-bullhorn", roles: ALL },
-    { href: "/login", label: "Đăng nhập", icon: "fa-right-to-bracket", roles: ALL },
+    { href: "/", label: tr("Trang chủ"), icon: "fa-house", roles: ALL },
+    { href: "/#announcements", label: tr("Thông báo"), icon: "fa-bullhorn", roles: ALL },
+    { href: "/login", label: tr("Đăng nhập"), icon: "fa-right-to-bracket", roles: ALL },
   ];
   const active =
     [...items]
@@ -94,12 +94,21 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
       .find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`)) ||
     items[0];
 
+  function navigate(event: MouseEvent<HTMLAnchorElement>, href: string, label: string) {
+    setOpen(false);
+    if (user?.mustChangePassword && href !== "/account") {
+      event.preventDefault();
+      remindPasswordChange(label);
+      if (pathname !== "/account") router.replace("/account");
+    }
+  }
+
   return (
     <div className="workspace min-h-screen bg-[#f5f7fa]">
-      <a href="#workspace-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:p-3 focus:text-teal-900">Chuyển đến nội dung</a>
+      <a href="#workspace-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:p-3 focus:text-teal-900">{tr("Chuyển đến nội dung")}</a>
       <aside
         id="workspace-navigation"
-        aria-label="Điều hướng chính"
+        aria-label={tr("Điều hướng chính")}
         className={cn(
           "compact-sidebar fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-[#102c36] text-slate-300 transition-all duration-200 lg:visible lg:translate-x-0",
           open ? "visible translate-x-0" : "invisible -translate-x-full",
@@ -110,24 +119,17 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
           <span className="sidebar-label whitespace-nowrap text-lg font-semibold text-white">CodeMark</span>
         </div>
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
-          <p className="sidebar-label px-3 pb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-100/50">Không gian học tập</p>
+          <p className="sidebar-label px-3 pb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-100/50">{tr("Không gian học tập")}</p>
           {items.map((item) => {
             const isActive = active?.href === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                aria-label={item.label}
-                title={item.label}
+                aria-label={tr(item.label)}
+                title={tr(item.label)}
                 aria-current={isActive ? "page" : undefined}
-                onClick={(event) => {
-                  setOpen(false);
-                  if (user?.mustChangePassword && item.href !== "/account") {
-                    event.preventDefault();
-                    remindPasswordChange(item.label);
-                    if (pathname !== "/account") router.replace("/account");
-                  }
-                }}
+                onClick={(event) => navigate(event, item.href, item.label)}
                 className={cn(
                   "flex items-center gap-3 rounded-xl border px-3 py-2.5 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200",
                   isActive
@@ -136,14 +138,14 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
                 )}
               >
                 <i aria-hidden="true" className={cn("fa-solid w-4 shrink-0 text-center", item.icon)} />
-                <span className="sidebar-label whitespace-nowrap">{item.label}</span>
+                <span className="sidebar-label whitespace-nowrap">{tr(item.label)}</span>
               </Link>
             );
           })}
         </nav>
         <div className="sidebar-label m-3 rounded-xl border border-white/10 bg-white/5 p-4">
-          <p className="text-xs font-medium text-teal-100">Kết nối lớp học của bạn.</p>
-          <p className="mt-1.5 text-[11px] leading-5 text-slate-400">Lớp học, lịch học và tiến độ tại một nơi.</p>
+          <p className="text-xs font-medium text-teal-100">{tr("Kết nối lớp học của bạn.")}</p>
+          <p className="mt-1.5 text-[11px] leading-5 text-slate-400">{tr("Lớp học, lịch học và tiến độ tại một nơi.")}</p>
         </div>
       </aside>
 
@@ -155,57 +157,8 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
       )}
 
       <div className="lg:pl-20">
-        <header className="sticky top-0 z-20 flex h-20 items-center justify-between gap-3 border-b border-slate-200/80 bg-white px-4 lg:px-8">
-          <div className="flex items-center gap-3">
-            <button
-              className="rounded-md border border-slate-200 p-2 text-slate-500 lg:hidden"
-              onClick={() => setOpen(true)}
-              aria-label="Mở điều hướng"
-              aria-expanded={open}
-              aria-controls="workspace-navigation"
-            >
-              <i className="fa-solid fa-bars" />
-            </button>
-            <div>
-              <p className="text-sm font-semibold text-slate-800">
-                {active?.label || "Trang chủ"}
-              </p>
-              <p className="text-[11px] text-slate-400">
-                Không gian học tập của bạn
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {user ? <>
-            <Link
-              href="/account"
-              title="Tài khoản của tôi"
-              className="flex items-center gap-3 rounded-md px-1 py-1 transition hover:bg-slate-50"
-            >
-              <div className="hidden text-right sm:block">
-                <p className="text-sm font-semibold text-slate-700">{user.name}</p>
-                <p className="text-[11px] uppercase tracking-wide text-slate-400">
-                  {roleLabel(user.role)}
-                </p>
-              </div>
-              <Avatar name={user.name} role={user.role} />
-            </Link>
-            <Button
-              variant="secondary"
-              size="sm"
-              aria-label="Đăng xuất"
-              onClick={async () => {
-                await logout();
-                router.replace("/");
-              }}
-            >
-              <i className="fa-solid fa-arrow-right-from-bracket" />
-              <span className="hidden sm:inline">Đăng xuất</span>
-            </Button>
-            </> : <Link href="/login" className="inline-flex items-center gap-2 rounded-xl bg-teal-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-900"><i className="fa-solid fa-right-to-bracket" aria-hidden="true"/> Đăng nhập</Link>}
-          </div>
-        </header>
-        <div className="flex flex-col gap-4 xl:flex-row"><main id="workspace-content" tabIndex={-1} className="workspace-content min-w-0 flex-1 p-4 outline-none sm:p-6 lg:p-8"><div id="drawer-root"/><div id="screen-content">{user?.mustChangePassword && pathname !== "/account" ? <p>Vui lòng đổi mật khẩu ở trang Tài khoản.</p> : children}</div></main>{user && !user.mustChangePassword && pathname !== "/leaderboard" && <aside aria-label="Xếp hạng nhanh" className="w-full min-w-0 shrink-0 self-start p-4 xl:sticky xl:top-24 xl:w-96 xl:pl-0 xl:pr-6 xl:pt-8 2xl:w-[26rem]"><Leaderboard/></aside>}</div>
+        <WorkspaceHeader menuOpen={open} onMenuOpen={() => setOpen(true)} onNavigate={navigate} />
+        <div className="flex flex-col gap-4 xl:flex-row"><main id="workspace-content" tabIndex={-1} className="workspace-content min-w-0 flex-1 p-4 outline-none sm:p-6 lg:p-8"><div id="drawer-root"/><div id="screen-content">{user?.mustChangePassword && pathname !== "/account" ? <p>{tr("Vui lòng đổi mật khẩu ở trang Tài khoản.")}</p> : children}</div></main>{user && !user.mustChangePassword && pathname !== "/leaderboard" && <aside aria-label={tr("Xếp hạng nhanh")} className="w-full min-w-0 shrink-0 self-start p-4 xl:sticky xl:top-24 xl:w-96 xl:pl-0 xl:pr-6 xl:pt-8 2xl:w-[26rem]"><Leaderboard/></aside>}</div>
       </div>
     </div>
   );

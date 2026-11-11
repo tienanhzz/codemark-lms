@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "../../../components/LanguageProvider";
 
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
@@ -61,6 +62,7 @@ const COURSE_COLORS = [
 ];
 
 export default function CoursesPage() {
+  const { tr, locale } = useI18n();
   const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,24 +138,22 @@ export default function CoursesPage() {
     }
   }
 
-  if (loading) return <Spinner label="Đang tải lớp học…" />;
+  if (loading) return <Spinner label={tr("Đang tải lớp học…")} />;
 
   return (
     <div>
       <PageHeader
         icon="fa-book-open"
-        title="Lớp học"
+        title={tr("Lớp học")}
         description={
           user?.role === "student"
-            ? "Courses you are enrolled in for the current and previous terms."
-            : "Deliver content, rosters, attendance and assessments."
+            ? tr("Courses you are enrolled in for the current and previous terms.")
+            : tr("Deliver content, rosters, attendance and assessments.")
         }
         actions={
           canCreate ? (
             <Button onClick={() => setCreateOpen(true)}>
-              <i className="fa-solid fa-plus" />
-              Thêm lớp học
-            </Button>
+              <i className="fa-solid fa-plus" />{tr("Thêm lớp học")}</Button>
           ) : undefined
         }
       />
@@ -166,29 +166,27 @@ export default function CoursesPage() {
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Tìm mã lớp, tiêu đề, học kỳ hoặc giảng viên"
+            placeholder={tr("Tìm mã lớp, tiêu đề, học kỳ hoặc giảng viên")}
             className="pl-8"
           />
         </div>
         <span className="text-xs text-slate-500">
-          {filtered.length} of {courses.length} lớp học
-        </span>
+          {filtered.length}{" " + tr("of") + " "}{courses.length}{" " + tr("lớp học")}</span>
       </div>
 
       {filtered.length === 0 ? (
         <EmptyState
           icon="fa-book-open"
-          title={courses.length ? "No matching courses" : "No courses yet"}
+          title={courses.length ? tr("No matching courses") : tr("No courses yet")}
           description={
             canCreate
-              ? "Create the first course to start adding meetings and content."
-              : "Your teacher will add you to a course roster."
+              ? tr("Create the first course to start adding meetings and content.")
+              : tr("Your teacher will add you to a course roster.")
           }
           action={
             canCreate ? (
               <Button onClick={() => setCreateOpen(true)}>
-                <i className="fa-solid fa-plus" /> Tạo lớp học
-              </Button>
+                <i className="fa-solid fa-plus" />{" " + tr("Tạo lớp học")}</Button>
             ) : undefined
           }
         />
@@ -220,7 +218,7 @@ export default function CoursesPage() {
                 </Badge>
               </div>
               <p className="mt-2 line-clamp-2 min-h-8 text-xs text-slate-600">
-                {course.description || "No description provided."}
+                {course.description || tr("No description provided.")}
               </p>
               <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-500">
                 <span>
@@ -229,26 +227,23 @@ export default function CoursesPage() {
                 </span>
                 <span>
                   <i className={cn("fa-solid fa-clock mr-1", colors.icon)} />
-                  {course.meetings?.length || 0} buổi học
-                </span>
+                  {course.meetings?.length || 0}{" " + tr("buổi học")}</span>
                 <span>
                   <i className={cn("fa-solid fa-user-group mr-1", colors.icon)} />
-                  {course.studentCount ?? 0} sinh viên
-                </span>
+                  {course.studentCount ?? 0}{" " + tr("sinh viên")}</span>
                 <span>
                   <i className={cn("fa-solid fa-file-signature mr-1", colors.icon)} />
-                  {course.assessmentCount ?? 0} bài kiểm tra
-                </span>
+                  {course.assessmentCount ?? 0}{" " + tr("bài kiểm tra")}</span>
               </div>
               <div className={cn("mt-4 flex items-center justify-between border-t pt-3 text-[11px] text-slate-500", colors.divider)}>
                 <span>
-                  {formatDate(course.startDate)} – {formatDate(course.endDate)}
+                  {formatDate(course.startDate, locale)} – {formatDate(course.endDate, locale)}
                 </span>
                 <span>
                   {course.published ? (
-                    <Badge tone="published">Đã công bố</Badge>
+                    <Badge tone="published">{tr("Đã công bố")}</Badge>
                   ) : (
-                    <Badge tone="draft">Bản nháp</Badge>
+                    <Badge tone="draft">{tr("Bản nháp")}</Badge>
                   )}
                 </span>
               </div>
@@ -261,39 +256,36 @@ export default function CoursesPage() {
       <Drawer
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        title="Tạo lớp học"
+        title={tr("Tạo lớp học")}
         width="max-w-2xl"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setCreateOpen(false)}>
-              Hủy
-            </Button>
+            <Button variant="secondary" onClick={() => setCreateOpen(false)}>{tr("Hủy")}</Button>
             <Button type="submit" form="create-course-form" loading={saving}>
-              <i className="fa-solid fa-floppy-disk" /> Lưu lớp học
-            </Button>
+              <i className="fa-solid fa-floppy-disk" />{" " + tr("Lưu lớp học")}</Button>
           </>
         }
       >
         <form id="create-course-form" onSubmit={createCourse} className="grid gap-3 sm:grid-cols-2">
-          <Field label="Mã lớp">
+          <Field label={tr("Mã lớp")}>
             <Input name="code" required placeholder="CS101" maxLength={32} />
           </Field>
-          <Field label="Học kỳ">
-            <Input name="term" required placeholder="Học kỳ 1 năm 2026" maxLength={64} />
+          <Field label={tr("Học kỳ")}>
+            <Input name="term" required placeholder={tr("Học kỳ 1 năm 2026")} maxLength={64} />
           </Field>
-          <Field label="Tiêu đề" className="sm:col-span-2">
-            <Input name="title" required placeholder="Nhập môn khoa học máy tính" />
+          <Field label={tr("Tiêu đề")} className="sm:col-span-2">
+            <Input name="title" required placeholder={tr("Nhập môn khoa học máy tính")} />
           </Field>
-          <Field label="Ngày bắt đầu">
+          <Field label={tr("Ngày bắt đầu")}>
             <Input name="startDate" type="date" required />
           </Field>
-          <Field label="Ngày kết thúc">
+          <Field label={tr("Ngày kết thúc")}>
             <Input name="endDate" type="date" required />
           </Field>
           {user?.role === "admin" && (
             <Field
-              label="Mã giảng viên phụ trách (tùy chọn)"
-              hint="Để trống nếu bạn là giảng viên phụ trách."
+              label={tr("Mã giảng viên phụ trách (tùy chọn)")}
+              hint={tr("Để trống nếu bạn là giảng viên phụ trách.")}
               className="sm:col-span-2"
             >
               <Input
@@ -304,13 +296,13 @@ export default function CoursesPage() {
               />
             </Field>
           )}
-          <Field label="Mô tả" className="sm:col-span-2">
-            <Textarea name="description" placeholder="Đề cương và mục tiêu lớp học" />
+          <Field label={tr("Mô tả")} className="sm:col-span-2">
+            <Textarea name="description" placeholder={tr("Đề cương và mục tiêu lớp học")} />
           </Field>
-          <Field label="Công bố" className="sm:col-span-2">
+          <Field label={tr("Công bố")} className="sm:col-span-2">
             <Select name="published" defaultValue="off">
-              <option value="off">Bản nháp — ẩn với sinh viên</option>
-              <option value="on">Công bố — hiển thị với sinh viên trong lớp</option>
+              <option value="off">{tr("Bản nháp — ẩn với sinh viên")}</option>
+              <option value="on">{tr("Công bố — hiển thị với sinh viên trong lớp")}</option>
             </Select>
           </Field>
           {formError && (

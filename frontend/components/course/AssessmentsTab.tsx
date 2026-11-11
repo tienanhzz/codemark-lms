@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "../LanguageProvider";
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
@@ -21,6 +22,7 @@ import {
 import { isStaff, type CourseTabProps } from "./types";
 
 export function AssessmentsTab({ course, role }: CourseTabProps) {
+  const { tr, locale } = useI18n();
   const staff = isStaff(role);
   const [items, setItems] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,19 +82,18 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
     }
   }
 
-  if (loading) return <Spinner label="Đang tải bài kiểm tra…" />;
+  if (loading) return <Spinner label={tr("Đang tải bài kiểm tra…")} />;
 
   return (
     <div className="space-y-4">
       {error && <Alert tone="danger">{error}</Alert>}
       <Card
-        title="Bài tập và bài thi"
-        subtitle="Bài tập, bài thi và bài lập trình"
+        title={tr("Bài tập và bài thi")}
+        subtitle={tr("Bài tập, bài thi và bài lập trình")}
         actions={
           staff ? (
             <Button size="sm" onClick={() => setOpen(true)}>
-              <i className="fa-solid fa-plus" /> Tạo bài kiểm tra
-            </Button>
+              <i className="fa-solid fa-plus" />{" " + tr("Tạo bài kiểm tra")}</Button>
           ) : undefined
         }
       >
@@ -118,39 +119,36 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
                       </p>
                     </div>
                     {assessment.published ? (
-                      <Badge tone="published">Đã công bố</Badge>
+                      <Badge tone="published">{tr("Đã công bố")}</Badge>
                     ) : (
-                      <Badge tone="draft">Bản nháp</Badge>
+                      <Badge tone="draft">{tr("Bản nháp")}</Badge>
                     )}
                   </div>
                   <p className="mt-2 line-clamp-2 min-h-8 text-xs text-slate-500">
-                    {assessment.description || "No description."}
+                    {assessment.description || tr("No description.")}
                   </p>
                   <div className="mt-3 space-y-1 text-xs text-slate-500">
                     <p>
                       <i className="fa-regular fa-clock mr-1" />
-                      {formatDateTime(assessment.opensAt)} →{" "}
-                      {formatDateTime(assessment.closesAt)}
+                      {formatDateTime(assessment.opensAt, locale)} →{" "}
+                      {formatDateTime(assessment.closesAt, locale)}
                     </p>
                     <p>
                       <i className="fa-solid fa-hourglass-half mr-1" />
-                      {assessment.durationMinutes} phút · {assessment.maxAttempts} lượt làm(s)
-                    </p>
+                      {assessment.durationMinutes}{" " + tr("phút ·") + " "}{assessment.maxAttempts}{" " + tr("lượt làm(s)")}</p>
                     {staff ? (
                       <p>
                         <i className="fa-solid fa-list-check mr-1" />
-                        {assessment.questionCount ?? 0} câu hỏi ·{" "}
-                        {assessment.attemptCount ?? 0} lượt làm
-                      </p>
+                        {assessment.questionCount ?? 0}{" " + tr("câu hỏi ·")}{" "}
+                        {assessment.attemptCount ?? 0}{" " + tr("lượt làm")}</p>
                     ) : (
                       <p>
                         <i className="fa-solid fa-user-check mr-1" />
-                        {submitted.length} đã nộp
-                        {inProgress ? " · 1 in progress" : ""}
+                        {submitted.length}{" " + tr("đã nộp")}{inProgress ? tr(" · 1 in progress") : ""}
                         {submitted.length
-                          ? ` · best ${Math.max(
+                          ? tr(" · best {0}", { 0: (Math.max(
                               ...submitted.map((attempt) => attempt.score || 0),
-                            )}`
+                            )) })
                           : ""}
                       </p>
                     )}
@@ -162,11 +160,11 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
         ) : (
           <EmptyState
             icon="fa-file-signature"
-            title="Chưa có bài kiểm tra"
+            title={tr("Chưa có bài kiểm tra")}
             description={
               staff
-                ? "Create a quiz or code challenge and publish it when ready."
-                : "Your teacher has not published an assessment yet."
+                ? tr("Create a quiz or code challenge and publish it when ready.")
+                : tr("Your teacher has not published an assessment yet.")
             }
           />
         )}
@@ -175,64 +173,59 @@ export function AssessmentsTab({ course, role }: CourseTabProps) {
       <Drawer
         open={open}
         onClose={() => setOpen(false)}
-        title="Tạo bài kiểm tra"
+        title={tr("Tạo bài kiểm tra")}
         width="max-w-2xl"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setOpen(false)}>
-              Hủy
-            </Button>
+            <Button variant="secondary" onClick={() => setOpen(false)}>{tr("Hủy")}</Button>
             <Button type="submit" form="assessment-form" loading={saving}>
-              <i className="fa-solid fa-floppy-disk" /> Lưu
-            </Button>
+              <i className="fa-solid fa-floppy-disk" />{" " + tr("Lưu")}</Button>
           </>
         }
       >
         <form id="assessment-form" onSubmit={save} className="grid gap-3 sm:grid-cols-2">
-          <Field label="Hệ số điểm rank" hint="100% kết quả = 100 điểm × hệ số">
+          <Field label={tr("Hệ số điểm rank")} hint={tr("100% kết quả = 100 điểm × hệ số")}>
             <Input name="rankWeight" type="number" min={0.1} max={10} step={0.1} defaultValue={1} required />
           </Field>
-          <Field label="Tiêu đề" className="sm:col-span-2">
+          <Field label={tr("Tiêu đề")} className="sm:col-span-2">
             <Input name="title" required />
           </Field>
-          <Field label="Loại">
+          <Field label={tr("Loại")}>
             <Select name="kind" defaultValue="quiz">
-              <option value="quiz">Bài tập</option>
-              <option value="exam">Bài thi</option>
-              <option value="code">Bài lập trình</option>
+              <option value="quiz">{tr("Bài tập")}</option>
+              <option value="exam">{tr("Bài thi")}</option>
+              <option value="code">{tr("Bài lập trình")}</option>
             </Select>
           </Field>
-          <Field label="Thời gian (phút)">
+          <Field label={tr("Thời gian (phút)")}>
             <Input name="durationMinutes" type="number" min={1} max={600} defaultValue={60} />
           </Field>
-          <Field label="Mở lúc">
+          <Field label={tr("Mở lúc")}>
             <Input name="opensAt" type="datetime-local" required />
           </Field>
-          <Field label="Đóng lúc">
+          <Field label={tr("Đóng lúc")}>
             <Input name="closesAt" type="datetime-local" required />
           </Field>
-          <Field label="Số lần làm tối đa">
+          <Field label={tr("Số lần làm tối đa")}>
             <Input name="maxAttempts" type="number" min={1} max={10} defaultValue={1} />
           </Field>
-          <Field label="Hiển thị">
+          <Field label={tr("Hiển thị")}>
             <label className="flex items-center gap-2 pt-2 text-sm text-slate-600">
               <input
                 type="checkbox"
                 name="published"
                 className="h-4 w-4 rounded border-slate-300"
-              />
-              Công bố ngay
-            </label>
+              />{tr("Công bố ngay")}</label>
           </Field>
           <Field
-            label="Danh sách IP / CIDR được phép"
-            hint="Không bắt buộc. Mỗi dòng một địa chỉ mạng hoặc ngăn cách bằng dấu phẩy. Để trống để cho phép các IP không bị chặn."
+            label={tr("Danh sách IP / CIDR được phép")}
+            hint={tr("Không bắt buộc. Mỗi dòng một địa chỉ mạng hoặc ngăn cách bằng dấu phẩy. Để trống để cho phép các IP không bị chặn.")}
             className="sm:col-span-2"
           >
             <Textarea name="ipAllowlist" placeholder="192.168.1.0/24" />
           </Field>
-          <Field label="Mô tả" className="sm:col-span-2">
-            <Textarea name="description" placeholder="Hướng dẫn sinh viên" />
+          <Field label={tr("Mô tả")} className="sm:col-span-2">
+            <Textarea name="description" placeholder={tr("Hướng dẫn sinh viên")} />
           </Field>
         </form>
       </Drawer>

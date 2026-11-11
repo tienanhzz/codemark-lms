@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "../../../../components/LanguageProvider";
+
 import { confirmInline } from "../../../../components/InlineConfirm";
 
 import Link from "next/link";
@@ -36,6 +38,7 @@ function toLocalInput(value: string) {
 }
 
 export default function AssessmentPage() {
+  const { tr, locale } = useI18n();
   const params = useParams<{ id: string }>();
   const assessmentId = Number(params.id);
   const router = useRouter();
@@ -182,7 +185,7 @@ export default function AssessmentPage() {
   }
 
   async function deleteQuestion(question: Question) {
-    if (!await confirmInline("Xóa câu hỏi này và bộ kiểm thử của nó?")) return;
+    if (!await confirmInline(tr("Xóa câu hỏi này và bộ kiểm thử của nó?"))) return;
     try {
       await api(`/api/questions/${question.id}`, { method: "DELETE" });
       await load();
@@ -259,7 +262,7 @@ export default function AssessmentPage() {
     }
   }
 
-  if (loading) return <Spinner label="Đang tải bài kiểm tra…" />;
+  if (loading) return <Spinner label={tr("Đang tải bài kiểm tra…")} />;
   if (error && !assessment) return <Alert tone="danger">{error}</Alert>;
   if (!assessment) return null;
 
@@ -270,44 +273,40 @@ export default function AssessmentPage() {
           href={`/courses/${assessment.courseId}`}
           className="text-xs font-medium text-slate-500 hover:text-teal-700"
         >
-          <i className="fa-solid fa-arrow-left mr-1" /> Quay lại lớp học
-        </Link>
+          <i className="fa-solid fa-arrow-left mr-1" />{" " + tr("Quay lại lớp học")}</Link>
       </div>
 
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-slate-800">{assessment.title}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            {assessment.kind} · mở lúc {formatDateTime(assessment.opensAt)} · đóng lúc{" "}
-            {formatDateTime(assessment.closesAt)} · {assessment.durationMinutes} phút ·{" "}
-            {assessment.maxAttempts} lượt làm(s)
-          </p>
+            {assessment.kind}{" " + tr("· mở lúc") + " "}{formatDateTime(assessment.opensAt, locale)}{" " + tr("· đóng lúc")}{" "}
+            {formatDateTime(assessment.closesAt, locale)} · {assessment.durationMinutes}{" " + tr("phút ·")}{" "}
+            {assessment.maxAttempts}{" " + tr("lượt làm(s)")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {assessment.published ? (
-            <Badge tone="published">Đã công bố</Badge>
+            <Badge tone="published">{tr("Đã công bố")}</Badge>
           ) : (
-            <Badge tone="draft">Bản nháp</Badge>
+            <Badge tone="draft">{tr("Bản nháp")}</Badge>
           )}
           {staff ? (
             <>
               <Button variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
-                <i className="fa-solid fa-pen" /> Sửa
-              </Button>
+                <i className="fa-solid fa-pen" />{" " + tr("Sửa")}</Button>
               <Button
                 variant={assessment.published ? "secondary" : "success"}
                 size="sm"
                 loading={saving}
                 onClick={togglePublish}
               >
-                {assessment.published ? "Unpublish" : "Publish"}
+                {assessment.published ? tr("Unpublish") : tr("Publish")}
               </Button>
               <Link
                 href={`/monitor/${assessment.id}`}
                 className="inline-flex items-center gap-2 rounded-md border border-teal-700 bg-teal-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-teal-800"
               >
-                <i className="fa-solid fa-desktop" /> Giám sát
-              </Link>
+                <i className="fa-solid fa-desktop" />{" " + tr("Giám sát")}</Link>
               <Button
                 variant="secondary"
                 size="sm"
@@ -318,8 +317,7 @@ export default function AssessmentPage() {
                   ).catch((err) => setError(errorMessage(err)))
                 }
               >
-                <i className="fa-solid fa-download" /> CSV giám sát
-              </Button>
+                <i className="fa-solid fa-download" />{" " + tr("CSV giám sát")}</Button>
             </>
           ) : (
             <Button
@@ -329,10 +327,10 @@ export default function AssessmentPage() {
             >
               <i className="fa-solid fa-play" />
               {counts.inProgress
-                ? "Resume attempt"
+                ? tr("Resume attempt")
                 : counts.submitted.length >= assessment.maxAttempts
-                  ? "Attempts used"
-                  : "Start attempt"}
+                  ? tr("Attempts used")
+                  : tr("Start attempt")}
             </Button>
           )}
         </div>
@@ -342,7 +340,7 @@ export default function AssessmentPage() {
       {notice && <Alert tone="success" className="mb-3">{notice}</Alert>}
 
       {assessment.description && (
-        <Card className="mb-4" title="Hướng dẫn">
+        <Card className="mb-4" title={tr("Hướng dẫn")}>
           <p className="prose-lesson text-sm text-slate-600">{assessment.description}</p>
         </Card>
       )}
@@ -350,8 +348,8 @@ export default function AssessmentPage() {
       {!staff && (
         <Card
           className="mb-4"
-          title="Lượt làm của bạn"
-          subtitle={`Best score: ${counts.best ?? "—"}`}
+          title={tr("Lượt làm của bạn")}
+          subtitle={tr("Best score: {0}", { 0: (counts.best ?? "—") })}
         >
           {attempts.length ? (
             <div className="space-y-2">
@@ -361,12 +359,10 @@ export default function AssessmentPage() {
                   className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-slate-100 px-3 py-2 text-sm"
                 >
                   <div>
-                    <p className="font-medium text-slate-700">
-                      Lượt làm #{attempt.id} · {attempt.status}
+                    <p className="font-medium text-slate-700">{tr("Lượt làm #")}{attempt.id} · {attempt.status}
                     </p>
-                    <p className="text-xs text-slate-500">
-                      Bắt đầu {formatDateTime(attempt.startedAt)} · hạn nộp{" "}
-                      {formatDateTime(attempt.deadline)}
+                    <p className="text-xs text-slate-500">{tr("Bắt đầu") + " "}{formatDateTime(attempt.startedAt, locale)}{" " + tr("· hạn nộp")}{" "}
+                      {formatDateTime(attempt.deadline, locale)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -379,16 +375,14 @@ export default function AssessmentPage() {
                       <Link
                         href={`/attempts/${attempt.id}`}
                         className="rounded-md bg-teal-700 px-2.5 py-1.5 text-xs font-medium text-white"
-                      >
-                        Tiếp tục
-                      </Link>
+                      >{tr("Tiếp tục")}</Link>
                     )}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <EmptyState icon="fa-file-circle-plus" title="Chưa có lượt làm bài" />
+            <EmptyState icon="fa-file-circle-plus" title={tr("Chưa có lượt làm bài")} />
           )}
         </Card>
       )}
@@ -396,8 +390,8 @@ export default function AssessmentPage() {
       {staff && (
         <Card
           className="mb-4"
-          title="Câu hỏi"
-          subtitle={`${assessment.questions?.length || 0} questions · answers and hidden cases are staff-only`}
+          title={tr("Câu hỏi")}
+          subtitle={tr("{0} questions · answers and hidden cases are staff-only", { 0: (assessment.questions?.length || 0) })}
           actions={
             <>
               <Button
@@ -407,14 +401,11 @@ export default function AssessmentPage() {
                   setQuestionOpen(true);
                 }}
               >
-                <i className="fa-solid fa-plus" /> Câu hỏi
-              </Button>
+                <i className="fa-solid fa-plus" />{" " + tr("Câu hỏi")}</Button>
               <Link
                 href={`/monitor/${assessment.id}`}
                 className="text-xs font-semibold text-teal-700"
-              >
-                Mở giám sát
-              </Link>
+              >{tr("Mở giám sát")}</Link>
             </>
           }
         >
@@ -433,9 +424,8 @@ export default function AssessmentPage() {
                       <p className="mt-1 text-xs text-slate-500">
                         <Badge tone="info">{question.kind}</Badge>
                         {question.language ? ` · ${question.language}` : ""} ·{" "}
-                        {question.points} điểm
-                        {question.kind === "code"
-                          ? ` · ${question.testCaseCount} test case(s)`
+                        {question.points}{" " + tr("điểm")}{question.kind === "code"
+                          ? tr(" · {0} test case(s)", { 0: (question.testCaseCount) })
                           : ""}
                       </p>
                     </div>
@@ -446,8 +436,7 @@ export default function AssessmentPage() {
                           variant="secondary"
                           onClick={() => openCases(question)}
                         >
-                          <i className="fa-solid fa-vial" /> Kiểm thử
-                        </Button>
+                          <i className="fa-solid fa-vial" />{" " + tr("Kiểm thử")}</Button>
                       )}
                       <Button
                         size="sm"
@@ -485,8 +474,7 @@ export default function AssessmentPage() {
                     </ul>
                   )}
                   {question.answer && question.kind !== "mcq" && (
-                    <p className="mt-2 rounded bg-slate-50 px-2 py-1 text-xs text-slate-600">
-                      Đáp án mong đợi: <span className="font-mono">{question.answer}</span>
+                    <p className="mt-2 rounded bg-slate-50 px-2 py-1 text-xs text-slate-600">{tr("Đáp án mong đợi:") + " "}<span className="font-mono">{question.answer}</span>
                     </p>
                   )}
                 </article>
@@ -495,25 +483,25 @@ export default function AssessmentPage() {
           ) : (
             <EmptyState
               icon="fa-list-check"
-              title="Chưa có câu hỏi"
-              description="Thêm câu hỏi trắc nghiệm, trả lời ngắn hoặc lập trình."
+              title={tr("Chưa có câu hỏi")}
+              description={tr("Thêm câu hỏi trắc nghiệm, trả lời ngắn hoặc lập trình.")}
             />
           )}
         </Card>
       )}
 
       {staff && (
-        <Card title="Lượt làm bài" subtitle="Lượt đang làm và đã nộp">
+        <Card title={tr("Lượt làm bài")} subtitle={tr("Lượt đang làm và đã nộp")}>
           {attempts.length ? (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wide text-slate-400">
-                    <th className="py-2">Sinh viên</th>
-                    <th className="py-2">Trạng thái</th>
-                    <th className="py-2">Điểm</th>
-                    <th className="py-2">Hạn nộp</th>
-                    <th className="py-2 text-right">Thao tác</th>
+                    <th className="py-2">{tr("Sinh viên")}</th>
+                    <th className="py-2">{tr("Trạng thái")}</th>
+                    <th className="py-2">{tr("Điểm")}</th>
+                    <th className="py-2">{tr("Hạn nộp")}</th>
+                    <th className="py-2 text-right">{tr("Thao tác")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -521,7 +509,7 @@ export default function AssessmentPage() {
                     <tr key={attempt.id}>
                       <td className="py-2">
                         <p className="font-medium text-slate-700">
-                          {attempt.student?.name || "Unknown student"}
+                          {attempt.student?.name || tr("Unknown student")}
                         </p>
                         <p className="text-xs text-slate-400">{attempt.student?.studentId}</p>
                       </td>
@@ -538,15 +526,13 @@ export default function AssessmentPage() {
                           : "—"}
                       </td>
                       <td className="py-2 text-xs text-slate-500">
-                        {formatDateTime(attempt.deadline)}
+                        {formatDateTime(attempt.deadline, locale)}
                       </td>
                       <td className="py-2 text-right">
                         <Link
                           href={`/monitor/${assessment.id}`}
                           className="text-xs font-semibold text-teal-700"
-                        >
-                          Giám sát
-                        </Link>
+                        >{tr("Giám sát")}</Link>
                       </td>
                     </tr>
                   ))}
@@ -554,7 +540,7 @@ export default function AssessmentPage() {
               </table>
             </div>
           ) : (
-            <EmptyState icon="fa-user-clock" title="Chưa có lượt làm bài" />
+            <EmptyState icon="fa-user-clock" title={tr("Chưa có lượt làm bài")} />
           )}
         </Card>
       )}
@@ -562,16 +548,12 @@ export default function AssessmentPage() {
       <Drawer
         open={editOpen}
         onClose={() => setEditOpen(false)}
-        title="Sửa bài kiểm tra"
+        title={tr("Sửa bài kiểm tra")}
         width="max-w-2xl"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setEditOpen(false)}>
-              Hủy
-            </Button>
-            <Button type="submit" form="edit-assessment-form" loading={saving}>
-              Lưu
-            </Button>
+            <Button variant="secondary" onClick={() => setEditOpen(false)}>{tr("Hủy")}</Button>
+            <Button type="submit" form="edit-assessment-form" loading={saving}>{tr("Lưu")}</Button>
           </>
         }
       >
@@ -580,11 +562,11 @@ export default function AssessmentPage() {
           onSubmit={saveAssessment}
           className="grid gap-3 sm:grid-cols-2"
         >
-          <Field label="Hệ số điểm rank"><Input name="rankWeight" type="number" min={0.1} max={10} step={0.1} defaultValue={assessment.rankWeight || 1} required /></Field>
-          <Field label="Tiêu đề" className="sm:col-span-2">
+          <Field label={tr("Hệ số điểm rank")}><Input name="rankWeight" type="number" min={0.1} max={10} step={0.1} defaultValue={assessment.rankWeight || 1} required /></Field>
+          <Field label={tr("Tiêu đề")} className="sm:col-span-2">
             <Input name="title" defaultValue={assessment.title} required />
           </Field>
-          <Field label="Mở lúc">
+          <Field label={tr("Mở lúc")}>
             <Input
               name="opensAt"
               type="datetime-local"
@@ -592,7 +574,7 @@ export default function AssessmentPage() {
               required
             />
           </Field>
-          <Field label="Đóng lúc">
+          <Field label={tr("Đóng lúc")}>
             <Input
               name="closesAt"
               type="datetime-local"
@@ -600,7 +582,7 @@ export default function AssessmentPage() {
               required
             />
           </Field>
-          <Field label="Thời gian (phút)">
+          <Field label={tr("Thời gian (phút)")}>
             <Input
               name="durationMinutes"
               type="number"
@@ -609,7 +591,7 @@ export default function AssessmentPage() {
               defaultValue={assessment.durationMinutes}
             />
           </Field>
-          <Field label="Số lần làm tối đa">
+          <Field label={tr("Số lần làm tối đa")}>
             <Input
               name="maxAttempts"
               type="number"
@@ -618,13 +600,13 @@ export default function AssessmentPage() {
               defaultValue={assessment.maxAttempts}
             />
           </Field>
-          <Field label="Danh sách IP / CIDR được phép" className="sm:col-span-2">
+          <Field label={tr("Danh sách IP / CIDR được phép")} className="sm:col-span-2">
             <Textarea
               name="ipAllowlist"
               defaultValue={(assessment.ipAllowlist || []).join("\n")}
             />
           </Field>
-          <Field label="Mô tả" className="sm:col-span-2">
+          <Field label={tr("Mô tả")} className="sm:col-span-2">
             <Textarea name="description" defaultValue={assessment.description} />
           </Field>
         </form>
@@ -636,7 +618,7 @@ export default function AssessmentPage() {
           setQuestionOpen(false);
           setEditingQuestion(null);
         }}
-        title={editingQuestion ? "Edit question" : "New question"}
+        title={editingQuestion ? tr("Edit question") : tr("New question")}
         width="max-w-2xl"
         footer={
           <>
@@ -646,31 +628,27 @@ export default function AssessmentPage() {
                 setQuestionOpen(false);
                 setEditingQuestion(null);
               }}
-            >
-              Hủy
-            </Button>
-            <Button type="submit" form="question-form" loading={saving}>
-              Lưu câu hỏi
-            </Button>
+            >{tr("Hủy")}</Button>
+            <Button type="submit" form="question-form" loading={saving}>{tr("Lưu câu hỏi")}</Button>
           </>
         }
       >
         <form id="question-form" onSubmit={saveQuestion} className="grid gap-3 sm:grid-cols-2">
-          <Field label="Đề bài" className="sm:col-span-2">
+          <Field label={tr("Đề bài")} className="sm:col-span-2">
             <Textarea
               name="prompt"
               defaultValue={editingQuestion?.prompt || ""}
               required
             />
           </Field>
-          <Field label="Loại">
+          <Field label={tr("Loại")}>
             <Select name="kind" defaultValue={editingQuestion?.kind || "short"}>
-              <option value="short">Trả lời ngắn</option>
-              <option value="mcq">Trắc nghiệm</option>
-              <option value="code">Mã</option>
+              <option value="short">{tr("Trả lời ngắn")}</option>
+              <option value="mcq">{tr("Trắc nghiệm")}</option>
+              <option value="code">{tr("Mã")}</option>
             </Select>
           </Field>
-          <Field label="Điểm">
+          <Field label={tr("Điểm")}>
             <Input
               name="points"
               type="number"
@@ -680,16 +658,16 @@ export default function AssessmentPage() {
             />
           </Field>
           <Field
-            label="Các lựa chọn (mỗi dòng một lựa chọn trắc nghiệm)"
+            label={tr("Các lựa chọn (mỗi dòng một lựa chọn trắc nghiệm)")}
             className="sm:col-span-2"
           >
             <Textarea
               name="options"
               defaultValue={(editingQuestion?.options || []).join("\n")}
-              placeholder={"First option\nSecond option"}
+              placeholder={tr("First option\nSecond option")}
             />
           </Field>
-          <Field label="Ngôn ngữ lập trình">
+          <Field label={tr("Ngôn ngữ lập trình")}>
             <Select
               name="language"
               defaultValue={editingQuestion?.language || "python"}
@@ -701,21 +679,21 @@ export default function AssessmentPage() {
               <option value="sql">SQL</option>
             </Select>
           </Field>
-          <Field label="Thứ tự">
+          <Field label={tr("Thứ tự")}>
             <Input
               name="position"
               type="number"
               defaultValue={editingQuestion?.position ?? assessment.questions?.length ?? 0}
             />
           </Field>
-          <Field label="Chủ đề" hint="Có thể chọn nhiều thẻ; danh mục cha chỉ dùng để điều hướng." className="sm:col-span-2">
+          <Field label={tr("Chủ đề")} hint={tr("Có thể chọn nhiều thẻ; danh mục cha chỉ dùng để điều hướng.")} className="sm:col-span-2">
             <select name="tagIds" multiple defaultValue={editingQuestion?.tagIds||[]} className="w-full min-h-32 rounded-lg border border-slate-200 bg-white p-2 text-sm">
               {availableTags.map(tag=><option key={tag.tagId} value={tag.tagId}>{tag.label} · {tag.tagId}</option>)}
             </select>
           </Field>
           <Field
-            label="Đáp án đúng"
-            hint="Trắc nghiệm: số thứ tự đáp án từ 0. Trả lời ngắn: đáp án chính xác, ngăn cách nhiều đáp án bằng |."
+            label={tr("Đáp án đúng")}
+            hint={tr("Trắc nghiệm: số thứ tự đáp án từ 0. Trả lời ngắn: đáp án chính xác, ngăn cách nhiều đáp án bằng |.")}
             className="sm:col-span-2"
           >
             <Input name="answer" defaultValue={editingQuestion?.answer || ""} />
@@ -726,11 +704,11 @@ export default function AssessmentPage() {
       <Drawer
         open={casesQuestion !== null}
         onClose={() => setCasesQuestion(null)}
-        title="Bộ kiểm thử"
+        title={tr("Bộ kiểm thử")}
         width="max-w-2xl"
       >
         {caseLoading ? (
-          <Spinner label="Đang tải bộ kiểm thử…" />
+          <Spinner label={tr("Đang tải bộ kiểm thử…")} />
         ) : (
           <div className="space-y-3">
             {cases.length ? (
@@ -741,8 +719,7 @@ export default function AssessmentPage() {
                     className="rounded-md border border-slate-100 p-2 text-xs"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-600">
-                        Bộ kiểm thử #{testCase.id} {testCase.hidden ? "(hidden)" : "(visible)"}
+                      <span className="font-semibold text-slate-600">{tr("Bộ kiểm thử #")}{testCase.id} {testCase.hidden ? tr("(hidden)") : tr("(visible)")}
                       </span>
                       <Button
                         size="sm"
@@ -752,11 +729,11 @@ export default function AssessmentPage() {
                         <i className="fa-solid fa-trash text-rose-500" />
                       </Button>
                     </div>
-                    <p className="mt-1 text-slate-500">Đầu vào:</p>
+                    <p className="mt-1 text-slate-500">{tr("Đầu vào:")}</p>
                     <pre className="whitespace-pre-wrap rounded bg-slate-50 p-1">
-                      {testCase.input || "(empty)"}
+                      {testCase.input || tr("(empty)")}
                     </pre>
-                    <p className="mt-1 text-slate-500">Kết quả mong đợi:</p>
+                    <p className="mt-1 text-slate-500">{tr("Kết quả mong đợi:")}</p>
                     <pre className="whitespace-pre-wrap rounded bg-slate-50 p-1">
                       {testCase.expectedOutput}
                     </pre>
@@ -764,13 +741,13 @@ export default function AssessmentPage() {
                 ))}
               </div>
             ) : (
-              <Alert tone="info">Chưa có bộ kiểm thử.</Alert>
+              <Alert tone="info">{tr("Chưa có bộ kiểm thử.")}</Alert>
             )}
             <form onSubmit={addCase} className="space-y-2 border-t border-slate-100 pt-3">
-              <Field label="Đầu vào (stdin)">
+              <Field label={tr("Đầu vào (stdin)")}>
                 <Textarea name="input" className="min-h-16 font-mono text-xs" />
               </Field>
-              <Field label="Kết quả mong đợi">
+              <Field label={tr("Kết quả mong đợi")}>
                 <Textarea
                   name="expectedOutput"
                   required
@@ -778,25 +755,22 @@ export default function AssessmentPage() {
                 />
               </Field>
               <div className="grid gap-2 sm:grid-cols-4">
-                <Field label="Điểm">
+                <Field label={tr("Điểm")}>
                   <Input name="points" type="number" min={0} step="0.5" defaultValue={1} />
                 </Field>
-                <Field label="Thời gian (ms)">
+                <Field label={tr("Thời gian (ms)")}>
                   <Input name="timeLimitMs" type="number" min={100} defaultValue={2000} />
                 </Field>
-                <Field label="Bộ nhớ (MB)">
+                <Field label={tr("Bộ nhớ (MB)")}>
                   <Input name="memoryMb" type="number" min={32} defaultValue={256} />
                 </Field>
-                <Field label="Ẩn">
+                <Field label={tr("Ẩn")}>
                   <label className="flex items-center gap-2 pt-2 text-sm text-slate-600">
-                    <input type="checkbox" name="hidden" className="h-4 w-4" />
-                    Ẩn
-                  </label>
+                    <input type="checkbox" name="hidden" className="h-4 w-4" />{tr("Ẩn")}</label>
                 </Field>
               </div>
               <Button type="submit" size="sm" loading={saving}>
-                <i className="fa-solid fa-plus" /> Thêm bộ kiểm thử
-              </Button>
+                <i className="fa-solid fa-plus" />{" " + tr("Thêm bộ kiểm thử")}</Button>
             </form>
           </div>
         )}

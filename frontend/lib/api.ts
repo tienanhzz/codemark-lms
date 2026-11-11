@@ -117,8 +117,10 @@ export function errorMessage(error: unknown) {
     if (error.status === 0) return "Không kết nối được máy chủ. Kiểm tra backend và địa chỉ API.";
     if (error.status >= 500) return `Máy chủ gặp lỗi (HTTP ${error.status}). Vui lòng kiểm tra log backend hoặc liên hệ quản trị viên.`;
     if (error.status === 404) return "Không tìm thấy chức năng trên máy chủ. Kiểm tra backend đã chạy bản mới nhất.";
-    const code = /^[a-z][a-z0-9_]{0,79}$/.test(error.message) ? `, mã: ${error.message}` : "";
-    return `Yêu cầu chưa được xử lý (HTTP ${error.status}${code}). Vui lòng kiểm tra dữ liệu và thử lại.`;
+    if (/^[a-z][a-z0-9_]{0,79}$/.test(error.message)) {
+      return `Yêu cầu chưa được xử lý (HTTP ${error.status}, mã: ${error.message}). Vui lòng kiểm tra dữ liệu và thử lại.`;
+    }
+    return `Yêu cầu chưa được xử lý (HTTP ${error.status}). Vui lòng kiểm tra dữ liệu và thử lại.`;
   }
   return "Có lỗi xảy ra. Vui lòng thử lại.";
 }

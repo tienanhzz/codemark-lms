@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "../../../components/LanguageProvider";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -17,6 +18,7 @@ import {
 } from "../../../components/ui";
 
 export default function AdminOverviewPage() {
+  const { tr, locale } = useI18n();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,7 +30,7 @@ export default function AdminOverviewPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <Spinner label="Đang tải trang quản trị…" />;
+  if (loading) return <Spinner label={tr("Đang tải trang quản trị…")} />;
   if (error) return <Alert tone="danger">{error}</Alert>;
   if (!stats) return null;
 
@@ -38,29 +40,29 @@ export default function AdminOverviewPage() {
     <div>
       <PageHeader
         icon="fa-shield-halved"
-        title="Quản trị"
-        description="Tài khoản, phiên đăng nhập, chặn mạng và nhật ký hoạt động."
+        title={tr("Quản trị")}
+        description={tr("Tài khoản, phiên đăng nhập, chặn mạng và nhật ký hoạt động.")}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon="fa-users" label="Tài khoản" value={totalUsers} tone="purple" />
+        <StatCard icon="fa-users" label={tr("Tài khoản")} value={totalUsers} tone="purple" />
         <StatCard
           icon="fa-signal"
-          label="Phiên hoạt động"
+          label={tr("Phiên hoạt động")}
           value={stats.activeSessions}
           tone="emerald"
         />
-        <StatCard icon="fa-book" label="Lớp học" value={stats.courses} tone="sky" />
+        <StatCard icon="fa-book" label={tr("Lớp học")} value={stats.courses} tone="sky" />
         <StatCard
           icon="fa-file-signature"
-          label="Bài tập và bài thi"
+          label={tr("Bài tập và bài thi")}
           value={stats.assessments}
           tone="amber"
         />
       </div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <Card title="Tài khoản theo vai trò" subtitle="Phân bố vai trò người dùng">
+        <Card title={tr("Tài khoản theo vai trò")} subtitle={tr("Phân bố vai trò người dùng")}>
           <BarChart
             data={Object.entries(stats.users).map(([label, value]) => ({
               label,
@@ -69,29 +71,29 @@ export default function AdminOverviewPage() {
             color="bg-purple-600"
           />
         </Card>
-        <Card title="Số liệu hoạt động" subtitle="Hoạt động trên toàn hệ thống">
+        <Card title={tr("Số liệu hoạt động")} subtitle={tr("Hoạt động trên toàn hệ thống")}>
           <div className="grid grid-cols-2 gap-3">
             <StatCard
               icon="fa-pen-to-square"
-              label="Lượt làm bài"
+              label={tr("Lượt làm bài")}
               value={stats.attempts}
               tone="sky"
             />
             <StatCard
               icon="fa-qrcode"
-              label="Lượt điểm danh"
+              label={tr("Lượt điểm danh")}
               value={stats.attendanceCheckins}
               tone="emerald"
             />
             <StatCard
               icon="fa-triangle-exclamation"
-              label="Đơn nghỉ chờ duyệt"
+              label={tr("Đơn nghỉ chờ duyệt")}
               value={stats.pendingLeave}
               tone="amber"
             />
             <StatCard
               icon="fa-user-clock"
-              label="Phiên hoạt động"
+              label={tr("Phiên hoạt động")}
               value={stats.activeSessions}
               tone="rose"
             />
@@ -101,11 +103,10 @@ export default function AdminOverviewPage() {
 
       <Card
         className="mt-5"
-        title="Nhật ký gần đây"
-        subtitle="Hoạt động bảo mật trên toàn hệ thống"
+        title={tr("Nhật ký gần đây")}
+        subtitle={tr("Hoạt động bảo mật trên toàn hệ thống")}
         actions={
-          <Link href="/admin/audit" className="text-xs font-semibold text-teal-700">
-            Nhật ký đầy đủ <i className="fa-solid fa-arrow-right ml-1" />
+          <Link href="/admin/audit" className="text-xs font-semibold text-teal-700">{tr("Nhật ký đầy đủ") + " "}<i className="fa-solid fa-arrow-right ml-1" />
           </Link>
         }
       >
@@ -121,7 +122,7 @@ export default function AdminOverviewPage() {
                     {event.kind.replaceAll("_", " ")}
                   </p>
                   <p className="text-xs text-slate-500">
-                    {event.ip || "unknown IP"} · {relativeTime(event.createdAt)}
+                    {event.ip || tr("unknown IP")} · {relativeTime(event.createdAt, locale)}
                   </p>
                 </div>
                 <Badge tone="info">#{event.id}</Badge>
@@ -129,7 +130,7 @@ export default function AdminOverviewPage() {
             ))}
           </div>
         ) : (
-          <EmptyState icon="fa-clipboard-list" title="Chưa có nhật ký" />
+          <EmptyState icon="fa-clipboard-list" title={tr("Chưa có nhật ký")} />
         )}
       </Card>
     </div>

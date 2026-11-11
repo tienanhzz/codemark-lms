@@ -1,3 +1,5 @@
+import { getLanguage, getLocale, Language, translate } from "./i18n";
+
 export const WEEKDAYS = [
   "Thứ hai",
   "Thứ ba",
@@ -10,26 +12,26 @@ export const WEEKDAYS = [
 
 export const WEEKDAYS_SHORT = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 
-export function weekdayName(index: number) {
-  return WEEKDAYS[index] || "Chưa xác định";
+export function weekdayName(index: number, language: Language = getLanguage()) {
+  return translate(WEEKDAYS[index] || "Chưa xác định", undefined, language);
 }
 
-export function formatDate(value?: string | null) {
+export function formatDate(value?: string | null, locale = getLocale()) {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleDateString("vi-VN", {
+  return date.toLocaleDateString(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",
   });
 }
 
-export function formatDateTime(value?: string | null) {
+export function formatDateTime(value?: string | null, locale = getLocale()) {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleString("vi-VN", {
+  return date.toLocaleString(locale, {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -42,15 +44,16 @@ export function formatTime(value?: string | null) {
   return value.slice(0, 5);
 }
 
-export function relativeTime(value: string) {
+export function relativeTime(value: string, locale = getLocale()) {
   const date = new Date(value);
   const diff = Date.now() - date.getTime();
   const minutes = Math.round(diff / 60000);
-  if (Math.abs(minutes) < 1) return "vừa xong";
-  if (Math.abs(minutes) < 60) return `${minutes} phút trước`;
+  if (Math.abs(minutes) < 1) return translate("vừa xong", undefined, locale.startsWith("en") ? "en" : "vi");
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  if (Math.abs(minutes) < 60) return formatter.format(-minutes, "minute");
   const hours = Math.round(minutes / 60);
-  if (Math.abs(hours) < 24) return `${hours} giờ trước`;
-  return `${Math.round(hours / 24)} ngày trước`;
+  if (Math.abs(hours) < 24) return formatter.format(-hours, "hour");
+  return formatter.format(-Math.round(hours / 24), "day");
 }
 
 export function formatBytes(bytes?: number | null) {
@@ -60,10 +63,9 @@ export function formatBytes(bytes?: number | null) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
 }
 
-export function roleLabel(role?: string | null) {
-  if (role === "ta") return "Trợ giảng";
+export function roleLabel(role?: string | null, language: Language = getLanguage()) {
   if (!role) return "—";
-  return ({admin:"Quản trị viên",teacher:"Giảng viên",student:"Sinh viên",ta:"Trợ giảng"} as Record<string,string>)[role] || role;
+  return translate(({admin:"Quản trị viên",teacher:"Giảng viên",student:"Sinh viên",ta:"Trợ giảng"} as Record<string,string>)[role] || role, undefined, language);
 }
 
 export function initials(name?: string) {

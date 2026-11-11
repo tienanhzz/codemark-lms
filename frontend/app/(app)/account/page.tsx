@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "../../../components/LanguageProvider";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { api, errorMessage } from "../../../lib/api";
@@ -17,6 +18,7 @@ import {
 const MIN_PASSWORD = 12;
 
 export default function AccountPage() {
+  const { tr, language } = useI18n();
   const { user, refresh, passwordReminder } = useAuth();
   const reminderRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
@@ -82,14 +84,14 @@ export default function AccountPage() {
     <div className="mx-auto max-w-3xl">
       <PageHeader
         icon="fa-user-gear"
-        title="Tài khoản của tôi"
-        description="Xem thông tin tài khoản và đổi mật khẩu."
+        title={tr("Tài khoản của tôi")}
+        description={tr("Xem thông tin tài khoản và đổi mật khẩu.")}
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <StatCard
           icon="fa-id-badge"
-          label="Họ tên"
+          label={tr("Họ tên")}
           value={user.name}
           hint={
             <>
@@ -101,29 +103,29 @@ export default function AccountPage() {
         />
         <StatCard
           icon="fa-shield-halved"
-          label="Vai trò hệ thống"
-          value={roleLabel(user.role)}
-          hint="Do quản trị viên cấp"
+          label={tr("Vai trò hệ thống")}
+          value={roleLabel(user.role, language)}
+          hint={tr("Do quản trị viên cấp")}
           tone="purple"
         />
       </div>
 
       <Card
         className="mt-5"
-        title="Đổi mật khẩu"
-        subtitle={`Mật khẩu cần ít nhất ${MIN_PASSWORD} ký tự. Phiên đăng nhập vẫn được giữ sau khi đổi mật khẩu.`}
+        title={tr("Đổi mật khẩu")}
+        subtitle={tr("Mật khẩu cần ít nhất {0} ký tự. Phiên đăng nhập vẫn được giữ sau khi đổi mật khẩu.", { 0: (MIN_PASSWORD) })}
       >
         {user.mustChangePassword && (
           <div ref={reminderRef} tabIndex={-1} role="alert" className="mb-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
             <Alert tone="warning">
               {passwordReminder
-                ? `Bạn cần đổi mật khẩu lần đầu trước khi sử dụng chức năng “${passwordReminder.feature}”. Vui lòng hoàn tất đổi mật khẩu bên dưới.`
-                : "Tài khoản mới cần đổi mật khẩu lần đầu trước khi sử dụng các chức năng khác."}
+                ? tr("Bạn cần đổi mật khẩu lần đầu trước khi sử dụng chức năng “{0}”. Vui lòng hoàn tất đổi mật khẩu bên dưới.", { 0: tr(passwordReminder.feature) })
+                : tr("Tài khoản mới cần đổi mật khẩu lần đầu trước khi sử dụng các chức năng khác.")}
             </Alert>
           </div>
         )}
         <form onSubmit={changePassword} className="grid gap-3 sm:grid-cols-2">
-          <Field label="Mật khẩu hiện tại" className="sm:col-span-2">
+          <Field label={tr("Mật khẩu hiện tại")} className="sm:col-span-2">
             <Input
               name="currentPassword"
               type="password"
@@ -131,7 +133,7 @@ export default function AccountPage() {
               required
             />
           </Field>
-          <Field label="Mật khẩu mới">
+          <Field label={tr("Mật khẩu mới")}>
             <Input
               name="newPassword"
               type="password"
@@ -140,7 +142,7 @@ export default function AccountPage() {
               required
             />
           </Field>
-          <Field label="Nhập lại mật khẩu mới">
+          <Field label={tr("Nhập lại mật khẩu mới")}>
             <Input
               name="confirmPassword"
               type="password"
@@ -161,26 +163,19 @@ export default function AccountPage() {
           )}
           <div className="sm:col-span-2">
             <Button type="submit" loading={saving}>
-              <i className="fa-solid fa-key" /> Cập nhật mật khẩu
-            </Button>
+              <i className="fa-solid fa-key" />{" " + tr("Cập nhật mật khẩu")}</Button>
           </div>
         </form>
       </Card>
 
-      <Card className="mt-5" title="Bảo mật phiên đăng nhập" subtitle="Cách hệ thống bảo vệ tài khoản của bạn">
+      <Card className="mt-5" title={tr("Bảo mật phiên đăng nhập")} subtitle={tr("Cách hệ thống bảo vệ tài khoản của bạn")}>
         <ul className="space-y-2 text-sm text-slate-600">
           <li className="flex items-start gap-2">
-            <i className="fa-solid fa-circle-check mt-1 text-emerald-500" />
-            Mỗi tài khoản chỉ có một phiên hoạt động. Đăng nhập nơi khác sẽ thu hồi phiên cũ và ghi nhật ký.
-          </li>
+            <i className="fa-solid fa-circle-check mt-1 text-emerald-500" />{tr("Mỗi tài khoản chỉ có một phiên hoạt động. Đăng nhập nơi khác sẽ thu hồi phiên cũ và ghi nhật ký.")}</li>
           <li className="flex items-start gap-2">
-            <i className="fa-solid fa-circle-check mt-1 text-emerald-500" />
-            Phiên hết hạn sau hai phút không hoạt động.
-          </li>
+            <i className="fa-solid fa-circle-check mt-1 text-emerald-500" />{tr("Phiên hết hạn sau hai phút không hoạt động.")}</li>
           <li className="flex items-start gap-2">
-            <i className="fa-solid fa-circle-check mt-1 text-emerald-500" />
-            Mật khẩu được băm một chiều và không được trả về qua API.
-          </li>
+            <i className="fa-solid fa-circle-check mt-1 text-emerald-500" />{tr("Mật khẩu được băm một chiều và không được trả về qua API.")}</li>
         </ul>
       </Card>
     </div>

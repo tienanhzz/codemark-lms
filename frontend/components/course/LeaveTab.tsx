@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "../LanguageProvider";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { api, download, errorMessage } from "../../lib/api";
@@ -18,6 +19,7 @@ import {
 import { isStaff, type CourseTabProps } from "./types";
 
 export function LeaveTab({ course, role }: CourseTabProps) {
+  const { tr, language, locale } = useI18n();
   const staff = isStaff(role);
   const [items, setItems] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,7 +92,7 @@ export function LeaveTab({ course, role }: CourseTabProps) {
     [items, filter],
   );
 
-  if (loading) return <Spinner label="Đang tải đơn nghỉ phép…" />;
+  if (loading) return <Spinner label={tr("Đang tải đơn nghỉ phép…")} />;
 
   return (
     <div className="space-y-4">
@@ -98,19 +100,19 @@ export function LeaveTab({ course, role }: CourseTabProps) {
       {notice && <Alert tone="success">{notice}</Alert>}
 
       {!staff && (
-        <Card title="Xin nghỉ phép" subtitle="Đính kèm ảnh JPEG, PNG, WebP hoặc PDF (tối đa 5 MiB)">
+        <Card title={tr("Xin nghỉ phép")} subtitle={tr("Đính kèm ảnh JPEG, PNG, WebP hoặc PDF (tối đa 5 MiB)")}>
           <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
-            <Field label="Buổi học">
+            <Field label={tr("Buổi học")}>
               <Select name="meetingId" defaultValue="">
-                <option value="">Không chọn buổi cụ thể</option>
+                <option value="">{tr("Không chọn buổi cụ thể")}</option>
                 {course.meetings?.map((meeting) => (
                   <option key={meeting.id} value={meeting.id}>
-                    {weekdayName(meeting.weekday)} {meeting.start}–{meeting.end}
+                    {weekdayName(meeting.weekday, language)} {meeting.start}–{meeting.end}
                   </option>
                 ))}
               </Select>
             </Field>
-            <Field label="File minh chứng">
+            <Field label={tr("File minh chứng")}>
               <input
                 name="evidence"
                 type="file"
@@ -118,21 +120,20 @@ export function LeaveTab({ course, role }: CourseTabProps) {
                 className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium"
               />
             </Field>
-            <Field label="Lý do" className="sm:col-span-2">
-              <Textarea name="reason" required placeholder="Giải thích lý do vắng…" />
+            <Field label={tr("Lý do")} className="sm:col-span-2">
+              <Textarea name="reason" required placeholder={tr("Giải thích lý do vắng…")} />
             </Field>
             <div className="sm:col-span-2">
               <Button type="submit" loading={saving}>
-                <i className="fa-solid fa-paper-plane" /> Gửi đơn
-              </Button>
+                <i className="fa-solid fa-paper-plane" />{" " + tr("Gửi đơn")}</Button>
             </div>
           </form>
         </Card>
       )}
 
       <Card
-        title="Đơn nghỉ phép"
-        subtitle={staff ? "Approve or reject with an audit trail" : "Your submitted requests"}
+        title={tr("Đơn nghỉ phép")}
+        subtitle={staff ? tr("Approve or reject with an audit trail") : tr("Your submitted requests")}
         actions={
           staff ? (
             <Select
@@ -140,10 +141,10 @@ export function LeaveTab({ course, role }: CourseTabProps) {
               onChange={(event) => setFilter(event.target.value)}
               className="w-40"
             >
-              <option value="pending">Chờ duyệt</option>
-              <option value="approved">Đã duyệt</option>
-              <option value="rejected">Đã từ chối</option>
-              <option value="all">Tất cả</option>
+              <option value="pending">{tr("Chờ duyệt")}</option>
+              <option value="approved">{tr("Đã duyệt")}</option>
+              <option value="rejected">{tr("Đã từ chối")}</option>
+              <option value="all">{tr("Tất cả")}</option>
             </Select>
           ) : undefined
         }
@@ -155,25 +156,24 @@ export function LeaveTab({ course, role }: CourseTabProps) {
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold text-slate-700">
-                      {staff ? item.student?.name || "Student" : "Leave request"}
+                      {staff ? item.student?.name || tr("Student") : tr("Leave request")}
                       <span className="ml-2 text-[11px] font-normal text-slate-400">
-                        {formatDateTime(item.createdAt)}
+                        {formatDateTime(item.createdAt, locale)}
                       </span>
                     </p>
                     <p className="mt-1 text-sm text-slate-600">{item.reason}</p>
                     <p className="mt-1 text-xs text-slate-500">
                       {item.meetingId
-                        ? `Meeting #${item.meetingId}`
-                        : "No specific meeting"}
+                        ? tr("Meeting #{0}", { 0: (item.meetingId) })
+                        : tr("No specific meeting")}
                       {item.evidenceName
-                        ? ` · Evidence: ${item.evidenceName} (${formatBytes(
+                        ? tr(" · Evidence: {0} ({1})", { 0: (item.evidenceName), 1: (formatBytes(
                             item.evidenceSize,
-                          )})`
+                          )) })
                         : ""}
                     </p>
                     {item.decisionNote && (
-                      <p className="mt-1 text-xs text-slate-500">
-                        Ghi chú xét duyệt: {item.decisionNote}
+                      <p className="mt-1 text-xs text-slate-500">{tr("Ghi chú xét duyệt:") + " "}{item.decisionNote}
                       </p>
                     )}
                   </div>
@@ -191,26 +191,23 @@ export function LeaveTab({ course, role }: CourseTabProps) {
                         ).catch((err) => setError(errorMessage(err)))
                       }
                     >
-                      <i className="fa-solid fa-download" /> Minh chứng
-                    </Button>
+                      <i className="fa-solid fa-download" />{" " + tr("Minh chứng")}</Button>
                   )}
                   {staff && item.status === "pending" && (
                     <>
-                      <Textarea aria-label="Ghi chú xét duyệt" placeholder="Lý do / ghi chú xét duyệt" value={notes[item.id] || ""} onChange={e=>setNotes({...notes,[item.id]:e.target.value})}/>
+                      <Textarea aria-label={tr("Ghi chú xét duyệt")} placeholder={tr("Lý do / ghi chú xét duyệt")} value={notes[item.id] || ""} onChange={e=>setNotes({...notes,[item.id]:e.target.value})}/>
                       <Button
                         size="sm"
                         variant="success"
                         onClick={() => decide(item, "approved")}
                       >
-                        <i className="fa-solid fa-check" /> Duyệt
-                      </Button>
+                        <i className="fa-solid fa-check" />{" " + tr("Duyệt")}</Button>
                       <Button
                         size="sm"
                         variant="danger"
                         onClick={() => decide(item, "rejected")}
                       >
-                        <i className="fa-solid fa-xmark" /> Từ chối
-                      </Button>
+                        <i className="fa-solid fa-xmark" />{" " + tr("Từ chối")}</Button>
                     </>
                   )}
                 </div>
@@ -220,11 +217,11 @@ export function LeaveTab({ course, role }: CourseTabProps) {
         ) : (
           <EmptyState
             icon="fa-envelope-open-text"
-            title="Chưa có đơn nghỉ phép"
+            title={tr("Chưa có đơn nghỉ phép")}
             description={
               staff
-                ? "No requests match this filter."
-                : "You have not submitted any leave requests."
+                ? tr("No requests match this filter.")
+                : tr("You have not submitted any leave requests.")
             }
           />
         )}

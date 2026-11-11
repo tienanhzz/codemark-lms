@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "../LanguageProvider";
+
 import { confirmInline } from "../InlineConfirm";
 
 import { FormEvent, useEffect, useState } from "react";
@@ -20,6 +22,7 @@ import {
 import { type CourseTabProps } from "./types";
 
 export function RosterTab({ course }: CourseTabProps) {
+  const { tr, language } = useI18n();
   const [roster, setRoster] = useState<RosterEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -92,43 +95,42 @@ export function RosterTab({ course }: CourseTabProps) {
     }
   }
 
-  if (loading) return <Spinner label="Đang tải danh sách thành viên…" />;
+  if (loading) return <Spinner label={tr("Đang tải danh sách thành viên…")} />;
 
   return (
     <div className="space-y-4">
       {error && <Alert tone="danger">{error}</Alert>}
       {notice && <Alert tone="success">{notice}</Alert>}
 
-      <Card title="Thêm thành viên" subtitle="Nhập chính xác mã đăng nhập 10 số">
+      <Card title={tr("Thêm thành viên")} subtitle={tr("Nhập chính xác mã đăng nhập 10 số")}>
         <form onSubmit={add} className="grid gap-3 sm:grid-cols-3">
-          <Field label="Mã đăng nhập">
+          <Field label={tr("Mã đăng nhập")}>
             <Input name="studentId" type="text" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} required placeholder="2025000001" />
           </Field>
-          <Field label="Vai trò trong lớp">
+          <Field label={tr("Vai trò trong lớp")}>
             <Select name="courseRole" defaultValue="student">
-              <option value="student">Sinh viên</option>
-              <option value="ta">Trợ giảng</option>
-              <option value="teacher">Giảng viên</option>
+              <option value="student">{tr("Sinh viên")}</option>
+              <option value="ta">{tr("Trợ giảng")}</option>
+              <option value="teacher">{tr("Giảng viên")}</option>
             </Select>
           </Field>
           <div className="flex items-end">
             <Button type="submit" loading={saving} className="w-full">
-              <i className="fa-solid fa-user-plus" /> Thêm thành viên
-            </Button>
+              <i className="fa-solid fa-user-plus" />{" " + tr("Thêm thành viên")}</Button>
           </div>
         </form>
       </Card>
 
-      <Card title="Danh sách thành viên lớp" subtitle={`${roster.length} members`}>
+      <Card title={tr("Danh sách thành viên lớp")} subtitle={tr("{0} members", { 0: (roster.length) })}>
         {roster.length ? (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[560px] text-sm">
               <thead>
                 <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wide text-slate-400">
-                  <th className="py-2">Thành viên</th>
-                  <th className="py-2">Vai trò tài khoản</th>
-                  <th className="py-2">Vai trò trong lớp</th>
-                  <th className="py-2 text-right">Thao tác</th>
+                  <th className="py-2">{tr("Thành viên")}</th>
+                  <th className="py-2">{tr("Vai trò tài khoản")}</th>
+                  <th className="py-2">{tr("Vai trò trong lớp")}</th>
+                  <th className="py-2 text-right">{tr("Thao tác")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -144,20 +146,20 @@ export function RosterTab({ course }: CourseTabProps) {
                       </div>
                     </td>
                     <td className="py-2">
-                      <Badge tone={entry.user.role}>{roleLabel(entry.user.role)}</Badge>
+                      <Badge tone={entry.user.role}>{roleLabel(entry.user.role, language)}</Badge>
                     </td>
                     <td className="py-2">
                       {entry.user.id === course.ownerId ? (
-                        <Badge tone="teacher">Phụ trách</Badge>
+                        <Badge tone="teacher">{tr("Phụ trách")}</Badge>
                       ) : (
                         <Select
                           value={entry.courseRole}
                           onChange={(event) => changeRole(entry, event.target.value)}
                           className="w-36 py-1 text-xs"
                         >
-                          <option value="student">Sinh viên</option>
-                          <option value="ta">TA</option>
-                          <option value="teacher">Giảng viên</option>
+                          <option value="student">{tr("Sinh viên")}</option>
+                          <option value="ta">{tr("TA")}</option>
+                          <option value="teacher">{tr("Giảng viên")}</option>
                         </Select>
                       )}
                     </td>
@@ -174,7 +176,7 @@ export function RosterTab({ course }: CourseTabProps) {
             </table>
           </div>
         ) : (
-          <EmptyState icon="fa-users" title="Chưa có thành viên" />
+          <EmptyState icon="fa-users" title={tr("Chưa có thành viên")} />
         )}
       </Card>
     </div>

@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "../../../../components/LanguageProvider";
+
 import { confirmInline } from "../../../../components/InlineConfirm";
 
 import { useCallback, useEffect, useState } from "react";
@@ -27,6 +29,7 @@ type SessionRow = {
 };
 
 export default function AdminSessionsPage() {
+  const { tr, language, locale } = useI18n();
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -66,12 +69,11 @@ export default function AdminSessionsPage() {
     <div>
       <PageHeader
         icon="fa-signal"
-        title="Phiên hoạt động"
-        description="Mỗi tài khoản có một phiên đăng nhập. Phiên hết hạn sau 2 phút không hoạt động."
+        title={tr("Phiên hoạt động")}
+        description={tr("Mỗi tài khoản có một phiên đăng nhập. Phiên hết hạn sau 2 phút không hoạt động.")}
         actions={
           <Button variant="secondary" onClick={load}>
-            <i className="fa-solid fa-rotate" /> Làm mới
-          </Button>
+            <i className="fa-solid fa-rotate" />{" " + tr("Làm mới")}</Button>
         }
       />
       {error && <Alert tone="danger" className="mb-3">{error}</Alert>}
@@ -79,17 +81,17 @@ export default function AdminSessionsPage() {
 
       <Card bodyClassName="p-0">
         {loading && sessions.length === 0 ? (
-          <Spinner label="Đang tải phiên…" />
+          <Spinner label={tr("Đang tải phiên…")} />
         ) : sessions.length ? (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-sm">
               <thead>
                 <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wide text-slate-400">
-                  <th className="px-4 py-3">Tài khoản</th>
-                  <th className="px-4 py-3">Vai trò</th>
+                  <th className="px-4 py-3">{tr("Tài khoản")}</th>
+                  <th className="px-4 py-3">{tr("Vai trò")}</th>
                   <th className="px-4 py-3">IP</th>
-                  <th className="px-4 py-3">Hoạt động gần nhất</th>
-                  <th className="px-4 py-3 text-right">Thao tác</th>
+                  <th className="px-4 py-3">{tr("Hoạt động gần nhất")}</th>
+                  <th className="px-4 py-3 text-right">{tr("Thao tác")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -102,24 +104,23 @@ export default function AdminSessionsPage() {
                           <p className="font-medium text-slate-700">{row.name}</p>
                           <p className="text-xs text-slate-400">{row.studentId}</p>
                           <p className="max-w-xs truncate text-[10px] text-slate-300">
-                            {row.userAgent || "unknown user agent"}
+                            {row.userAgent || tr("unknown user agent")}
                           </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge tone={row.role}>{roleLabel(row.role)}</Badge>
+                      <Badge tone={row.role}>{roleLabel(row.role, language)}</Badge>
                     </td>
                     <td className="px-4 py-3 font-mono text-xs text-slate-500">
                       {row.ip || "—"}
                     </td>
                     <td className="px-4 py-3 text-xs text-slate-500">
-                      {formatDateTime(row.lastActivity)}
+                      {formatDateTime(row.lastActivity, locale)}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Button size="sm" variant="danger" onClick={() => revoke(row)}>
-                        <i className="fa-solid fa-power-off" /> Thu hồi
-                      </Button>
+                        <i className="fa-solid fa-power-off" />{" " + tr("Thu hồi")}</Button>
                     </td>
                   </tr>
                 ))}
@@ -130,8 +131,8 @@ export default function AdminSessionsPage() {
           <div className="p-4">
             <EmptyState
               icon="fa-signal"
-              title="Không có phiên hoạt động"
-              description="Phiên xuất hiện sau khi đăng nhập thành công."
+              title={tr("Không có phiên hoạt động")}
+              description={tr("Phiên xuất hiện sau khi đăng nhập thành công.")}
             />
           </div>
         )}

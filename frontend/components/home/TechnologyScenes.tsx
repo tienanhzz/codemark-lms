@@ -1,4 +1,5 @@
 "use client";
+import { useI18n } from "../LanguageProvider";
 
 import { useId } from "react";
 
@@ -10,13 +11,14 @@ export const SCENE_NAMES = [
 ];
 
 export function TechnologyScene({ variant }: { variant: number }) {
+  const { tr } = useI18n();
   const gradientId = useId().replace(/:/g, "");
   const id = (name: string) => gradientId + "-" + name;
   const paint = (name: string) => "url(#" + id(name) + ")";
 
   if (variant === 0) return (
       <svg viewBox="0 0 1000 540" preserveAspectRatio="xMidYMid slice" role="img"
-        aria-label={SCENE_NAMES[variant]}
+        aria-label={tr(SCENE_NAMES[variant])}
         className="learning-motion-scene block h-full w-full">
         <defs>
           <radialGradient id={id("nebula")}><stop stopColor="#164e63" stopOpacity=".8" /><stop offset="1" stopColor="#061322" stopOpacity="0" /></radialGradient>
@@ -144,7 +146,7 @@ export function TechnologyScene({ variant }: { variant: number }) {
 
   return (
     <svg viewBox="0 0 1000 540" preserveAspectRatio="xMidYMid slice" role="img"
-      aria-label={SCENE_NAMES[variant]} className="learning-motion-scene block h-full w-full">
+      aria-label={tr(SCENE_NAMES[variant])} className="learning-motion-scene block h-full w-full">
         <defs>
           <radialGradient id={id("nebula")}><stop stopColor="#164e63" stopOpacity=".8" /><stop offset="1" stopColor="#061322" stopOpacity="0" /></radialGradient>
           <radialGradient id={id("purple")}><stop stopColor="#55378d" stopOpacity=".45" /><stop offset="1" stopColor="#061322" stopOpacity="0" /></radialGradient>

@@ -1,4 +1,6 @@
 "use client";
+import { useI18n } from "../LanguageProvider";
+
 import { useState } from "react";
 import { api, errorMessage } from "../../lib/api";
 import { useAuth } from "../AuthProvider";
@@ -16,6 +18,7 @@ type Report = {
 };
 function saveCsv(text: string, name: string) { const url = URL.createObjectURL(new Blob(["\uFEFF" + text], { type: "text/csv;charset=utf-8" })); const a = document.createElement("a"); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url); }
 export function BulkAccountForm({ onCreated }: { onCreated: () => Promise<void> }) {
+  const { tr } = useI18n();
     const { user } = useAuth();
     const [csv, setCsv] = useState(""), [report, setReport] = useState<Report | null>(null), [reset, setReset] = useState(false), [message, setMessage] = useState(""), [busy, setBusy] = useState(false);
     async function process(text: string, commit = false, resetExisting = reset) { setBusy(true); try {
@@ -40,22 +43,22 @@ export function BulkAccountForm({ onCreated }: { onCreated: () => Promise<void> 
         return;
     } const text = await f.text(); setCsv(text); await process(text); }
     if (user?.role !== "admin")
-        return <Alert tone="danger">Chỉ quản trị viên được sử dụng.</Alert>;
+        return <Alert tone="danger">{tr("Chỉ quản trị viên được sử dụng.")}</Alert>;
     return <div className="space-y-4">
-    <Card title="Tạo tài khoản hàng loạt" subtitle="CSV UTF-8, 2 cột studentId,password. Mật khẩu 12–72 byte. Tất cả tài khoản phải đổi mật khẩu lần đầu.">
-    <Button onClick={() => saveCsv("studentId,password\n2025999999,CodeMark@2026\n", "tai-khoan-mau.csv")}>Tải file mẫu</Button>
-    <div className="my-4 rounded-xl border-2 border-dashed border-teal-500 p-12 text-center" tabIndex={0} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); file(e.dataTransfer.files[0]); }}>Kéo thả file CSV vào đây</div>
-    <label className="block text-sm">Hoặc chọn file khi không thể kéo thả<input type="file" accept=".csv" onChange={e => file(e.target.files?.[0])}/>
+    <Card title={tr("Tạo tài khoản hàng loạt")} subtitle={tr("CSV UTF-8, 2 cột studentId,password. Mật khẩu 12–72 byte. Tất cả tài khoản phải đổi mật khẩu lần đầu.")}>
+    <Button onClick={() => saveCsv("studentId,password\n2025999999,CodeMark@2026\n", "tai-khoan-mau.csv")}>{tr("Tải file mẫu")}</Button>
+    <div className="my-4 rounded-xl border-2 border-dashed border-teal-500 p-12 text-center" tabIndex={0} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); file(e.dataTransfer.files[0]); }}>{tr("Kéo thả file CSV vào đây")}</div>
+    <label className="block text-sm">{tr("Hoặc chọn file khi không thể kéo thả")}<input type="file" accept=".csv" onChange={e => file(e.target.files?.[0])}/>
     </label>
     <label className="my-3 block">
     <input type="checkbox" checked={reset} onChange={e => { setReset(e.target.checked); if (csv)
-        process(csv, false, e.target.checked); }}/> Đặt lại mật khẩu tài khoản sinh viên đã tồn tại</label>{message && <Alert>{message}</Alert>}{report && <>
+        process(csv, false, e.target.checked); }}/>{" " + tr("Đặt lại mật khẩu tài khoản sinh viên đã tồn tại")}</label>{message && <Alert>{message}</Alert>}{report && <>
         <table className="my-4 w-full text-left text-sm">
         <thead>
         <tr>
-        <th>Dòng</th>
-        <th>Mã đăng nhập</th>
-        <th>Trạng thái</th>
+        <th>{tr("Dòng")}</th>
+        <th>{tr("Mã đăng nhập")}</th>
+        <th>{tr("Trạng thái")}</th>
         </tr>
         </thead>
         <tbody>{report.rows.map(r => <tr key={r.line}>
@@ -64,8 +67,8 @@ export function BulkAccountForm({ onCreated }: { onCreated: () => Promise<void> 
             <td>{r.status}</td>
             </tr>)}</tbody>
         </table>
-        <Button disabled={!csv || !report.valid || busy} onClick={() => process(csv, true)}>Tạo {report.valid} tài khoản</Button>
-        <Button variant="secondary" onClick={() => saveCsv("line,studentId,error\n" + report.rows.filter(r => !r.valid).map(r => `${r.line},${/^[0-9]{10}$/.test(r.studentId) ? r.studentId : "khong-hop-le"},${r.status}`).join("\n"), "dong-loi.csv")}>Tải CSV dòng lỗi</Button>
+        <Button disabled={!csv || !report.valid || busy} onClick={() => process(csv, true)}>{tr("Tạo") + " "}{report.valid}{" " + tr("tài khoản")}</Button>
+        <Button variant="secondary" onClick={() => saveCsv("line,studentId,error\n" + report.rows.filter(r => !r.valid).map(r => `${r.line},${/^[0-9]{10}$/.test(r.studentId) ? r.studentId : "khong-hop-le"},${r.status}`).join("\n"), "dong-loi.csv")}>{tr("Tải CSV dòng lỗi")}</Button>
         </>}</Card>
     </div>;
 }
