@@ -3,7 +3,7 @@ import { useI18n } from "../LanguageProvider";
 
 import { FormEvent, useEffect, useState } from "react";
 import { api, errorMessage } from "../../lib/api";
-import { Alert, Button, Card, Field, Input, Textarea } from "../ui";
+import { Alert, Button, Card, Field, Input, Select, Textarea } from "../ui";
 import { CourseTabProps, isStaff } from "./types";
 type Quiz = {
     id: number;
@@ -11,6 +11,8 @@ type Quiz = {
     url: string;
     description: string;
     dueAt: string;
+    opensAt: string;
+    difficulty: string;
     maxScore: number;
     results: {
         id: number;
@@ -37,7 +39,7 @@ export function QuizLinksTab({ course, role }: CourseTabProps) {
     useEffect(() => { load(); }, [course.id]);
     async function act(path: string, body: unknown) { setBusy(true); try {
         const result = await api<any>(path, { method: "POST", body });
-        setMessage(result.errors?.length ? `Đã nhập ${result.imported} dòng. Lỗi: ${JSON.stringify(result.errors)}` : "Đã lưu thành công.");
+        setMessage(result.errors?.length ? `Đã nhập ${result.imported} dòng. Lỗi: ${JSON.stringify(result.errors)}` : tr("Đã lưu thành công."));
         window.dispatchEvent(new Event("lms:points"));
         await load();
     }
@@ -47,11 +49,16 @@ export function QuizLinksTab({ course, role }: CourseTabProps) {
     finally {
         setBusy(false);
     } }
-    async function add(e: FormEvent<HTMLFormElement>) { e.preventDefault(); const f = new FormData(e.currentTarget); await act(`/api/courses/${course.id}/quiz-links`, { title: f.get("title"), url: f.get("url"), description: f.get("description"), dueAt: new Date(String(f.get("dueAt"))).toISOString(), maxScore: Number(f.get("maxScore")) }); }
+    async function add(e: FormEvent<HTMLFormElement>) { e.preventDefault(); const f = new FormData(e.currentTarget); await act(`/api/courses/${course.id}/quiz-links`, { title: f.get("title"), url: f.get("url"), description: f.get("description"), opensAt: new Date(String(f.get("opensAt"))).toISOString(), difficulty: f.get("difficulty"), dueAt: new Date(String(f.get("dueAt"))).toISOString(), maxScore: Number(f.get("maxScore")) }); }
     return <div className="space-y-4">{message && <Alert>{message}</Alert>}{staff && <>
         <Button onClick={() => setCreate(!create)}>{create ? tr("Quay lại") : tr("Thêm quiz link")}</Button>{create && <Card title={tr("Gán quiz cho lớp")}>
             <p className="mb-4 text-sm">{tr("Yêu cầu sinh viên dùng mã 10 chữ số làm tên trong Wayground/Kahoot/Google Forms. Điểm chỉ cộng sau khi xác nhận.")}</p>
             <form className="space-y-3" onSubmit={add}>
+            <Field label={tr("Mở lúc")} hint="Quiz dùng chung lịch bài tập của khóa học."><Input name="opensAt" type="datetime-local" required /></Field>
+            <Field label="Độ khó" hint="Đạt từ 50% nhận EXP một lần"><Select name="difficulty" defaultValue="easy">
+              <option value="easy">Dễ</option><option value="medium">Trung bình</option>
+              <option value="hard">Khó</option><option value="expert">Chuyên gia</option>
+            </Select></Field>
             <Field label={tr("Tiêu đề")}>
             <Input name="title" required/>
             </Field>

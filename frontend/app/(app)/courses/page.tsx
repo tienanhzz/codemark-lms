@@ -114,7 +114,8 @@ export default function CoursesPage() {
         term: form.get("term"),
         startDate: form.get("startDate"),
         endDate: form.get("endDate"),
-        published: form.get("published") === "on",
+        practiceCadence: form.get("practiceCadence"),
+          published: form.get("published") === "on",
       };
       if (user?.role === "admin" && ownerCode.trim()) {
         const found = await api<{ users: User[] }>(
@@ -148,7 +149,7 @@ export default function CoursesPage() {
         description={
           user?.role === "student"
             ? tr("Courses you are enrolled in for the current and previous terms.")
-            : tr("Deliver content, rosters, attendance and assessments.")
+            : undefined
         }
         actions={
           canCreate ? (
@@ -299,6 +300,7 @@ export default function CoursesPage() {
           <Field label={tr("Mô tả")} className="sm:col-span-2">
             <Textarea name="description" placeholder={tr("Đề cương và mục tiêu lớp học")} />
           </Field>
+          <Field label="L?ch b?i luy?n t?p"><Select name="practiceCadence" defaultValue={"weekly"}><option value="weekly">M?i tu?n</option><option value="daily">M?i ng?y</option></Select></Field>
           <Field label={tr("Công bố")} className="sm:col-span-2">
             <Select name="published" defaultValue="off">
               <option value="off">{tr("Bản nháp — ẩn với sinh viên")}</option>

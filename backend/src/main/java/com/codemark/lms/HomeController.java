@@ -24,9 +24,8 @@ class HomeController {
   Object list(@RequestParam(defaultValue = "1") int page) {
     Api.require(page >= 1 && page <= 100000, "invalid_page", 400);
     var rows = em.createQuery("select a from HomeAnnouncement a order by a.id desc", HomeAnnouncement.class)
-        .setFirstResult((page - 1) * 10).setMaxResults(10).getResultList();
-    long total = em.createQuery("select count(a) from HomeAnnouncement a", Long.class).getSingleResult();
-    return Api.map("items", rows.stream().map(this::view).toList(), "total", total);
+        .getResultList().stream().filter(a -> !displayBody(a).isBlank()).toList();
+    return Api.map("items", rows.stream().skip((page - 1L) * 10).limit(10).map(this::view).toList(), "total", rows.size());
   }
 
   @PostMapping
@@ -66,6 +65,7 @@ class HomeController {
   }
 
   private void canEdit(User user, HomeAnnouncement item) {
+    Api.require(!"system".equals(item.authorRole), "system_announcement_read_only", 403);
     Api.require(user.role.equals("admin") || user.id.equals(item.authorId), "forbidden", 403);
   }
 
@@ -79,8 +79,13 @@ class HomeController {
   }
 
   private Object view(HomeAnnouncement item) {
-    return Api.map("id", item.id, "title", item.title, "body", item.body,
+    return Api.map("id", item.id, "title", item.title, "body", displayBody(item),
         "createdAt", item.createdAt, "authorId", item.authorId,
         "authorName", item.authorName, "authorRole", item.authorRole);
+  }
+
+  static String displayBody(HomeAnnouncement item) {
+    if (!"system".equals(item.authorRole)) return item.body;
+    return RankAnnouncementText.normalizeBody(item.body);
   }
 }

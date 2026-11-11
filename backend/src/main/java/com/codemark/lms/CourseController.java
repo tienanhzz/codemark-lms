@@ -5,6 +5,8 @@ import static com.codemark.lms.Api.*;
 import jakarta.servlet.http.*;
 import java.time.*;
 import java.util.*;
+import java.nio.charset.StandardCharsets;
+import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +17,13 @@ class CourseController {
   private final Store store;
   private final Access access;
   private final Views views;
+  private final RankService rank;
 
-  CourseController(Store s, Access a, Views v) {
+  CourseController(Store s, Access a, Views v, RankService rank) {
     store = s;
     access = a;
     views = v;
+    this.rank = rank;
   }
 
   @GetMapping("/courses")
@@ -58,6 +62,11 @@ class CourseController {
     c.title = text(b, "title", c.title);
     c.description = text(b, "description", c.description);
     c.term = text(b, "term", c.term);
+    String cadence = text(b, "practiceCadence", c.practiceCadence);
+    require(Set.of("daily", "weekly").contains(cadence), "invalid_practice_cadence", 400);
+    if (c.id != null && !cadence.equals(c.practiceCadence))
+      PracticeSchedule.validateCadenceChange(store, c, cadence);
+    c.practiceCadence = cadence;
     c.startDate =
         LocalDate.parse(
             text(
@@ -94,6 +103,7 @@ class CourseController {
   Object edit(HttpServletRequest r, @PathVariable long id, @RequestBody Map<String, Object> b) {
     User u = access.current(r);
     Course c = access.owner(u, id);
+    PracticeSchedule.lock(store, c);
     update(c, b);
     return views.course(c, u);
   }
@@ -102,6 +112,7 @@ class CourseController {
   Object delete(HttpServletRequest r, @PathVariable long id) {
     User u = access.current(r);
     Course c = access.owner(u, id);
+    store.list(RewardRequest.class,"where e.course=?1",c).forEach(store::delete);
     for (QuizLink quiz : store.list(QuizLink.class, "where e.course=?1", c)) {
       store.list(QuizResult.class, "where e.quiz=?1", quiz).forEach(store::delete);
       store.delete(quiz);
@@ -277,9 +288,12 @@ class CourseController {
   Object addLesson(
       HttpServletRequest r, @PathVariable long id, @RequestBody Map<String, Object> b) {
     Lesson l = new Lesson();
-    l.course = access.course(access.current(r), id, true);
+    User actor=access.current(r);
+    l.course = access.course(actor, id, true);
+    l.createdById=actor.id;
     lessonFields(l, b);
     store.save(l);
+    rewardMaterial(l,actor);
     return views.lesson(l);
   }
 
@@ -289,6 +303,8 @@ class CourseController {
     l.content = text(b, "content", l.content);
     l.position = integer(b, "position", l.position, 0, 10000);
     l.published = bool(b, "published", l.published);
+    l.advancedMaterial = bool(b,"advancedMaterial",l.advancedMaterial);
+    require(!l.advancedMaterial || l.content.trim().length()>=200,"advanced_material_too_short",400);
     if (b.containsKey("tagIds")) l.tagIds = LearningTaxonomyController.validatedTagIds(store,b.get("tagIds"),true);
   }
 
@@ -296,9 +312,30 @@ class CourseController {
   Object editLesson(
       HttpServletRequest r, @PathVariable long id, @RequestBody Map<String, Object> b) {
     Lesson l = store.get(Lesson.class, id);
-    access.course(access.current(r), l.course.id, true);
+    User actor=access.current(r);
+    access.course(actor, l.course.id, true);
     lessonFields(l, b);
+    rewardMaterial(l,actor);
     return views.lesson(l);
+  }
+
+  private void rewardMaterial(Lesson l,User actor) {
+    // Existing un-attributed lessons do not retroactively reward whichever staff member edits them.
+    if(l.published && !l.content.isBlank() && "teacher".equals(actor.role) && Objects.equals(l.createdById,actor.id))
+      rank.awardAction(actor,l.course,l.advancedMaterial?"teacher_advanced_material":"teacher_material",l.id,actor,Instant.now());
+  }
+
+  @GetMapping("/lessons/{id}/download")
+  ResponseEntity<byte[]> downloadLesson(HttpServletRequest r,@PathVariable long id) {
+    User actor=access.current(r); Lesson l=store.get(Lesson.class,id);
+    Course c=access.course(actor,l.course.id,false);
+    boolean student="student".equals(access.role(actor,c));
+    require(l.published || !student,"forbidden",403);
+    require(!l.content.isBlank(),"material_empty",400);
+    byte[] content=("# "+l.title+"\n\n"+l.content+"\n").getBytes(StandardCharsets.UTF_8);
+    if(student && "student".equals(actor.role)) rank.awardAction(actor,c,"material_download",l.id,actor,Instant.now());
+    return ResponseEntity.ok().contentType(MediaType.parseMediaType("text/markdown;charset=UTF-8"))
+        .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=lesson-"+l.id+".md").body(content);
   }
 
   @DeleteMapping("/lessons/{id}")
@@ -359,13 +396,41 @@ class CourseController {
     p.course = access.course(u, id, false);
     p.author = u;
     p.body = required(b, "body");
+    require(p.body.length()<=100000,"discussion_too_long",400);
+    DiscussionPost parent=null;
     if (b.get("parentId") != null) {
       p.parentId = Long.valueOf(b.get("parentId").toString());
-      require(
-          store.get(DiscussionPost.class, p.parentId).course.id.equals(id), "invalid_parent", 400);
+      parent=store.get(DiscussionPost.class,p.parentId);
+      require(parent.course.id.equals(id) && parent.parentId==null,"invalid_parent",400);
     }
     store.save(p);
+    Instant now=Instant.now();
+    if("student".equals(u.role) && "student".equals(access.role(u,p.course))) {
+      if(parent==null) rank.awardAction(u,p.course,"discussion_question",p.id,u,now);
+      else if("student".equals(parent.author.role) && !parent.author.id.equals(u.id))
+        rank.awardAction(u,p.course,"discussion_answer",parent.id,u,now);
+    } else if("teacher".equals(u.role) && parent!=null && "student".equals(parent.author.role)
+        && !now.isAfter(parent.createdAt.plusSeconds(86400)))
+      rank.awardAction(u,p.course,"teacher_reply",parent.id,u,now);
     return views.post(p);
+  }
+
+  @PostMapping("/discussions/{id}/best-answer")
+  Object bestAnswer(HttpServletRequest r,@PathVariable long id) {
+    User actor=access.current(r); DiscussionPost answer=store.get(DiscussionPost.class,id);
+    access.course(actor,answer.course.id,true);
+    require("teacher".equals(actor.role) || "admin".equals(actor.role),"forbidden",403);
+    require(answer.parentId!=null && "student".equals(answer.author.role),"invalid_best_answer",400);
+    store.flush(); // Persist a prior decision within a shared transaction before refreshing the question row.
+    DiscussionPost question=store.get(DiscussionPost.class,answer.parentId); store.refreshLocked(question);
+    require(question.parentId==null && question.course.id.equals(answer.course.id) && "student".equals(question.author.role)
+        && !question.author.id.equals(answer.author.id),"invalid_best_answer",400);
+    require(question.bestAnswerId==null || question.bestAnswerId.equals(answer.id),"best_answer_already_selected",409);
+    if(question.bestAnswerId==null) {
+      question.bestAnswerId=answer.id; answer.bestAnswer=true;
+      rank.awardAction(answer.author,answer.course,"best_answer",question.id,actor,Instant.now());
+    }
+    return views.post(answer);
   }
 
   @DeleteMapping("/discussions/{id}")

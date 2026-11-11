@@ -4,7 +4,7 @@ import { useI18n } from "../LanguageProvider";
 import { confirmInline } from "../InlineConfirm";
 
 import { FormEvent, useEffect, useState } from "react";
-import { api, errorMessage } from "../../lib/api";
+import { api, download, errorMessage } from "../../lib/api";
 import { formatDateTime } from "../../lib/format";
 import type { Lesson } from "../../lib/types";
 import {
@@ -64,6 +64,7 @@ export function LessonsTab({ course, role }: CourseTabProps) {
         content: form.get("content"),
         position: Number(form.get("position") || 0),
         published: form.get("published") === "on",
+        advancedMaterial: form.get("advancedMaterial") === "on",
         tagIds: form.getAll("tagIds").map(String),
       };
       if (editing) {
@@ -89,6 +90,14 @@ export function LessonsTab({ course, role }: CourseTabProps) {
     } catch (err) {
       setError(errorMessage(err));
     }
+  }
+
+  async function downloadLesson(lesson: Lesson) {
+    setError("");
+    try {
+      await download(`/api/lessons/${lesson.id}/download`, `bai-hoc-${lesson.id}.md`);
+      window.dispatchEvent(new Event("lms:points"));
+    } catch (err) { setError(errorMessage(err)); }
   }
 
   if (loading) return <Spinner label={tr("Đang tải bài học…")} />;
@@ -127,6 +136,7 @@ export function LessonsTab({ course, role }: CourseTabProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     {!lesson.published && <Badge tone="draft">{tr("Bản nháp")}</Badge>}
+                    {lesson.advancedMaterial && <Badge tone="approved">Nâng cao</Badge>}
                     <i
                       className={`fa-solid fa-chevron-${
                         expanded === lesson.id ? "up" : "down"
@@ -139,7 +149,8 @@ export function LessonsTab({ course, role }: CourseTabProps) {
                     <p className="prose-lesson text-sm text-slate-600">
                       {lesson.content || tr("No content.")}
                     </p>
-                    {!!lesson.tagIds?.length && <p className="mt-2 text-xs text-slate-500">{tr("Chủ đề:") + " "}{lesson.tagIds.join(", ")}</p>}
+                    {!!lesson.tagIds?.length && <p className="mt-2 text-xs text-slate-500">{tr("Chủ đề:")} {lesson.tagIds.join(", ")}</p>}
+                    {!!lesson.content?.trim() && <div className="mt-3"><Button size="sm" variant="secondary" onClick={() => void downloadLesson(lesson)}><i className="fa-solid fa-download" /> Tải tài liệu</Button>{!staff && <span className="ml-2 text-xs text-slate-500">+3 EXP cho lần tải đầu tiên</span>}</div>}
                     {staff && (
                       <div className="mt-3 flex gap-2">
                         <Button
@@ -202,6 +213,9 @@ export function LessonsTab({ course, role }: CourseTabProps) {
               className="min-h-48"
               placeholder={tr("Ghi chú, liên kết và hướng dẫn bài học…")}
             />
+          </Field>
+          <Field label="Tài liệu nâng cao" hint="Nội dung tối thiểu 200 ký tự. Giảng viên nhận tối đa 6 Reputation cho một tài liệu, kể cả khi nâng cấp từ tài liệu thường.">
+            <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" name="advancedMaterial" defaultChecked={editing?.advancedMaterial || false} /> Tài liệu tham khảo nâng cao</label>
           </Field>
           <Field label={tr("Chủ đề")} hint={tr("Có thể chọn nhiều thẻ.")}>
             <select name="tagIds" multiple defaultValue={editing?.tagIds||[]} className="w-full min-h-28 rounded-lg border border-slate-200 bg-white p-2 text-sm">

@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { localOrigins } from "./lan.mjs";
 import { maven } from "./maven.mjs";
+import { checkDevPorts } from "./dev-preflight.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const backendDir = join(root, "backend");
@@ -64,6 +65,13 @@ process.on("SIGTERM", () => {
   stopAll();
   process.exit(0);
 });
+
+try {
+  await checkDevPorts();
+} catch (error) {
+  console.error(`[dev] ${error.message}`);
+  process.exit(1);
+}
 
 maven(["-DskipTests", "package"]);
 console.log("[dev] backend: Spring Boot on http://localhost:5000");

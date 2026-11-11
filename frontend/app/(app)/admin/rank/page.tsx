@@ -4,20 +4,16 @@ import { useI18n } from "../../../../components/LanguageProvider";
 import { FormEvent, useEffect, useState } from "react";
 import { api, errorMessage } from "../../../../lib/api";
 import { useAuth } from "../../../../components/AuthProvider";
-import { Alert, Button, Card, Field, Input, Textarea } from "../../../../components/ui";
-type Tier = {
-    name: string;
-    threshold: number;
-};
+import { Alert, Button, Card, Field, Input, Select, Textarea } from "../../../../components/ui";
 export default function Page() {
   const { tr, locale } = useI18n();
     const { user } = useAuth();
-    const [config, setConfig] = useState<any>(null), [tiers, setTiers] = useState<Tier[]>([]), [mask, setMask] = useState(true), [ledger, setLedger] = useState<any[]>([]), [offset, setOffset] = useState(0), [message, setMessage] = useState("");
+    const [config, setConfig] = useState<any>(null), [ledger, setLedger] = useState<any[]>([]), [offset, setOffset] = useState(0), [message, setMessage] = useState("");
+    const [courses, setCourses] = useState<{ id: number; title: string; code: string }[]>([]);
     async function load() { try {
-        const [c, l] = await Promise.all([api<any>("/api/rank/config"), api<any>(`/api/rank/ledger?offset=${offset}`)]);
+        const [c, l, classes] = await Promise.all([api<any>("/api/rank/config"), api<any>(`/api/rank/ledger?offset=${offset}`), api<{ courses: { id: number; title: string; code: string }[] }>("/api/courses")]);
+        setCourses(classes.courses);
         setConfig(c);
-        setTiers(c.tiers);
-        setMask(c.maskCodes);
         setLedger(l.entries);
     }
     catch (e) {
@@ -54,18 +50,10 @@ export default function Page() {
     <ul>{config?.seasons.map((s: any) => <li key={s.id} className="my-3">{s.name} · {s.active ? tr("Đang hoạt động") : tr("Đã đóng")} <Button size="sm" disabled={s.active} onClick={() => act(`/api/rank/seasons/${s.id}/activate`, {})}>{tr("Kích hoạt")}</Button>
         </li>)}</ul>
     </Card>
-    <Card title={tr("Tier và ngưỡng điểm")}>
-    <p className="mb-3 text-sm">{tr("Dòng đầu bắt đầu từ 0. Ngưỡng không âm, tăng dần; tên không trùng.")}</p>{tiers.map((t, i) => <div key={i} className="mb-2 flex gap-2">
-        <Input aria-label={tr("Tên tier")} value={t.name} onChange={e => setTiers(tiers.map((x, j) => j === i ? { ...x, name: e.target.value } : x))}/>
-        <Input aria-label={tr("Ngưỡng")} type="number" min="0" value={t.threshold} onChange={e => setTiers(tiers.map((x, j) => j === i ? { ...x, threshold: Number(e.target.value) } : x))}/>
-        <Button variant="secondary" onClick={() => setTiers(tiers.filter((_, j) => j !== i))}>{tr("Bỏ")}</Button>
-        </div>)}<Button variant="secondary" onClick={() => setTiers([...tiers, { name: "Tier mới", threshold: (tiers.at(-1)?.threshold || 0) + 100 }])}>{tr("Thêm tier")}</Button>
-    <label className="my-3 block">
-    <input type="checkbox" checked={mask} onChange={e => setMask(e.target.checked)}/>{" " + tr("Che giữa mã sinh viên")}</label>
-    <Button onClick={() => act("/api/rank/tiers", { tiers, maskCodes: mask }, "PUT")}>{tr("Lưu cấu hình")}</Button>
-    </Card>
     <Card title={tr("Điều chỉnh điểm")}>
+    <p className="mb-3 text-sm text-slate-600">EXP học tập được tính riêng theo lớp và không giới hạn ở 150. Quy tắc hoạt động mới cộng 3–7 điểm; Reputation giảng viên được theo dõi riêng. Xem chi tiết trong mục Danh hiệu & phần thưởng.</p>
     <form className="space-y-3" onSubmit={e => { e.preventDefault(); const f = new FormData(e.currentTarget); act("/api/rank/adjustments", Object.fromEntries(f)); }}>
+    <Field label={tr("Lớp học")}><Select name="courseId" required defaultValue=""><option value="" disabled>Chọn lớp để điều chỉnh EXP</option>{courses.map(c => <option key={c.id} value={c.id}>{c.title} · {c.code}</option>)}</Select></Field>
     <Input name="studentId" placeholder={tr("Mã sinh viên 10 số")} pattern="[0-9]{10}" required/>
     <Input name="points" type="number" step="any" placeholder={tr("Điểm cộng/trừ")} required/>
     <Textarea name="reason" placeholder={tr("Lý do bắt buộc")} required maxLength={255}/>
@@ -76,12 +64,13 @@ export default function Page() {
     <div className="overflow-x-auto">
     <table className="w-full text-left text-xs">
     <thead>
-    <tr>{["ID", tr("ID sinh viên"), tr("Mùa"), tr("Nguồn"), tr("Điểm"), tr("Lý do"), tr("Người ghi"), tr("Dates")].map(s => <th key={s}>{s}</th>)}</tr>
+    <tr>{["ID", tr("Mã sinh viên"), tr("Mùa"), "Lớp", tr("Nguồn"), tr("Điểm"), tr("Lý do"), tr("Người ghi"), tr("Thời gian")].map(s => <th key={s}>{s}</th>)}</tr>
     </thead>
     <tbody>{ledger.map(e => <tr key={e.id}>
         <td>{e.id}</td>
         <td>{e.studentId}</td>
         <td>{e.seasonId}</td>
+        <td>{courses.find(c => c.id === e.courseId)?.code || e.courseId || "Chưa phân lớp"}</td>
         <td>{e.sourceType} #{e.sourceId}</td>
         <td>{e.points}</td>
         <td>{e.reason}</td>

@@ -3,21 +3,30 @@ import { useI18n } from "./LanguageProvider";
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, errorMessage } from "../lib/api";
-import { cn, initials } from "../lib/format";
-import { useAuth } from "./AuthProvider";
+import { api, download, errorMessage } from "../lib/api";
+import { cn } from "../lib/format";
 import { Alert, Button, Input, Select } from "./ui";
+import { useAuth } from "./AuthProvider";
 
 type Row = {
   userId: number; studentId: string; name: string; position: number;
-  tier: string; points: number; mine: boolean;
+  tier: string; points: number; mine: boolean; badge?: string;
 };
-type Data = { season: string | null; rows: Row[]; mine: Row | null; total: number };
-const MEDALS = [
-  "border-amber-200 bg-amber-50 text-amber-700",
-  "border-slate-200 bg-slate-100 text-slate-600",
-  "border-orange-200 bg-orange-50 text-orange-700",
-];
+type Course = { id: number; title: string; code: string; total?: number; rows?: Row[] };
+type Data = { season: string | null; rows: Row[]; mine: Row | null; total: number; courses?: Course[] };
+const rankStyles: Record<string, string> = {
+  Master: "border-purple-300 bg-purple-50 text-purple-800",
+  Ruby: "border-red-300 bg-red-50 text-red-800",
+  Diamond: "border-blue-300 bg-blue-50 text-blue-800",
+  Gold: "border-yellow-300 bg-yellow-50 text-yellow-800",
+  Silver: "border-slate-300 bg-slate-100 text-slate-600",
+  Bronze: "border-slate-200 bg-white text-slate-700",
+};
+function RankBadge({ tier }: { tier: string }) {
+  return <span className="flex shrink-0 flex-col items-center gap-1">
+    <img src={`/ranks/${tier.toLowerCase()}.png`} alt={`Rank ${tier}`} title={tier} width={40} height={36} className="h-9 w-10 object-contain" />
+  </span>;
+}
 
 export function Leaderboard({ full = false }: { full?: boolean }) {
   const { tr, locale } = useI18n();
@@ -26,32 +35,38 @@ export function Leaderboard({ full = false }: { full?: boolean }) {
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [courses, setCourses] = useState<{ id: number; title: string }[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [course, setCourse] = useState("");
   const [q, setQ] = useState("");
-  const [page, setPage] = useState(0);
+  const [audience, setAudience] = useState<"student" | "teacher">("student");
+  const [exporting, setExporting] = useState(false);
   const requestId = useRef(0);
-  const pageSize = full ? 20 : 10;
-
-  useEffect(() => {
-    api<{ courses: { id: number; title: string }[] }>("/api/courses")
-      .then(d => setCourses(d.courses)).catch(() => {});
-  }, []);
+  const teachers = audience === "teacher";
+  const unit = teachers ? "Reputation" : "EXP";
 
   const load = useCallback(async () => {
     const id = ++requestId.current;
     setLoading(true);
     try {
-      const result = await api<Data>("/api/rank/leaderboard?limit=" + pageSize + "&offset=" + page * pageSize + "&q=" + encodeURIComponent(q) + (course ? "&courseId=" + course : ""));
+      const url = `/api/rank/leaderboard?limit=100&role=${audience}` + (course ? "&courseId=" + course : "");
+      const result = await api<Data>(url);
+      const rows = [...result.rows];
+      while ((course || audience === "teacher") && rows.length < result.total) {
+        if (id !== requestId.current) return;
+        const next = await api<Data>(url + "&offset=" + rows.length);
+        if (!next.rows.length) break;
+        rows.push(...next.rows);
+      }
       if (id !== requestId.current) return;
-      setData(result);
+      setData({ ...result, rows: [...new Map(rows.map(row => [row.userId, row])).values()] });
+      if (!course) setCourses(result.courses || []);
       setError("");
     } catch (e) {
       if (id === requestId.current) setError(errorMessage(e));
     } finally {
       if (id === requestId.current) setLoading(false);
     }
-  }, [course, q, page, pageSize]);
+  }, [course, audience]);
 
   useEffect(() => {
     const timer = window.setTimeout(load, 250);
@@ -66,81 +81,78 @@ export function Leaderboard({ full = false }: { full?: boolean }) {
     };
   }, [load]);
 
-  const podium = full && page === 0 && !q.trim()
-    ? (data?.rows.filter(r => r.position <= 3).slice(0, 3) || []) : [];
-  const mine = user?.role === "student" ? data?.mine : null;
+  const matches = (row: Row) => `${row.name} ${row.studentId}`.toLocaleLowerCase("vi-VN").includes(q.trim().toLocaleLowerCase("vi-VN"));
+  const rows = data?.rows.filter(matches) || [];
+  const matchesCourse = (group: Course) => `${group.title} ${group.code}`.toLocaleLowerCase("vi-VN").includes(q.trim().toLocaleLowerCase("vi-VN"));
+  const groups = (data?.courses || []).map(group => ({ ...group, rows: matchesCourse(group) ? (group.rows || []).slice(0, 5) : (group.rows || []).slice(0, 5).filter(matches) })).filter(group => !q.trim() || group.rows.length || matchesCourse(group));
+  function selectCourse(value: string) { requestId.current++; setCourse(value); setData(null); setLoading(true); setError(""); }
+  function selectAudience(value: "student" | "teacher") {
+    if (value === audience) return;
+    requestId.current++; setAudience(value); setCourse(""); setCourses([]); setData(null); setQ(""); setLoading(true); setError("");
+  }
+  async function exportTeachers() {
+    setExporting(true); setError("");
+    try { await download("/api/rank/teachers/report.pdf" + (course ? `?courseId=${course}` : ""), "vinh-danh-giang-vien.pdf"); }
+    catch (err) { setError(errorMessage(err)); }
+    finally { setExporting(false); }
+  }
 
   function rankRow(r: Row) {
     return <li key={r.userId} aria-current={r.mine ? "true" : undefined}
-      className={cn("flex items-center gap-3 rounded-2xl border px-3 py-4 transition-colors sm:px-4",
-        full && "sm:gap-5 sm:px-6 sm:py-5",
-        r.mine ? "border-teal-300 bg-teal-50/80" : "border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50/80")}>
-      <span aria-label={tr("Hạng ") + r.position} className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-sm font-bold tabular-nums", MEDALS[r.position - 1] || "border-transparent bg-slate-50 text-slate-500")}>
-        {r.position <= 3 ? <><i aria-hidden="true" className="fa-solid fa-medal text-lg" /><span className="sr-only">{r.position}</span></> : r.position}
+      className={cn("flex items-center gap-2 px-2 py-1.5 transition-colors sm:px-4",
+        full && "sm:gap-3 sm:px-4",
+        rankStyles[r.tier] || rankStyles.Bronze)}>
+      <span aria-label={tr("Hạng ") + r.position} className="flex h-7 w-7 shrink-0 items-center justify-center text-sm font-bold tabular-nums">
+        {r.position}
       </span>
-      {full && <span aria-hidden="true" className={cn("hidden h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-600 sm:flex", r.mine && "bg-teal-100 text-teal-800")}>{initials(r.name)}</span>}
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <p className={cn("break-words text-sm font-semibold text-slate-800", full && "sm:text-base")}>{r.name}</p>
-          {r.mine && <span className="rounded-md bg-teal-100 px-1.5 py-0.5 text-[10px] font-bold text-teal-800">{tr("Bạn")}</span>}
+          {r.mine && <span className="rounded-none bg-teal-100 px-1.5 py-0.5 text-[10px] font-bold text-teal-800">{tr("Bạn")}</span>}
+          {r.badge && <span className="text-[10px] font-semibold text-amber-700">{r.badge}</span>}
         </div>
-        <p className="mt-1 break-all text-xs text-slate-400">{r.studentId}<span className={full ? "sm:hidden" : ""}> · {r.tier}</span></p>
+        <p className="mt-0.5 break-all text-xs text-slate-400">{r.studentId}</p>
       </div>
-      {full && <span className="hidden w-32 shrink-0 text-center sm:block"><span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-teal-100 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-800"><i aria-hidden="true" className="fa-solid fa-shield-halved" />{r.tier}</span></span>}
-      <div className={cn("shrink-0 text-right", full && "sm:w-28")}><p className={cn("text-lg font-bold tabular-nums tracking-tight text-slate-900", full && "sm:text-2xl")}>{points.format(r.points)}</p><p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-400">{tr("điểm")}</p></div>
+      <div className={cn("shrink-0 text-right", full && "sm:w-28")}><p className={cn("text-lg font-bold tabular-nums tracking-tight", full && "sm:text-xl")}>{points.format(r.points)}</p><p className="mt-0.5 text-[9px] font-medium uppercase tracking-wide text-slate-500">{unit}</p></div>
+      <RankBadge tier={r.tier} />
     </li>;
   }
 
-  return <section aria-label={tr("Bảng xếp hạng")} className="min-w-0 overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_12px_40px_-24px_rgba(15,45,58,0.35)]">
-    <header className={cn("relative isolate overflow-hidden bg-[#102c36] px-6 pb-7 pt-6 text-white", full && "sm:px-9 sm:py-9")}>
-      <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-20 -z-10 h-64 w-64 rounded-full bg-teal-400/10 blur-2xl" />
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0"><p className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-200"><span className="h-1.5 w-1.5 rounded-full bg-teal-300" />{tr("Hành trình chinh phục")}</p>
-          <h2 className={cn("text-2xl font-bold tracking-tight", full && "sm:text-4xl")}>{tr("Bảng xếp hạng")}</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-300">{tr("Ghi nhận nỗ lực. Bứt phá mỗi ngày.")}</p>
-        </div>
-        <span aria-hidden="true" className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-amber-200/20 bg-amber-200/10 text-xl text-amber-300", full && "sm:h-16 sm:w-16 sm:text-3xl")}><i className="fa-solid fa-trophy" /></span>
-      </div>
-      <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-teal-100"><i aria-hidden="true" className="fa-regular fa-calendar" />{data?.season || (loading ? tr("Đang tải mùa…") : tr("Chưa có mùa hoạt động"))}</span>
-        {data && <span className="text-slate-300"><strong className="font-semibold text-white">{points.format(data.total)}</strong>{" " + tr("sinh viên")}{q.trim() ? tr(" phù hợp") : tr(" tham gia")}</span>}
-      </div>
+  return <section aria-label="Player Rank" className={cn("flex min-h-0 min-w-0 flex-col overflow-hidden rounded-none border border-slate-200/80 bg-white shadow-[0_12px_40px_-24px_rgba(15,45,58,0.35)]", full ? "h-[calc(100dvh-7rem)] sm:h-[calc(100dvh-8rem)] lg:h-[calc(100dvh-9rem)]" : "h-[calc(100dvh-7rem)] xl:h-full")}>
+    <header className="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-[#102c36] px-5 py-4 text-white">
+      <h2 className="text-xl font-bold">{teachers ? "Teacher Rank" : "Player Rank"}</h2>
+      <p className="text-xs text-slate-300"><strong className="font-semibold text-white">{data ? points.format(data.total) : "…"}</strong> {teachers ? "giảng viên" : "chiến binh tham gia"}</p>
     </header>
-    <div className={cn("space-y-5 p-5", full && "sm:space-y-7 sm:p-8")}>
-      <div className={cn("grid gap-3", full && "sm:grid-cols-2")}>
+    <div className={cn("flex min-h-0 flex-1 flex-col gap-4 p-4", full && "sm:p-6")}>
+      <div aria-label="Đối tượng xếp hạng" className="flex shrink-0 gap-2 border-b border-slate-100 pb-3">
+        <Button size="sm" variant={teachers ? "secondary" : "primary"} aria-pressed={!teachers} onClick={() => selectAudience("student")}>{tr("Sinh viên")}</Button>
+        <Button size="sm" variant={teachers ? "primary" : "secondary"} aria-pressed={teachers} onClick={() => selectAudience("teacher")}>{tr("Giảng viên")}</Button>
+      </div>
+      <div className={cn("grid shrink-0 gap-3", full && "sm:grid-cols-2")}>
         <label className="min-w-0"><span className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">{tr("Phạm vi xếp hạng")}</span>
-          <Select className="rounded-xl py-3" value={course} onChange={e => { setCourse(e.target.value); setPage(0); }}>
-            <option value="">{tr("Toàn trường")}</option>
-            <optgroup label={tr("Lớp của tôi")}>{courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}</optgroup>
+          <Select className="rounded-none py-3" value={course} onChange={e => selectCourse(e.target.value)}>
+            <option value="">All</option>
+            <optgroup label={tr("Lớp học")}>{courses.map(c => <option key={c.id} value={c.id}>{c.title} · {c.code}</option>)}</optgroup>
           </Select>
         </label>
-        {full && <label className="min-w-0"><span className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">{tr("Tìm sinh viên")}</span><div className="relative"><i aria-hidden="true" className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400" /><Input className="rounded-xl py-3 pl-10" placeholder={tr("Nhập tên hoặc mã hiển thị…")} value={q} onChange={e => { setQ(e.target.value); setPage(0); }} /></div></label>}
+        {full && <label className="min-w-0"><span className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-slate-500">{teachers ? "Tìm giảng viên" : tr("Tìm sinh viên")}</span><div className="relative"><i aria-hidden="true" className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400" /><Input className="rounded-none py-3 pl-10" placeholder="Nhập tên hoặc mã đầy đủ…" value={q} onChange={e => { setQ(e.target.value); }} /></div></label>}
       </div>
+      {!course && <p className="shrink-0 text-xs text-slate-500">{teachers ? "Reputation toàn hệ thống · Chọn lớp để xem đóng góp trong lớp." : "Top 5 mỗi lớp · Tìm trong sinh viên đang hiển thị hoặc tên/mã lớp."}</p>}
       {error && <Alert tone="danger">{error}</Alert>}
-      {podium.length > 0 && <div><p className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">{tr("Những gương mặt dẫn đầu")}</p>
-        <div className="grid gap-3 sm:grid-cols-3">{podium.map(r => <div key={r.userId} className={cn("relative min-w-0 overflow-hidden rounded-2xl border p-5", r.position === 1 ? "border-amber-200 bg-gradient-to-br from-amber-50 to-white" : "border-slate-200 bg-slate-50/60")}>
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-2"><span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold", MEDALS[r.position - 1])}><i aria-hidden="true" className={"fa-solid " + (r.position === 1 ? "fa-crown" : "fa-medal")} />{tr("Hạng") + " "}{r.position}</span><span className="text-xs text-slate-500">{r.tier}</span></div>
-          <span aria-hidden="true" className={cn("mb-3 flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-bold", r.position === 1 ? "bg-amber-100 text-amber-800" : "bg-white text-slate-600 ring-1 ring-slate-200")}>{initials(r.name)}</span>
-          <p className="break-words font-semibold text-slate-800">{r.name}{r.mine && <span className="ml-2 text-xs text-teal-700">{tr("(Bạn)")}</span>}</p>
-          <p className="mt-1 break-all text-xs text-slate-400">{r.studentId}</p>
-          <p className="mt-4 text-3xl font-bold tabular-nums tracking-tight text-slate-900">{points.format(r.points)}<span className="ml-2 text-xs font-medium tracking-normal text-slate-500">{tr("điểm")}</span></p>
-        </div>)}</div>
-      </div>}
-      {mine && <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-teal-200 bg-teal-50 px-4 py-4">
-        <div className="flex items-center gap-3"><span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-800 text-white"><i className="fa-solid fa-location-dot" /></span><div><p className="text-xs font-medium text-teal-700">{tr("Vị trí của bạn")}</p><p className="mt-0.5 font-bold text-teal-950">{tr("Hạng #")}{mine.position}<span className="ml-2 text-xs font-normal text-teal-700">{mine.tier}</span></p></div></div>
-        <p className="text-xl font-bold tabular-nums text-teal-900">{points.format(mine.points)}<span className="ml-1 text-xs font-medium">{tr("điểm")}</span></p>
-      </div>}
-      <div aria-busy={loading}>
-        <div className="mb-3 flex items-center justify-between gap-3"><h3 className="text-sm font-bold text-slate-800">{full ? tr("Bảng thành tích") : tr("Top 10 sinh viên")}</h3><span className="text-[11px] text-slate-400">{full ? (data?.total || 0) + tr(" kết quả") : tr("Điểm tích lũy")}</span></div>
-        {full && <div aria-hidden="true" className="mb-2 hidden items-center gap-5 px-6 text-[10px] font-semibold uppercase tracking-widest text-slate-400 sm:flex"><span className="w-10">{tr("Hạng")}</span><span className="flex-1 pl-16">{tr("Sinh viên")}</span><span className="w-32 text-center">{tr("Bậc hạng")}</span><span className="w-28 text-right">{tr("Tổng điểm")}</span></div>}
-        {loading && !data ? <div role="status" className="space-y-3"><span className="sr-only">{tr("Đang tải bảng xếp hạng")}</span>{[0, 1, 2, 3].map(i => <div key={i} className="h-20 animate-pulse rounded-2xl bg-slate-100" />)}</div>
-          : data?.rows.length ? <ol className={cn("space-y-2", !full && "max-h-[480px] overflow-y-auto overscroll-contain pr-1")}>{data.rows.map(rankRow)}</ol>
-          : <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-5 py-10 text-center"><i aria-hidden="true" className={"fa-solid " + (error ? "fa-cloud-arrow-down" : q.trim() ? "fa-magnifying-glass" : "fa-ranking-star") + " mb-4 text-3xl text-slate-300"} /><p className="text-sm font-semibold text-slate-700">{error ? tr("Chưa tải được bảng xếp hạng") : q.trim() ? tr("Không tìm thấy sinh viên") : tr("Chưa có thành tích để hiển thị")}</p><p className="mt-2 text-xs leading-6 text-slate-500">{error ? tr("Bạn có thể thử tải lại bên dưới.") : q.trim() ? tr("Thử tên hoặc mã hiển thị khác.") : data?.season ? tr("Điểm số sẽ xuất hiện khi sinh viên hoàn thành hoạt động học tập.") : tr("Bảng xếp hạng sẽ cập nhật khi mùa mới bắt đầu.")}</p></div>}
+      <div aria-busy={loading} aria-label={teachers ? "Danh sách giảng viên xếp hạng" : "Danh sách sinh viên xếp hạng"} tabIndex={0} className="min-h-0 flex-1 overflow-y-scroll overscroll-contain [scrollbar-gutter:stable] focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600">
+        {full && <div aria-hidden="true" className="mb-2 hidden items-center gap-3 px-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400 sm:flex"><span className="w-7">STT</span><span className="flex-1">{teachers ? tr("Giảng viên") : tr("Sinh viên")}</span><span className="w-28 text-right">{unit}</span><span className="w-10 text-center">Rank</span></div>}
+        {loading && !data ? <div role="status" className="space-y-3"><span className="sr-only">Đang tải Player Rank</span>{[0, 1, 2, 3].map(i => <div key={i} className="h-20 animate-pulse rounded-none bg-slate-100" />)}</div>
+          : !teachers && !course && groups.length ? <div className="space-y-4">{groups.map(group => <section key={group.id} aria-label={`${group.title} · ${group.code}`} className="border border-slate-200">
+            <header className="flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-3 py-2"><div className="min-w-0"><h3 className="break-words text-sm font-bold text-slate-800">{group.title}</h3><p className="mt-1 break-all text-xs text-slate-500">{group.code} · {group.total} sinh viên · Top 5</p></div><Button variant="ghost" size="sm" onClick={() => selectCourse(String(group.id))}>Xem lớp</Button></header>
+            {group.rows.length ? <ol className="divide-y divide-slate-200">{group.rows.map(rankRow)}</ol> : <p className="p-4 text-sm text-slate-500">Chưa có sinh viên trong lớp.</p>}
+          </section>)}</div>
+          : (course || teachers) && rows.length ? <ol className="divide-y divide-slate-200">{rows.map(rankRow)}</ol>
+          : <div className="rounded-none border border-dashed border-slate-200 bg-slate-50/70 px-5 py-10 text-center"><i aria-hidden="true" className={"fa-solid " + (error ? "fa-cloud-arrow-down" : q.trim() ? "fa-magnifying-glass" : "fa-ranking-star") + " mb-4 text-3xl text-slate-300"} /><p className="text-sm font-semibold text-slate-700">{error ? tr("Chưa tải được bảng xếp hạng") : q.trim() ? (teachers ? "Không tìm thấy giảng viên" : tr("Không tìm thấy sinh viên")) : tr("Chưa có thành tích để hiển thị")}</p><p className="mt-2 text-xs leading-6 text-slate-500">{error ? tr("Bạn có thể thử tải lại bên dưới.") : q.trim() ? "Thử tên hoặc mã đầy đủ khác." : data?.season ? (teachers ? "Đóng góp giảng dạy được ghi nhận bằng Reputation." : tr("Điểm số sẽ xuất hiện khi sinh viên hoàn thành hoạt động học tập.")) : tr("Bảng xếp hạng sẽ cập nhật khi mùa mới bắt đầu.")}</p></div>}
       </div>
-      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-        <Button variant="ghost" size="sm" onClick={load} disabled={loading} aria-label={tr("Làm mới bảng xếp hạng")}><i aria-hidden="true" className={cn("fa-solid fa-arrow-rotate-right", loading && "animate-spin")} />{tr("Làm mới")}</Button>
-        {!full ? <Link className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-xs font-semibold text-teal-800 hover:bg-teal-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600" href="/leaderboard">{tr("Xem đầy đủ")}<i aria-hidden="true" className="fa-solid fa-arrow-right" /></Link>
-          : <nav aria-label={tr("Phân trang bảng xếp hạng")} className="flex items-center gap-2"><Button variant="secondary" size="sm" aria-label={tr("Trang trước")} disabled={page === 0 || loading} onClick={() => setPage(p => p - 1)}><i aria-hidden="true" className="fa-solid fa-chevron-left" /></Button><span className="px-2 text-xs font-medium tabular-nums text-slate-600">{tr("Trang") + " "}{page + 1} / {Math.max(1, Math.ceil((data?.total || 0) / pageSize))}</span><Button variant="secondary" size="sm" aria-label={tr("Trang sau")} disabled={loading || (page + 1) * pageSize >= (data?.total || 0)} onClick={() => setPage(p => p + 1)}><i aria-hidden="true" className="fa-solid fa-chevron-right" /></Button></nav>}
+      <footer className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+        <Button variant="ghost" size="sm" onClick={load} disabled={loading} aria-label="Làm mới Player Rank"><i aria-hidden="true" className={cn("fa-solid fa-arrow-rotate-right", loading && "animate-spin")} />{tr("Làm mới")}</Button>
+        {teachers && (user?.role === "admin" || user?.role === "teacher") && <Button variant="secondary" size="sm" onClick={exportTeachers} loading={exporting}><i aria-hidden="true" className="fa-solid fa-file-pdf" />Xuất PDF</Button>}
+        {!full && <Link className="inline-flex items-center gap-2 px-2 py-2 text-xs font-semibold text-teal-800 hover:bg-teal-50" href="/leaderboard">Mở Player Rank<i aria-hidden="true" className="fa-solid fa-arrow-right" /></Link>}
       </footer>
     </div>
   </section>;

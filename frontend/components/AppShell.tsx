@@ -5,12 +5,13 @@ import { Leaderboard } from "./Leaderboard";
 import { io } from "../lib/realtime";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { MouseEvent, ReactNode, useEffect, useState } from "react";
+import { MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { SOCKET_URL, api } from "../lib/api";
 import { cn } from "../lib/format";
 import type { Role } from "../lib/types";
 import { useAuth } from "./AuthProvider";
 import { WorkspaceHeader } from "./WorkspaceHeader";
+import type { RewardProfile } from "./RewardAppearance";
 
 const ALL: Role[] = ["admin", "teacher", "ta", "student"];
 
@@ -22,7 +23,8 @@ const NAV: Array<{
 }> = [
   { href: "/", label: "Trang chủ", icon: "fa-house", roles: ALL },
   { href: "/rank-adjustment", label: "Điều chỉnh điểm", icon: "fa-pen", roles: ["admin", "teacher"] },
-  { href: "/leaderboard", label: "Bảng xếp hạng", icon: "fa-trophy", roles: ALL },
+  { href: "/leaderboard", label: "Player Rank", icon: "fa-trophy", roles: ALL },
+  { href: "/rewards", label: "Danh hiệu & phần thưởng", icon: "fa-medal", roles: ALL },
   { href: "/admin/rank", label: "Mùa và điểm rank", icon: "fa-ranking-star", roles: ["admin"] },
   { href: "/admin/taxonomy", label: "Danh mục nội dung", icon: "fa-tags", roles: ["admin"] },
   { href: "/dashboard", label: "Tổng quan", icon: "fa-gauge-high", roles: ALL },
@@ -43,6 +45,21 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [rewardProfile, setRewardProfile] = useState<RewardProfile | null>(null);
+  const rewardRequest = useRef(0);
+
+  useEffect(() => {
+    let active = true;
+    if (!user || user.mustChangePassword) { setRewardProfile(null); return; }
+    const refreshRewards = () => {
+      const request = ++rewardRequest.current;
+      api<RewardProfile>("/api/rank/profile").then(profile => { if (active && request === rewardRequest.current) setRewardProfile(profile); }).catch(() => { if (active && request === rewardRequest.current) setRewardProfile(null); });
+    };
+    refreshRewards();
+    window.addEventListener("lms:points", refreshRewards);
+    window.addEventListener("lms:cosmetics", refreshRewards);
+    return () => { active = false; window.removeEventListener("lms:points", refreshRewards); window.removeEventListener("lms:cosmetics", refreshRewards); };
+  }, [user?.id, user?.role, user?.mustChangePassword]);
 
   useEffect(() => {
     if (!loading && !user && !publicPage) router.replace("/login");
@@ -72,6 +89,10 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
       socket.disconnect();
     };
   }, [user?.id]);
+
+  useEffect(() => {
+    document.getElementById("workspace-content")?.scrollTo({ top: 0 });
+  }, [pathname]);
 
   if (loading && !publicPage) {
     return (
@@ -104,7 +125,7 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
   }
 
   return (
-    <div className="workspace min-h-screen bg-[#f5f7fa]">
+    <div className="workspace min-h-screen bg-[#f5f7fa] xl:h-dvh xl:overflow-hidden">
       <a href="#workspace-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:p-3 focus:text-teal-900">{tr("Chuyển đến nội dung")}</a>
       <aside
         id="workspace-navigation"
@@ -156,9 +177,9 @@ export function AppShell({ children, publicPage = false }: { children: ReactNode
         />
       )}
 
-      <div className="lg:pl-20">
-        <WorkspaceHeader menuOpen={open} onMenuOpen={() => setOpen(true)} onNavigate={navigate} />
-        <div className="flex flex-col gap-4 xl:flex-row"><main id="workspace-content" tabIndex={-1} className="workspace-content min-w-0 flex-1 p-4 outline-none sm:p-6 lg:p-8"><div id="drawer-root"/><div id="screen-content">{user?.mustChangePassword && pathname !== "/account" ? <p>{tr("Vui lòng đổi mật khẩu ở trang Tài khoản.")}</p> : children}</div></main>{user && !user.mustChangePassword && pathname !== "/leaderboard" && <aside aria-label={tr("Xếp hạng nhanh")} className="w-full min-w-0 shrink-0 self-start p-4 xl:sticky xl:top-24 xl:w-96 xl:pl-0 xl:pr-6 xl:pt-8 2xl:w-[26rem]"><Leaderboard/></aside>}</div>
+      <div className="lg:pl-20 xl:flex xl:h-full xl:flex-col">
+        <WorkspaceHeader rewardProfile={rewardProfile} menuOpen={open} onMenuOpen={() => setOpen(true)} onNavigate={navigate} />
+        <div className="flex flex-col gap-4 xl:min-h-0 xl:flex-1 xl:flex-row xl:overflow-hidden"><main id="workspace-content" tabIndex={-1} className="workspace-content min-w-0 flex-1 p-4 outline-none sm:p-6 lg:p-8 xl:h-full xl:overflow-y-auto xl:overscroll-contain [scrollbar-gutter:stable]"><div id="drawer-root"/><div id="screen-content">{user?.mustChangePassword && pathname !== "/account" ? <p>{tr("Vui lòng đổi mật khẩu ở trang Tài khoản.")}</p> : children}</div></main>{user && !user.mustChangePassword && pathname !== "/leaderboard" && <aside aria-label={tr("Xếp hạng nhanh")} className="w-full min-w-0 shrink-0 p-4 xl:h-full xl:w-96 xl:overflow-hidden xl:py-4 xl:pl-0 xl:pr-6 2xl:w-[26rem]"><Leaderboard/></aside>}</div>
       </div>
     </div>
   );

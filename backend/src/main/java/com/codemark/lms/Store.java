@@ -45,4 +45,10 @@ public class Store {
   void lock(Object entity) {
     em.lock(entity, LockModeType.PESSIMISTIC_WRITE);
   }
+
+  void refreshLocked(Object entity) {
+    em.refresh(entity, LockModeType.PESSIMISTIC_WRITE);
+  }
+
+  void refresh(Object entity) { em.refresh(entity); }
 }

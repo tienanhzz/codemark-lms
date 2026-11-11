@@ -16,6 +16,8 @@ class DiscussionPost extends BaseEntity {
   User author;
 
   Long parentId;
+  Long bestAnswerId;
+  boolean bestAnswer;
 
   @Column(length = 100000)
   String body;

@@ -77,6 +77,7 @@ class GradingService {
 
   void submit(Attempt attempt) {
     if (!attempt.status.equals("in_progress")) return;
+    Instant submittedAt=Instant.now();
     double score = 0, max = 0;
     for (Question q :
         store.list(
@@ -92,8 +93,14 @@ class GradingService {
     attempt.score = Math.round(score * 1000) / 1000.0;
     attempt.maxScore = max;
     attempt.status = "submitted";
-    attempt.submittedAt = Instant.now();
-    if (max > 0) rank.best(attempt.student, attempt.assessment.kind.equals("exam") ? "exam" : "assignment", attempt.assessment.id, attempt.score / max * 100 * attempt.assessment.rankWeight, attempt.assessment.createdBy);
+    attempt.submittedAt = submittedAt;
+    if (max > 0) rank.awardSubmission(attempt,attempt.assessment.createdBy,submittedAt);
+  }
+
+  void quizPublished(Assessment assessment) {
+    if(assessment.published && "quiz".equals(assessment.kind) && assessment.createdBy!=null && "teacher".equals(assessment.createdBy.role)
+        && !store.list(Question.class,"where e.assessment=?1",assessment).isEmpty())
+      rank.awardAction(assessment.createdBy,assessment.course,"teacher_quiz",assessment.id,assessment.createdBy,Instant.now());
   }
 
   void checkOpen(Attempt attempt) {

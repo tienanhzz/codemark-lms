@@ -8,6 +8,7 @@ import { cn, roleLabel } from "../lib/format";
 import { useAuth } from "./AuthProvider";
 import { Avatar, Button } from "./ui";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { AvatarFrame, rewardThemeClasses, type RewardProfile } from "./RewardAppearance";
 
 const LINKS = [
   { href: "/", label: "Trang chủ", icon: "fa-house" },
@@ -17,19 +18,20 @@ const LINKS = [
 ];
 
 type HeaderProps = {
+  rewardProfile?: RewardProfile | null;
   menuOpen: boolean;
   onMenuOpen: () => void;
   onNavigate: (event: MouseEvent<HTMLAnchorElement>, href: string, label: string) => void;
 };
 
-export function WorkspaceHeader({ menuOpen, onMenuOpen, onNavigate }: HeaderProps) {
+export function WorkspaceHeader({ rewardProfile, menuOpen, onMenuOpen, onNavigate }: HeaderProps) {
   const { tr, language } = useI18n();
   const { user, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white">
+    <header data-reward-theme={rewardProfile?.selectedTheme || "default"} className={cn("sticky top-0 z-20 shrink-0 border-b border-slate-200/80", rewardThemeClasses[rewardProfile?.selectedTheme || "default"] || rewardThemeClasses.default)}>
       <div className="flex min-h-28 flex-wrap items-center justify-between gap-4 px-4 py-4 lg:px-8">
         <Link href="/" aria-label={tr("CodeMark — Trang chủ")} onClick={(event) => onNavigate(event, "/", "Trang chủ")} className="min-w-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600">
           <img src="/branding/logo.png" alt="Cyb3rT1t@ns — We Are Bigger On The Inside" width={1156} height={359} className="h-auto w-56 max-w-full sm:w-72" />
@@ -40,9 +42,9 @@ export function WorkspaceHeader({ menuOpen, onMenuOpen, onNavigate }: HeaderProp
             <Link href="/account" title={tr("Tài khoản của tôi")} className="flex items-center gap-3 rounded-md px-1 py-1 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600">
               <div className="hidden text-right sm:block">
                 <p className="max-w-36 truncate text-sm font-semibold text-slate-700">{user.name}</p>
-                <p className="text-[11px] uppercase tracking-wide text-slate-400">{roleLabel(user.role, language)}</p>
+                <p className="text-[11px] uppercase tracking-wide text-slate-400">{rewardProfile?.badges.find(badge => badge.id === "champion")?.title || rewardProfile?.badges.find(badge => badge.id === "elite")?.title || roleLabel(user.role, language)}</p>
               </div>
-              <Avatar name={user.name} role={user.role} />
+              <AvatarFrame frame={rewardProfile?.selectedFrame}><Avatar name={user.name} role={user.role} /></AvatarFrame>
             </Link>
             <Button variant="secondary" size="sm" aria-label={tr("Đăng xuất")} onClick={async () => { await logout(); router.replace("/"); }}>
               <i className="fa-solid fa-arrow-right-from-bracket" aria-hidden="true" />

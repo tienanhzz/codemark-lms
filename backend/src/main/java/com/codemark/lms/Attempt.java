@@ -23,6 +23,10 @@ class Attempt extends BaseEntity {
   String status = "in_progress";
   Double score;
   double maxScore;
+  @Column(length=20000) String teacherFeedback="";
+  @JdbcTypeCode(SqlTypes.JSON) Map<String,String> inlineFeedback=new LinkedHashMap<>();
+  Long gradedBy;
+  Instant gradedAt;
   Long currentQuestion;
 
   @JdbcTypeCode(SqlTypes.JSON)

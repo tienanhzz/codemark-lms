@@ -24,4 +24,7 @@ class Course extends BaseEntity {
   LocalDate startDate;
   LocalDate endDate;
   boolean published;
+  @Column(nullable=false)
+  @org.hibernate.annotations.ColumnDefault("'weekly'")
+  String practiceCadence = "weekly";
 }

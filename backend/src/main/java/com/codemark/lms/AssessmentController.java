@@ -33,7 +33,7 @@ class AssessmentController {
     Assessment a = store.get(Assessment.class, id);
     access.course(u, a.course.id, staff);
     if (!staff && "student".equals(access.role(u, a.course)))
-      require(a.published, "not_found", 404);
+      require(a.published && !Instant.now().isBefore(a.opensAt), "not_found", 404);
     return a;
   }
 
@@ -50,7 +50,7 @@ class AssessmentController {
     return map(
         "assessments",
         store.list(Assessment.class, "where e.course=?1 order by e.opensAt", c).stream()
-            .filter(a -> a.published || !"student".equals(access.role(u, c)))
+            .filter(a -> (a.published && !Instant.now().isBefore(a.opensAt)) || !"student".equals(access.role(u, c)))
             .map(a -> views.assessment(a, u, false))
             .toList());
   }
@@ -61,8 +61,10 @@ class AssessmentController {
     User u = access.current(r);
     Assessment a = new Assessment();
     a.course = access.course(u, id, true);
+    PracticeSchedule.lock(store, a.course);
     a.createdBy = u;
     fields(a, b);
+    PracticeSchedule.validate(store, a.course, a.kind, a.published, a.opensAt, null, null);
     store.save(a);
     return views.assessment(a, u, true);
   }
@@ -73,6 +75,9 @@ class AssessmentController {
     require(a.title != null && !a.title.isBlank(), "title_required", 400);
     a.description = text(b, "description", a.description);
     a.kind = text(b, "kind", a.kind);
+    require(Set.of("quiz", "code", "practice", "exam", "assignment", "project").contains(a.kind), "invalid_kind", 400);
+    a.difficulty = text(b, "difficulty", a.difficulty);
+    require(Set.of("easy", "medium", "hard", "expert").contains(a.difficulty), "invalid_difficulty", 400);
     if (b.containsKey("rankWeight")) {
       a.rankWeight = Double.parseDouble(b.get("rankWeight").toString());
       require(Double.isFinite(a.rankWeight) && a.rankWeight > 0 && a.rankWeight <= 10, "invalid_weight", 400);
@@ -81,6 +86,8 @@ class AssessmentController {
     a.closesAt =
         instant(b, "closesAt", a.closesAt == null ? Instant.now().plusSeconds(86400) : a.closesAt);
     require(a.closesAt.isAfter(a.opensAt), "invalid_time_range", 400);
+    if(b.containsKey("gradingDueAt")) a.gradingDueAt=b.get("gradingDueAt")==null || b.get("gradingDueAt").toString().isBlank()?null:Instant.parse(b.get("gradingDueAt").toString());
+    require(a.gradingDueAt==null || !a.gradingDueAt.isBefore(a.closesAt),"invalid_grading_deadline",400);
     a.durationMinutes = integer(b, "durationMinutes", a.durationMinutes, 1, 1440);
     a.maxAttempts = integer(b, "maxAttempts", a.maxAttempts, 1, 100);
     a.published = bool(b, "published", a.published);
@@ -104,7 +111,14 @@ class AssessmentController {
   Object edit(HttpServletRequest r, @PathVariable long id, @RequestBody Map<String, Object> b) {
     User u = access.current(r);
     Assessment a = allowed(u, id, true);
+    PracticeSchedule.lock(store, a.course);
+    store.refresh(a);
+    boolean wasPractice = a.published && !"exam".equals(a.kind);
+    var previousSlot = PracticeSchedule.slot(a.opensAt, a.course.practiceCadence);
     fields(a, b);
+    if (!wasPractice || !previousSlot.equals(PracticeSchedule.slot(a.opensAt, a.course.practiceCadence)))
+      PracticeSchedule.validate(store, a.course, a.kind, a.published, a.opensAt, a.id, null);
+    grading.quizPublished(a);
     return views.assessment(a, u, true);
   }
 
@@ -116,6 +130,7 @@ class AssessmentController {
   }
 
   static void deleteAssessment(Store s, Assessment a) {
+    s.list(RewardRequest.class,"where e.assessment=?1",a).forEach(request->request.assessment=null);
     for (Attempt t : s.list(Attempt.class, "where e.assessment=?1", a)) {
       s.list(ProctorEvent.class, "where e.attempt=?1", t).forEach(s::delete);
       s.delete(t);
@@ -147,6 +162,7 @@ class AssessmentController {
     q.assessment = allowed(access.current(r), id, true);
     questionFields(q, b);
     store.save(q);
+    grading.quizPublished(q.assessment);
     return views.question(q, true);
   }
 
