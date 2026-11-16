@@ -118,9 +118,13 @@ with SessionLocal() as db:
         set(message.payload) == {"eventId", "action", "requestId"}
         for message in audit_messages
     )
-    assert all(
-        message.status == "pending" and message.attempts == 0 for message in audit_messages
+    integration_message = db.scalar(
+        select(OutboxMessage).where(OutboxMessage.idempotency_key == "integration:" + event_id)
     )
+    assert integration_message is not None
+    assert integration_message.audit_event_id == event_id
+    assert integration_message.payload == payload
+    assert integration_message.status == "pending" and integration_message.attempts == 0
     assert (
         db.scalar(
             select(func.count(OutboxMessage.id))
