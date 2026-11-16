@@ -1,11 +1,11 @@
 {
   "buildId": "BUILD-002",
-  "checkedAt": "2026-11-14T19:36:24.870656+00:00",
+  "checkedAt": "2026-11-16T06:57:46.376136+00:00",
   "purpose": "Development/build dependency review only; no runtime external calls enabled.",
   "python": {
     "status": "pass",
     "exitCode": 0,
-    "packagesReported": 58,
+    "packagesReported": 64,
     "vulnerabilityRecords": 0,
     "skipped": [],
     "source": "pip-audit 2.10.1 / PyPI advisory feed",

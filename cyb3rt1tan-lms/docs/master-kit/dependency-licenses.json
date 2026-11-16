@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-11-14T19:36:18.873349+00:00",
+  "generatedAt": "2026-11-16T06:58:40.424760+00:00",
   "python": [
     {
       "name": "alembic",
       "version": "1.20.1",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "runtime",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -16,9 +16,9 @@
       "name": "annotated-doc",
       "version": "0.0.6",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "MIT",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -27,12 +27,10 @@
       "name": "annotated-types",
       "version": "0.8.0",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "MIT",
-      "licenseClassifiers": [
-        "OSI Approved :: MIT License"
-      ],
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -40,9 +38,9 @@
       "name": "anyio",
       "version": "4.16.0",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "MIT",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -51,9 +49,9 @@
       "name": "argon2-cffi",
       "version": "25.1.0",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "runtime",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -62,9 +60,9 @@
       "name": "argon2-cffi-bindings",
       "version": "26.2.0",
       "hashCount": 41,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "MIT",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -73,9 +71,9 @@
       "name": "ast-serialize",
       "version": "0.13.1",
       "hashCount": 57,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -87,6 +85,17 @@
       "installed": true,
       "scope": "development",
       "declaredLicense": "MIT",
+      "licenseClassifiers": [],
+      "registry": "https://pypi.org",
+      "review": "Metadata inventory only; not a legal or security approval"
+    },
+    {
+      "name": "bidict",
+      "version": "0.24.1",
+      "hashCount": 2,
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -108,9 +117,9 @@
       "name": "cffi",
       "version": "2.1.1",
       "hashCount": 100,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "MIT-0",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -119,9 +128,9 @@
       "name": "click",
       "version": "8.5.1",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "BSD-3-Clause",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -130,12 +139,10 @@
       "name": "colorama",
       "version": "0.4.6",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
       "declaredLicense": "NOASSERTION",
-      "licenseClassifiers": [
-        "OSI Approved :: BSD License"
-      ],
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -143,9 +150,9 @@
       "name": "cryptography",
       "version": "50.0.2",
       "hashCount": 59,
-      "installed": true,
+      "installed": false,
       "scope": "runtime",
-      "declaredLicense": "Apache-2.0 OR BSD-3-Clause",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -154,9 +161,9 @@
       "name": "fastapi",
       "version": "0.162.7",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "runtime",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -165,12 +172,10 @@
       "name": "h11",
       "version": "0.16.0",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "MIT",
-      "licenseClassifiers": [
-        "OSI Approved :: MIT License"
-      ],
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -178,12 +183,10 @@
       "name": "httpcore",
       "version": "1.0.9",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "BSD-3-Clause",
-      "licenseClassifiers": [
-        "OSI Approved :: BSD License"
-      ],
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -191,12 +194,10 @@
       "name": "httpx",
       "version": "0.28.1",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "BSD-3-Clause",
-      "licenseClassifiers": [
-        "OSI Approved :: BSD License"
-      ],
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -205,7 +206,7 @@
       "version": "3.20",
       "hashCount": 2,
       "installed": true,
-      "scope": "runtime",
+      "scope": "development",
       "declaredLicense": "BSD-3-Clause",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
@@ -215,9 +216,9 @@
       "name": "iniconfig",
       "version": "2.3.1",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -237,12 +238,10 @@
       "name": "jsonschema-path",
       "version": "0.5.0",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "Apache-2.0",
-      "licenseClassifiers": [
-        "OSI Approved :: Apache Software License"
-      ],
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -261,9 +260,9 @@
       "name": "lazy-object-proxy",
       "version": "1.13.0",
       "hashCount": 64,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "BSD-2-Clause",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -272,9 +271,9 @@
       "name": "librt",
       "version": "0.16.0",
       "hashCount": 137,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -283,9 +282,9 @@
       "name": "mako",
       "version": "1.4.3",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "MIT",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -294,9 +293,9 @@
       "name": "markupsafe",
       "version": "3.0.4",
       "hashCount": 151,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "BSD-3-Clause",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -305,9 +304,9 @@
       "name": "mypy",
       "version": "2.4.1",
       "hashCount": 52,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -316,9 +315,9 @@
       "name": "mypy-extensions",
       "version": "1.2.0",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -327,12 +326,10 @@
       "name": "openapi-schema-validator",
       "version": "0.9.0",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "BSD-3-Clause",
-      "licenseClassifiers": [
-        "OSI Approved :: BSD License"
-      ],
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -340,9 +337,9 @@
       "name": "openapi-spec-validator",
       "version": "0.9.0",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "Apache-2.0",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -351,9 +348,9 @@
       "name": "opentelemetry-api",
       "version": "1.45.2",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "Apache-2.0",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -373,12 +370,10 @@
       "name": "pathable",
       "version": "0.6.0",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "Apache-2.0",
-      "licenseClassifiers": [
-        "OSI Approved :: Apache Software License"
-      ],
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -386,12 +381,10 @@
       "name": "pathspec",
       "version": "1.1.1",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
       "declaredLicense": "NOASSERTION",
-      "licenseClassifiers": [
-        "OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)"
-      ],
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -399,9 +392,9 @@
       "name": "pillow",
       "version": "13.0.0",
       "hashCount": 83,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT-CMU",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -410,12 +403,10 @@
       "name": "pluggy",
       "version": "1.7.0",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT",
-      "licenseClassifiers": [
-        "OSI Approved :: MIT License"
-      ],
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -423,9 +414,9 @@
       "name": "psycopg",
       "version": "3.3.9",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "runtime",
-      "declaredLicense": "LGPL-3.0-only",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -434,9 +425,9 @@
       "name": "psycopg-binary",
       "version": "3.3.9",
       "hashCount": 66,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "LGPL-3.0-only",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -445,9 +436,9 @@
       "name": "pycparser",
       "version": "3.12",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "BSD-3-Clause",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -456,9 +447,9 @@
       "name": "pydantic",
       "version": "2.14.3",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "MIT",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -467,9 +458,9 @@
       "name": "pydantic-core",
       "version": "2.50.4",
       "hashCount": 140,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "MIT",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -478,12 +469,10 @@
       "name": "pydantic-settings",
       "version": "2.16.3",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT",
-      "licenseClassifiers": [
-        "OSI Approved :: MIT License"
-      ],
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -502,9 +491,9 @@
       "name": "pyotp",
       "version": "2.10.0",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "runtime",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -513,9 +502,9 @@
       "name": "pytest",
       "version": "9.2.0",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -524,9 +513,31 @@
       "name": "python-dotenv",
       "version": "1.2.4",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "runtime",
-      "declaredLicense": "BSD-3-Clause",
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
+      "registry": "https://pypi.org",
+      "review": "Metadata inventory only; not a legal or security approval"
+    },
+    {
+      "name": "python-engineio",
+      "version": "4.15.1",
+      "hashCount": 2,
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
+      "registry": "https://pypi.org",
+      "review": "Metadata inventory only; not a legal or security approval"
+    },
+    {
+      "name": "python-socketio",
+      "version": "5.18.1",
+      "hashCount": 2,
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -535,12 +546,21 @@
       "name": "pyyaml",
       "version": "6.0.3",
       "hashCount": 73,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT",
-      "licenseClassifiers": [
-        "OSI Approved :: MIT License"
-      ],
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
+      "registry": "https://pypi.org",
+      "review": "Metadata inventory only; not a legal or security approval"
+    },
+    {
+      "name": "redis",
+      "version": "8.1.0",
+      "hashCount": 2,
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
     },
@@ -583,9 +603,20 @@
       "name": "ruff",
       "version": "0.17.5",
       "hashCount": 18,
-      "installed": true,
+      "installed": false,
       "scope": "development",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
+      "registry": "https://pypi.org",
+      "review": "Metadata inventory only; not a legal or security approval"
+    },
+    {
+      "name": "simple-websocket",
+      "version": "1.1.0",
+      "hashCount": 2,
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -607,9 +638,9 @@
       "name": "sqlalchemy",
       "version": "2.1.8",
       "hashCount": 72,
-      "installed": true,
+      "installed": false,
       "scope": "runtime",
-      "declaredLicense": "MIT",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -618,9 +649,9 @@
       "name": "starlette",
       "version": "1.10.0",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "BSD-3-Clause",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -629,9 +660,9 @@
       "name": "typing-extensions",
       "version": "4.16.0",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "PSF-2.0",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -640,9 +671,9 @@
       "name": "typing-inspection",
       "version": "0.4.5",
       "hashCount": 2,
-      "installed": true,
-      "scope": "runtime",
-      "declaredLicense": "MIT",
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -662,9 +693,20 @@
       "name": "uvicorn",
       "version": "0.54.0",
       "hashCount": 2,
-      "installed": true,
+      "installed": false,
       "scope": "runtime",
-      "declaredLicense": "BSD-3-Clause",
+      "declaredLicense": "NOASSERTION",
+      "licenseClassifiers": [],
+      "registry": "https://pypi.org",
+      "review": "Metadata inventory only; not a legal or security approval"
+    },
+    {
+      "name": "wsproto",
+      "version": "1.3.2",
+      "hashCount": 2,
+      "installed": false,
+      "scope": "development",
+      "declaredLicense": "NOASSERTION",
       "licenseClassifiers": [],
       "registry": "https://pypi.org",
       "review": "Metadata inventory only; not a legal or security approval"
@@ -1320,6 +1362,15 @@
       "review": "Locked metadata inventory; optional platform packages may be absent"
     },
     {
+      "name": "@socket.io/component-emitter",
+      "version": "3.1.2",
+      "scope": "runtime",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org",
+      "optional": false,
+      "review": "Locked metadata inventory; optional platform packages may be absent"
+    },
+    {
       "name": "@swc/helpers",
       "version": "0.5.23",
       "scope": "runtime",
@@ -1653,6 +1704,15 @@
       "review": "Locked metadata inventory; optional platform packages may be absent"
     },
     {
+      "name": "debug",
+      "version": "4.4.3",
+      "scope": "runtime",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org",
+      "optional": false,
+      "review": "Locked metadata inventory; optional platform packages may be absent"
+    },
+    {
       "name": "decimal.js",
       "version": "10.6.0",
       "scope": "development",
@@ -1711,6 +1771,24 @@
       "version": "1.5.485",
       "scope": "development",
       "declaredLicense": "ISC",
+      "registry": "https://registry.npmjs.org",
+      "optional": false,
+      "review": "Locked metadata inventory; optional platform packages may be absent"
+    },
+    {
+      "name": "engine.io-client",
+      "version": "6.6.8",
+      "scope": "runtime",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org",
+      "optional": false,
+      "review": "Locked metadata inventory; optional platform packages may be absent"
+    },
+    {
+      "name": "engine.io-parser",
+      "version": "5.2.3",
+      "scope": "runtime",
+      "declaredLicense": "MIT",
       "registry": "https://registry.npmjs.org",
       "optional": false,
       "review": "Locked metadata inventory; optional platform packages may be absent"
@@ -2130,6 +2208,15 @@
       "review": "Locked metadata inventory; optional platform packages may be absent"
     },
     {
+      "name": "ms",
+      "version": "2.1.3",
+      "scope": "runtime",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org",
+      "optional": false,
+      "review": "Locked metadata inventory; optional platform packages may be absent"
+    },
+    {
       "name": "mz",
       "version": "2.7.0",
       "scope": "development",
@@ -2499,6 +2586,24 @@
       "review": "Locked metadata inventory; optional platform packages may be absent"
     },
     {
+      "name": "socket.io-client",
+      "version": "4.8.4",
+      "scope": "runtime",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org",
+      "optional": false,
+      "review": "Locked metadata inventory; optional platform packages may be absent"
+    },
+    {
+      "name": "socket.io-parser",
+      "version": "4.2.7",
+      "scope": "runtime",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org",
+      "optional": false,
+      "review": "Locked metadata inventory; optional platform packages may be absent"
+    },
+    {
       "name": "source-map-js",
       "version": "1.2.2",
       "scope": "runtime",
@@ -2787,6 +2892,15 @@
       "review": "Locked metadata inventory; optional platform packages may be absent"
     },
     {
+      "name": "ws",
+      "version": "8.21.3",
+      "scope": "runtime",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org",
+      "optional": false,
+      "review": "Locked metadata inventory; optional platform packages may be absent"
+    },
+    {
       "name": "xml-name-validator",
       "version": "5.0.0",
       "scope": "development",
@@ -2800,6 +2914,15 @@
       "version": "2.2.0",
       "scope": "development",
       "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org",
+      "optional": false,
+      "review": "Locked metadata inventory; optional platform packages may be absent"
+    },
+    {
+      "name": "xmlhttprequest-ssl",
+      "version": "2.1.2",
+      "scope": "runtime",
+      "declaredLicense": "NOASSERTION",
       "registry": "https://registry.npmjs.org",
       "optional": false,
       "review": "Locked metadata inventory; optional platform packages may be absent"
