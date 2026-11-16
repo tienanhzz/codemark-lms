@@ -18,6 +18,7 @@
 - Added `api/scripts/rewrap-mfa-secrets.py`. It defaults to a read-only dry-run; apply is limited to production, requires a versioned active key, an explicit confirmation phrase and `--backup-verified`, locks MFA rows, verifies decrypt/re-encrypt round trips, and writes a count-only audit event in the same transaction.
 - Admin `/operations` now includes a bilingual, responsive release-evidence panel. It keeps live database diagnostics separate from external gates and marks CI, secret scanning, ASVS, backup/restore, egress/TLS, key rotation and release approvals as unverified instead of inferring a pass.
 - The key custody card now reflects the actual implementation state: rewrap tooling exists, remains unrun, and old keys must be retained until rewrap and recovery evidence are reviewed.
+- Dependency evidence currently includes a CycloneDX 1.6 SBOM with 295 components and a license metadata inventory of 58 Python plus 237 Node packages; every inventory entry has a declared license value. The latest saved advisory reports dated 2026-11-14 show zero Python and npm findings. These are metadata/feed checks, not manual provenance or legal approval, and are two days old.
 
 ## Progress log
 
@@ -35,6 +36,7 @@
 - The Master Kit rebuild, Project CI and Secret Scan workflows passed on implementation commit `574eb67`: [Master Kit rebuild](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927535), [Project CI](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927345), and [Secret Scan](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927383). The secret scan reported no findings. Hosted acceptance is still needed for the subsequent HSTS commits, including `9287f99`.
 - Authenticated browser visual, keyboard and mobile review of the new `/operations` release panel remains pending.
 - Complete dependency provenance/license review beyond the automated inventory and the ASVS security/privacy review remain open.
+- Refresh the dependency advisory reports and SBOM for the current release commit; existing saved vulnerability-feed results were generated on 2026-11-14.
 - Runtime egress restrictions, TLS deployment, least-privilege service/database identities, managed key custody, an executed legacy ciphertext rewrap and verified key rotation/recovery drills, encrypted backup retention and a verified restore drill remain open.
 - Deployment and release acceptance remain pending. Local health checks, unit tests and workflow definitions do not prove production readiness.
 
