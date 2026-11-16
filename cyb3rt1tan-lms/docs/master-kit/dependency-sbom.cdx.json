@@ -3,7 +3,7 @@
   "specVersion": "1.6",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-11-16T06:58:40.424760+00:00",
+    "timestamp": "2026-11-16T07:02:26.779538+00:00",
     "component": {
       "type": "application",
       "bom-ref": "codemark-local",
@@ -9100,6 +9100,13 @@
           "value": "web/package-lock.json"
         }
       ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
+        }
+      ],
       "hashes": [
         {
           "alg": "SHA-512",
@@ -9125,7 +9132,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9135,11 +9149,11 @@
       "name": "annotated-doc",
       "version": "0.0.6",
       "purl": "pkg:pypi/annotated-doc@0.0.6",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9147,7 +9161,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9157,11 +9178,11 @@
       "name": "annotated-types",
       "version": "0.8.0",
       "purl": "pkg:pypi/annotated-types@0.8.0",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9169,7 +9190,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9179,11 +9207,11 @@
       "name": "anyio",
       "version": "4.16.0",
       "purl": "pkg:pypi/anyio@4.16.0",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9191,7 +9219,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9201,11 +9236,11 @@
       "name": "argon2-cffi-bindings",
       "version": "26.2.0",
       "purl": "pkg:pypi/argon2-cffi-bindings@26.2.0",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9213,7 +9248,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9235,7 +9277,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9257,7 +9306,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9308,7 +9364,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MPL-2.0"
+          }
         }
       ]
     },
@@ -9347,11 +9410,11 @@
       "name": "cffi",
       "version": "2.1.1",
       "purl": "pkg:pypi/cffi@2.1.1",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9359,7 +9422,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT-0"
+          }
         }
       ]
     },
@@ -9369,11 +9439,11 @@
       "name": "click",
       "version": "8.5.1",
       "purl": "pkg:pypi/click@8.5.1",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9381,7 +9451,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
         }
       ]
     },
@@ -9403,7 +9480,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "OSI Approved :: BSD License"
+          }
         }
       ]
     },
@@ -9425,7 +9509,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0 OR BSD-3-Clause"
+          }
         }
       ]
     },
@@ -9447,7 +9538,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9457,11 +9555,11 @@
       "name": "h11",
       "version": "0.16.0",
       "purl": "pkg:pypi/h11@0.16.0",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9469,7 +9567,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9491,7 +9596,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
         }
       ]
     },
@@ -9513,7 +9625,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
         }
       ]
     },
@@ -9523,11 +9642,11 @@
       "name": "idna",
       "version": "3.20",
       "purl": "pkg:pypi/idna@3.20",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9564,7 +9683,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9586,7 +9712,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
         }
       ]
     },
@@ -9666,7 +9799,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-2-Clause"
+          }
         }
       ]
     },
@@ -9688,7 +9828,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9698,11 +9845,11 @@
       "name": "mako",
       "version": "1.4.3",
       "purl": "pkg:pypi/mako@1.4.3",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9710,7 +9857,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9720,11 +9874,11 @@
       "name": "markupsafe",
       "version": "3.0.4",
       "purl": "pkg:pypi/markupsafe@3.0.4",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9732,7 +9886,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
         }
       ]
     },
@@ -9754,7 +9915,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9776,7 +9944,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9798,7 +9973,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
         }
       ]
     },
@@ -9820,7 +10002,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
         }
       ]
     },
@@ -9830,11 +10019,11 @@
       "name": "opentelemetry-api",
       "version": "1.45.2",
       "purl": "pkg:pypi/opentelemetry-api@1.45.2",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9842,7 +10031,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
         }
       ]
     },
@@ -9893,7 +10089,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache-2.0"
+          }
         }
       ]
     },
@@ -9915,7 +10118,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)"
+          }
         }
       ]
     },
@@ -9937,7 +10147,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT-CMU"
+          }
         }
       ]
     },
@@ -9959,7 +10176,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -9969,11 +10193,11 @@
       "name": "psycopg-binary",
       "version": "3.3.9",
       "purl": "pkg:pypi/psycopg-binary@3.3.9",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -9981,7 +10205,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "LGPL-3.0-only"
+          }
         }
       ]
     },
@@ -10003,7 +10234,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "LGPL-3.0-only"
+          }
         }
       ]
     },
@@ -10013,11 +10251,11 @@
       "name": "pycparser",
       "version": "3.12",
       "purl": "pkg:pypi/pycparser@3.12",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -10025,7 +10263,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
         }
       ]
     },
@@ -10035,11 +10280,11 @@
       "name": "pydantic-core",
       "version": "2.50.4",
       "purl": "pkg:pypi/pydantic-core@2.50.4",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -10047,7 +10292,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10069,7 +10321,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10079,11 +10338,11 @@
       "name": "pydantic",
       "version": "2.14.3",
       "purl": "pkg:pypi/pydantic@2.14.3",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -10091,7 +10350,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10142,7 +10408,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10164,7 +10437,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10186,7 +10466,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
         }
       ]
     },
@@ -10208,7 +10495,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10230,7 +10524,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10252,7 +10553,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10274,7 +10582,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10383,7 +10698,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10405,7 +10727,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "OSI Approved :: MIT License"
+          }
         }
       ]
     },
@@ -10456,7 +10785,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10466,11 +10802,11 @@
       "name": "starlette",
       "version": "1.10.0",
       "purl": "pkg:pypi/starlette@1.10.0",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -10478,7 +10814,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
         }
       ]
     },
@@ -10488,11 +10831,11 @@
       "name": "typing-extensions",
       "version": "4.16.0",
       "purl": "pkg:pypi/typing-extensions@4.16.0",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -10500,7 +10843,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "PSF-2.0"
+          }
         }
       ]
     },
@@ -10510,11 +10860,11 @@
       "name": "typing-inspection",
       "version": "0.4.5",
       "purl": "pkg:pypi/typing-inspection@0.4.5",
-      "scope": "optional",
+      "scope": "required",
       "properties": [
         {
           "name": "codemark:scope",
-          "value": "development"
+          "value": "runtime"
         },
         {
           "name": "codemark:lockfile",
@@ -10522,7 +10872,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     },
@@ -10573,7 +10930,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "BSD-3-Clause"
+          }
         }
       ]
     },
@@ -10595,7 +10959,14 @@
         },
         {
           "name": "codemark:installedOnGeneratorHost",
-          "value": "false"
+          "value": "true"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "MIT"
+          }
         }
       ]
     }
@@ -10603,7 +10974,11 @@
   "dependencies": [
     {
       "ref": "pkg:pypi/alembic@1.20.1",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/mako@1.4.3",
+        "pkg:pypi/sqlalchemy@2.1.8",
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
     },
     {
       "ref": "pkg:pypi/annotated-doc@0.0.6",
@@ -10615,15 +10990,22 @@
     },
     {
       "ref": "pkg:pypi/anyio@4.16.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/idna@3.20",
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
     },
     {
       "ref": "pkg:pypi/argon2-cffi@25.1.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/argon2-cffi-bindings@26.2.0"
+      ]
     },
     {
       "ref": "pkg:pypi/argon2-cffi-bindings@26.2.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/cffi@2.1.1"
+      ]
     },
     {
       "ref": "pkg:pypi/ast-serialize@0.13.1",
@@ -10643,7 +11025,9 @@
     },
     {
       "ref": "pkg:pypi/cffi@2.1.1",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/pycparser@3.12"
+      ]
     },
     {
       "ref": "pkg:pypi/click@8.5.1",
@@ -10655,11 +11039,21 @@
     },
     {
       "ref": "pkg:pypi/cryptography@50.0.2",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/cffi@2.1.1"
+      ]
     },
     {
       "ref": "pkg:pypi/fastapi@0.162.7",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/annotated-doc@0.0.6",
+        "pkg:pypi/anyio@4.16.0",
+        "pkg:pypi/opentelemetry-api@1.45.2",
+        "pkg:pypi/pydantic@2.14.3",
+        "pkg:pypi/starlette@1.10.0",
+        "pkg:pypi/typing-extensions@4.16.0",
+        "pkg:pypi/typing-inspection@0.4.5"
+      ]
     },
     {
       "ref": "pkg:pypi/h11@0.16.0",
@@ -10667,11 +11061,19 @@
     },
     {
       "ref": "pkg:pypi/httpcore@1.0.9",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/certifi@2026.10.23",
+        "pkg:pypi/h11@0.16.0"
+      ]
     },
     {
       "ref": "pkg:pypi/httpx@0.28.1",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/anyio@4.16.0",
+        "pkg:pypi/certifi@2026.10.23",
+        "pkg:pypi/httpcore@1.0.9",
+        "pkg:pypi/idna@3.20"
+      ]
     },
     {
       "ref": "pkg:pypi/idna@3.20",
@@ -10692,7 +11094,12 @@
     },
     {
       "ref": "pkg:pypi/jsonschema-path@0.5.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/attrs@26.1.0",
+        "pkg:pypi/pathable@0.6.0",
+        "pkg:pypi/pyyaml@6.0.3",
+        "pkg:pypi/referencing@0.37.0"
+      ]
     },
     {
       "ref": "pkg:pypi/jsonschema-specifications@2025.9.1",
@@ -10710,7 +11117,9 @@
     },
     {
       "ref": "pkg:pypi/mako@1.4.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/markupsafe@3.0.4"
+      ]
     },
     {
       "ref": "pkg:pypi/markupsafe@3.0.4",
@@ -10718,7 +11127,13 @@
     },
     {
       "ref": "pkg:pypi/mypy@2.4.1",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/ast-serialize@0.13.1",
+        "pkg:pypi/librt@0.16.0",
+        "pkg:pypi/mypy-extensions@1.2.0",
+        "pkg:pypi/pathspec@1.1.1",
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
     },
     {
       "ref": "pkg:pypi/mypy-extensions@1.2.0",
@@ -10726,15 +11141,31 @@
     },
     {
       "ref": "pkg:pypi/openapi-schema-validator@0.9.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/jsonschema@4.26.0",
+        "pkg:pypi/jsonschema-specifications@2025.9.1",
+        "pkg:pypi/pydantic@2.14.3",
+        "pkg:pypi/pydantic-settings@2.16.3",
+        "pkg:pypi/referencing@0.37.0",
+        "pkg:pypi/rfc3339-validator@0.1.4"
+      ]
     },
     {
       "ref": "pkg:pypi/openapi-spec-validator@0.9.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/jsonschema@4.26.0",
+        "pkg:pypi/jsonschema-path@0.5.0",
+        "pkg:pypi/lazy-object-proxy@1.13.0",
+        "pkg:pypi/openapi-schema-validator@0.9.0",
+        "pkg:pypi/pydantic@2.14.3",
+        "pkg:pypi/pydantic-settings@2.16.3"
+      ]
     },
     {
       "ref": "pkg:pypi/opentelemetry-api@1.45.2",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
     },
     {
       "ref": "pkg:pypi/packaging@26.3",
@@ -10758,7 +11189,10 @@
     },
     {
       "ref": "pkg:pypi/psycopg@3.3.9",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/psycopg-binary@3.3.9",
+        "pkg:pypi/tzdata@2026.6"
+      ]
     },
     {
       "ref": "pkg:pypi/psycopg-binary@3.3.9",
@@ -10770,15 +11204,27 @@
     },
     {
       "ref": "pkg:pypi/pydantic@2.14.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/annotated-types@0.8.0",
+        "pkg:pypi/pydantic-core@2.50.4",
+        "pkg:pypi/typing-extensions@4.16.0",
+        "pkg:pypi/typing-inspection@0.4.5"
+      ]
     },
     {
       "ref": "pkg:pypi/pydantic-core@2.50.4",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
     },
     {
       "ref": "pkg:pypi/pydantic-settings@2.16.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/pydantic@2.14.3",
+        "pkg:pypi/python-dotenv@1.2.4",
+        "pkg:pypi/typing-extensions@4.16.0",
+        "pkg:pypi/typing-inspection@0.4.5"
+      ]
     },
     {
       "ref": "pkg:pypi/pygments@2.21.0",
@@ -10790,7 +11236,13 @@
     },
     {
       "ref": "pkg:pypi/pytest@9.2.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/colorama@0.4.6",
+        "pkg:pypi/iniconfig@2.3.1",
+        "pkg:pypi/packaging@26.3",
+        "pkg:pypi/pluggy@1.7.0",
+        "pkg:pypi/pygments@2.21.0"
+      ]
     },
     {
       "ref": "pkg:pypi/python-dotenv@1.2.4",
@@ -10798,11 +11250,16 @@
     },
     {
       "ref": "pkg:pypi/python-engineio@4.15.1",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/simple-websocket@1.1.0"
+      ]
     },
     {
       "ref": "pkg:pypi/python-socketio@5.18.1",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/bidict@0.24.1",
+        "pkg:pypi/python-engineio@4.15.1"
+      ]
     },
     {
       "ref": "pkg:pypi/pyyaml@6.0.3",
@@ -10835,7 +11292,9 @@
     },
     {
       "ref": "pkg:pypi/simple-websocket@1.1.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/wsproto@1.3.2"
+      ]
     },
     {
       "ref": "pkg:pypi/six@1.17.0",
@@ -10843,11 +11302,15 @@
     },
     {
       "ref": "pkg:pypi/sqlalchemy@2.1.8",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
     },
     {
       "ref": "pkg:pypi/starlette@1.10.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/anyio@4.16.0"
+      ]
     },
     {
       "ref": "pkg:pypi/typing-extensions@4.16.0",
@@ -10855,7 +11318,9 @@
     },
     {
       "ref": "pkg:pypi/typing-inspection@0.4.5",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
     },
     {
       "ref": "pkg:pypi/tzdata@2026.6",
@@ -10863,11 +11328,16 @@
     },
     {
       "ref": "pkg:pypi/uvicorn@0.54.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/click@8.5.1",
+        "pkg:pypi/h11@0.16.0"
+      ]
     },
     {
       "ref": "pkg:pypi/wsproto@1.3.2",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:pypi/h11@0.16.0"
+      ]
     },
     {
       "ref": "pkg:npm/%40alloc/quick-lru@5.3.0",
