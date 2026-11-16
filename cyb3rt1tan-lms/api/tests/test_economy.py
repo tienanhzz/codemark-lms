@@ -68,7 +68,7 @@ def test_staff_rank_requires_role_metric_and_approved_manual_review(clients):
                      roles=["teacher"], password_hash=passwords.hash("A test password for fixtures only!"))
         db.add(staff)
     with TestClient(app) as teacher_client:
-        teacher_headers = login(teacher_client, "teacher-rank")
+        teacher_headers = login(teacher_client, "teacher-rank@example.test")
         teacher_id = teacher_client.get("/v1/me", headers=teacher_headers).json()["id"]
         with factory.begin() as db:
             db.add(EconomyLedger(user_id=teacher_id, currency="exp", delta=100, source="test",

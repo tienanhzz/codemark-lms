@@ -64,6 +64,13 @@ def test_rewrap_reads_legacy_and_versioned_rows_and_writes_active_key(clients, m
         rows = db.scalars(select(MfaMethod)).all()
         assert all(row.encrypted_secret.startswith("v2.new.") for row in rows)
         assert {mfa.secret(row) for row in rows} == {legacy_secret, "seed-beta"}
+        rewritten = {row.user_id: row.encrypted_secret for row in rows}
+    with factory.begin() as db:
+        assert rewrap_mfa_methods(db, "new") == 0
+    with factory() as db:
+        assert {
+            row.user_id: row.encrypted_secret for row in db.scalars(select(MfaMethod))
+        } == rewritten
 
 
 def test_rewrap_preflights_all_rows_and_rejects_missing_old_key(clients, monkeypatch):

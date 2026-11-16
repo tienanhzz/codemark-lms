@@ -1,12 +1,12 @@
 {
   "buildId": "BUILD-002",
-  "checkedAt": "2026-11-16T07:02:26.779538+00:00",
+  "checkedAt": "2026-11-14T19:36:18.873349+00:00",
   "dependencyInventory": "pass",
-  "pythonPackages": 64,
-  "nodePackages": 246,
+  "pythonPackages": 58,
+  "nodePackages": 237,
   "lockfiles": {
-    "api/requirements.lock": "498b42454a1b8ae05f5120bcbc377bcdeb4e377c3f274d428ec07b08483ca509",
-    "web/package-lock.json": "68baf589dfdec7b0b7879b9a666cc6a6dc981715e179dddb734baa5beba10057"
+    "api/requirements.lock": "98655c9411f46325822651c48329436e27992306921b716e9873da21088913c3",
+    "web/package-lock.json": "bf0854f72bdc442539f7c0cf06ea6cc9f5ef830f784d93959c915d41b76b03a0"
   },
   "sourceAssets": {
     "sourceChecks": "pass",
@@ -14,7 +14,10 @@
     "runtimeFirewallVerification": false,
     "dynamicThirdPartyRequestVerification": false
   },
-  "unknownLicenseMetadata": [],
+  "unknownLicenseMetadata": [
+    "colorama",
+    "pathspec"
+  ],
   "vulnerabilityScan": "Separate timestamped audit reports required",
   "browserVisualQA": "pending",
   "productionAcceptance": "pending"

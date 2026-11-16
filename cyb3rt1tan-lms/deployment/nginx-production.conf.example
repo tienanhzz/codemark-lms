@@ -1,0 +1,51 @@
+# Deployment template. Replace every .invalid name and certificate path.
+# Load inside an http {} block. The upstreams must terminate verified TLS.
+# Do not deploy the loopback HTTP acceptance configuration to production.
+map $http_upgrade $lms_upgrade { default upgrade; '' close; }
+upstream codemark_api_tls {
+    ip_hash;
+    server api-a.internal.invalid:8443;
+    server api-b.internal.invalid:8443;
+}
+upstream codemark_web_tls { server web.internal.invalid:8444; }
+server {
+    listen 443 ssl;
+    server_name lms.example.invalid;
+    ssl_certificate /run/credentials/browser-fullchain.pem;
+    ssl_certificate_key /run/credentials/browser-key.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    server_tokens off;
+    client_max_body_size 25m;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    # Keep cookies, invitation/reset fragments and personal data out of access logs.
+    access_log off;
+    proxy_http_version 1.1;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header Connection '';
+    proxy_ssl_verify on;
+    proxy_ssl_verify_depth 3;
+    proxy_ssl_trusted_certificate /run/credentials/service-ca.pem;
+    proxy_ssl_server_name on;
+    # Supply a dedicated client identity if upstreams require mTLS.
+    proxy_ssl_certificate /run/credentials/gateway-client.pem;
+    proxy_ssl_certificate_key /run/credentials/gateway-client-key.pem;
+    location /socket.io/ {
+        proxy_pass https://codemark_api_tls;
+        proxy_ssl_name api.internal.invalid;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $lms_upgrade;
+        proxy_read_timeout 75s;
+        proxy_buffering off;
+    }
+    location /v1/ {
+        proxy_pass https://codemark_api_tls;
+        proxy_ssl_name api.internal.invalid;
+    }
+    location / {
+        proxy_pass https://codemark_web_tls;
+        proxy_ssl_name web.internal.invalid;
+    }
+}

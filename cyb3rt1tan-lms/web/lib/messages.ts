@@ -106,7 +106,7 @@ const en = {
   saved: 'Your changes have been saved.',
   cancel: 'Reset changes',
   settingsIntro:
-    'A workspace that feels right for you. Changes are saved to your account across devices.',
+    'Preview your choices immediately, then select Save changes to keep them on your account across devices.',
   language: 'Interface language',
   languageHint: 'Choose the language used throughout your workspace.',
   appearance: 'Appearance',
@@ -277,7 +277,7 @@ const vi: typeof en = {
   saved: 'Đã lưu thay đổi của bạn.',
   cancel: 'Đặt lại thay đổi',
   settingsIntro:
-    'Điều chỉnh không gian phù hợp với bạn. Cài đặt được lưu theo tài khoản trên các thiết bị.',
+    'Xem trước thay đổi ngay lập tức, rồi chọn Lưu thay đổi để giữ cài đặt theo tài khoản trên các thiết bị.',
   language: 'Ngôn ngữ giao diện',
   languageHint: 'Chọn ngôn ngữ sử dụng trong không gian học tập.',
   appearance: 'Giao diện',

@@ -58,7 +58,7 @@ def target(db: Session, user_id: UUID) -> User:
 @router.get("/admin/identity/status")
 def identity_status(user: Admin) -> dict[str, bool]:
     try:
-        mfa.key_settings()
+        mfa.cipher()
         configured_mfa = True
     except HTTPException:
         configured_mfa = False

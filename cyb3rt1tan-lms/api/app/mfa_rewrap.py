@@ -23,6 +23,8 @@ def rewrap_mfa_methods(db: Session, active_id: str) -> int:
     plaintexts = [(row, decrypt_secret(row.user_id, row.encrypted_secret)) for row in rows]
     changed = 0
     for row, plaintext in plaintexts:
+        if row.encrypted_secret.startswith(f"v2.{active_id}."):
+            continue
         replacement = encrypt_secret(row.user_id, plaintext)
         if not replacement.startswith(f"v2.{active_id}."):
             raise ValueError("Configured active MFA key changed during rewrap.")

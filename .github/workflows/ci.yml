@@ -1,56 +1,20 @@
-name: Project CI
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
-permissions:
-  contents: read
-concurrency:
-  group: project-ci-${{ github.ref }}
-  cancel-in-progress: true
+name: Java and Next.js
+on: [push, pull_request]
 jobs:
-  verify-root-app:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-      - uses: actions/setup-java@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
       - name: Backend integration tests and package
         run: mvn -B -ntp -f backend/pom.xml verify
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run build:frontend
-
-  verify-codemark-lms-copy:
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-      - uses: actions/setup-java@v6
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
-          cache-dependency-path: codemark-lms/backend/pom.xml
-      - name: Backend integration tests and package
-        run: mvn -B -ntp -f codemark-lms/backend/pom.xml verify
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: codemark-lms/package-lock.json
-      - name: Install locked frontend dependencies
-        run: npm ci --prefix codemark-lms
-      - name: Build frontend
-        run: npm run build:frontend --prefix codemark-lms

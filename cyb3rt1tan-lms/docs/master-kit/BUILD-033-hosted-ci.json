@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "scope": "hosted-committed-baseline-only",
+  "checkedAt": "2026-11-16 12:47:21 UTC",
+  "baselineCommit": "051d239610bab0d7ef69bcada6a7cf16915d7e05",
+  "newWorkingTreeChangesCovered": false,
+  "runs": [
+    {
+      "name": "Secret scan",
+      "commit": "051d239610bab0d7ef69bcada6a7cf16915d7e05",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/tienanhzz/codemark-lms/actions/runs/43821034169",
+      "completedAt": "2026-11-16T07:03:15Z"
+    },
+    {
+      "name": "Project CI",
+      "commit": "051d239610bab0d7ef69bcada6a7cf16915d7e05",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/tienanhzz/codemark-lms/actions/runs/43821034056",
+      "completedAt": "2026-11-16T07:04:43Z"
+    },
+    {
+      "name": "Master kit rebuild",
+      "commit": "051d239610bab0d7ef69bcada6a7cf16915d7e05",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/tienanhzz/codemark-lms/actions/runs/43821034116",
+      "completedAt": "2026-11-16T07:07:05Z"
+    }
+  ]
+}

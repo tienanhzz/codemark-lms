@@ -16,6 +16,7 @@ Object.defineProperty(HTMLDialogElement.prototype, 'close', {
 });
 vi.stubGlobal('crypto', webcrypto);
 beforeEach(() => {
+  window.localStorage.clear();
   window.history.replaceState(null, '', '/');
   vi.clearAllMocks();
 });

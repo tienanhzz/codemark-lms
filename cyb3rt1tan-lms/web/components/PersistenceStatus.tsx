@@ -4,52 +4,6 @@ import { api } from '../lib/api';
 import type { PersistenceStatus as Status } from '../lib/contracts';
 import { copy, type Locale } from '../lib/workspaceCatalog';
 import { IdentityAlert } from './IdentityShared';
-
-const releaseEvidence = [
-  {
-    title: ['Hosted CI and secret scan', 'CI trên GitHub và quét secrets'],
-    detail: [
-      'This screen is not connected to GitHub Actions results; review the latest workflow run before release.',
-      'Màn hình chưa kết nối kết quả GitHub Actions; cần kiểm tra lần chạy workflow gần nhất trước khi phát hành.',
-    ],
-  },
-  {
-    title: ['ASVS security and privacy review', 'Rà soát bảo mật và quyền riêng tư theo ASVS'],
-    detail: [
-      'Record the reviewer, scope and findings in the release evidence before accepting this gate.',
-      'Ghi nhận người rà soát, phạm vi và phát hiện vào hồ sơ phát hành trước khi nghiệm thu mục này.',
-    ],
-  },
-  {
-    title: ['Encrypted backup and restore drill', 'Backup mã hóa và diễn tập khôi phục'],
-    detail: [
-      'The local pre-migration backup is not a production backup or a verified restore drill.',
-      'Backup trước migration trên máy local không thay thế backup production hay diễn tập khôi phục đã xác minh.',
-    ],
-  },
-  {
-    title: ['Runtime egress and service TLS', 'Egress runtime và TLS giữa dịch vụ'],
-    detail: [
-      'Database TLS settings do not prove that all production service links and outbound traffic are restricted.',
-      'Cấu hình TLS database chưa chứng minh mọi liên kết dịch vụ và lưu lượng outbound production đều được giới hạn.',
-    ],
-  },
-  {
-    title: ['Key custody, rewrap and rotation', 'Quản lý khóa, rewrap và xoay khóa'],
-    detail: [
-      'A guarded rewrap utility is available, but it has not been run. Keep old keys until the rewrap and recovery drill are verified.',
-      'Đã có công cụ rewrap có kiểm soát nhưng chưa chạy. Hãy giữ khóa cũ cho đến khi xác minh rewrap và diễn tập khôi phục.',
-    ],
-  },
-  {
-    title: ['Retention and release approval', 'Lưu giữ dữ liệu và duyệt phát hành'],
-    detail: [
-      'Retention, incident ownership and final release approval are not recorded in this runtime diagnostic.',
-      'Chẩn đoán runtime này chưa ghi nhận thời hạn lưu giữ, người phụ trách sự cố hay phê duyệt phát hành cuối.',
-    ],
-  },
-] as const;
-
 export function PersistenceStatus({ locale }: { locale: Locale }) {
   const [data, setData] = useState<Status | null>(null),
     [loading, setLoading] = useState(true),
@@ -168,36 +122,6 @@ export function PersistenceStatus({ locale }: { locale: Locale }) {
               ])}
             </p>
           )}
-          <section className="release-evidence" aria-labelledby="release-evidence-title">
-            <div className="release-evidence-heading">
-              <div>
-                <span className="eyebrow">BUILD-033</span>
-                <h3 id="release-evidence-title">
-                  {copy(locale, ['Release evidence', 'Bằng chứng nghiệm thu phát hành'])}
-                </h3>
-              </div>
-              <span className="release-evidence-state">
-                {copy(locale, ['Release status unverified', 'Trạng thái phát hành chưa xác minh'])}
-              </span>
-            </div>
-            <p className="service-note">
-              {copy(locale, [
-                'This runtime view cannot read GitHub Actions, backup catalogs or approval records. Each external gate remains unverified here; no green release status is inferred.',
-                'Runtime này không đọc được GitHub Actions, danh mục backup hay hồ sơ phê duyệt. Các mục nghiệm thu bên ngoài vẫn chưa được xác minh tại đây; không suy đoán trạng thái phát hành đạt.',
-              ])}
-            </p>
-            <ul className="release-evidence-grid">
-              {releaseEvidence.map((item) => (
-                <li className="release-evidence-card" key={item.title[0]}>
-                  <div className="release-evidence-card-heading">
-                    <h4>{copy(locale, item.title)}</h4>
-                    <span>{copy(locale, ['Not verified here', 'Chưa xác minh tại đây'])}</span>
-                  </div>
-                  <p>{copy(locale, item.detail)}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
         </>
       ) : null}
     </section>

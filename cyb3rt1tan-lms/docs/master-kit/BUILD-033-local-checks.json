@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "scope": "local-release-validation",
+  "status": "passed-local-checks",
+  "recordedAt": "2026-11-16T12:47:54.152399+00:00",
+  "baselineCommit": "051d239610bab0d7ef69bcada6a7cf16915d7e05",
+  "workingTreeDirty": true,
+  "sourceFingerprintSha256": "89c7eaa5c94e5f5c8705faf52384db1da1330958189525024a65df561f205d6a",
+  "productionAccepted": false,
+  "checks": {
+    "api": {
+      "uniquePassed": 171,
+      "fullRunPassed": 170,
+      "fixtureErrorsResolvedByTargetedRerun": 1,
+      "finalFocusedRegressionPassed": 23
+    },
+    "web": {
+      "passed": 72,
+      "files": 9
+    },
+    "ruff": "passed",
+    "changedPythonFormat": "passed-13-files",
+    "strictMypy": "passed-68-files",
+    "typescript": "passed",
+    "productionBuild": "passed",
+    "securityConfiguration": "passed",
+    "productionNextSameOriginPolling": "passed-both-path-forms-no-redirect",
+    "contracts": {
+      "status": "passed",
+      "paths": 199,
+      "operations": 230,
+      "schemas": 19,
+      "examples": 17
+    },
+    "workflowYaml": "parsed",
+    "patchWhitespace": "passed",
+    "runtime": {
+      "readiness": 200,
+      "operations": 200,
+      "unauthenticatedAdminAPI": 401
+    }
+  },
+  "browserAcceptance": {
+    "status": "pending",
+    "reason": "Native browser app access approval timed out; browser connector unavailable"
+  },
+  "newHostedRun": "pending-commit-push"
+}

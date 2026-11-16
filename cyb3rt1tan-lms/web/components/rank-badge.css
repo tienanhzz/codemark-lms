@@ -1,0 +1,17 @@
+.rank-badge { display: inline-flex; align-items: center; justify-content: center; gap: 7px; max-width: 100%; color: var(--rank-foreground); font-size: 11px; font-weight: 750; line-height: 1.4; }
+.rank-badge img { display: block; flex: none; width: 48px; height: 42px; border-radius: 4px; object-fit: contain; }
+.rank-badge > span { overflow-wrap: anywhere; }
+.rank-badge-compact { flex: 0 0 48px; font-size: 10px; text-align: center; }
+.rank-badge-hero { flex-direction: column; gap: 5px; font-size: 12px; }
+.rank-badge-hero img { width: 96px; height: 84px; }
+.ranks-workspace .wallet-rank-card.rank-surface { background: var(--rank-background); border-color: var(--rank-border); color: var(--rank-foreground); }
+.ranks-workspace .wallet-rank-card.rank-surface > span { color: var(--rank-foreground); }
+.ranks-workspace .wallet-rank-card .rank-badge { justify-self: start; }
+.ranks-workspace .wallet-rank-card progress { accent-color: var(--rank-foreground); }
+.ranks-workspace .rank-policy-card li.rank-surface { align-items: center; padding: 10px; border: 1px solid var(--rank-border); border-radius: 8px; background: var(--rank-background); color: var(--rank-foreground); }
+.rank-position-legend { display: grid; gap: 12px; }
+.rank-position-legend > p { color: var(--muted); font-size: 13px; line-height: 1.7; }
+.rank-position-legend ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr)); gap: 10px; list-style: none; margin: 0; padding: 0; }
+.rank-position-legend li { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 10px; padding: 14px 8px; border: 1px solid var(--rank-border); border-radius: 10px; background: var(--rank-background); color: var(--rank-foreground); }
+.rank-position-legend li > span { font-size: 11px; font-weight: 700; }
+@media (max-width: 480px) { .rank-badge-hero img { width: 76px; height: 67px; } }

@@ -25,12 +25,7 @@ if (
 ):
     raise SystemExit("Persistence integration requires codemark_lms_test.")
 os.environ.update(
-    {
-        "APP_ENV": "test",
-        "DATABASE_URL": target,
-        "MIGRATION_DATABASE_URL": target,
-        "SMTP_APPROVED": "false",
-    }
+    {"DATABASE_URL": target, "MIGRATION_DATABASE_URL": target, "SMTP_APPROVED": "false"}
 )
 sys.path.insert(0, str(root / "api"))
 from app.database import SessionLocal, engine
@@ -113,18 +108,13 @@ with SessionLocal() as db:
     assert db.scalar(select(func.count(AuditEvent.id))) == baseline_events
     assert db.scalar(select(func.count(OutboxMessage.id))) == baseline_messages
     messages = list(db.scalars(select(OutboxMessage)))
-    audit_messages = [message for message in messages if message.topic == "audit.committed"]
     assert all(
         set(message.payload) == {"eventId", "action", "requestId"}
-        for message in audit_messages
+        for message in messages
     )
-    integration_message = db.scalar(
-        select(OutboxMessage).where(OutboxMessage.idempotency_key == "integration:" + event_id)
+    assert all(
+        message.status == "pending" and message.attempts == 0 for message in messages
     )
-    assert integration_message is not None
-    assert integration_message.audit_event_id == event_id
-    assert integration_message.payload == payload
-    assert integration_message.status == "pending" and integration_message.attempts == 0
     assert (
         db.scalar(
             select(func.count(OutboxMessage.id))

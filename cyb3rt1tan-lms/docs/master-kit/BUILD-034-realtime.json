@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "scope": "isolated-local-realtime-acceptance",
+  "status": "passed",
+  "recordedAt": "2026-11-16T11:55:49.661434+00:00",
+  "baselineCommit": "051d239610bab0d7ef69bcada6a7cf16915d7e05",
+  "workingTreeDirty": true,
+  "sourceFingerprintSha256": "15d95d029f0fc7f4f4f55eaabef492401b0655f2519e72ce88394aa3c4da8190",
+  "productionAccepted": false,
+  "checks": [
+    {
+      "check": "two-api-fanout-and-revocation",
+      "status": "passed"
+    },
+    {
+      "check": "publish-retry-and-recovery",
+      "status": "passed"
+    },
+    {
+      "check": "gateway-websocket-and-revocation",
+      "status": "passed"
+    },
+    {
+      "check": "gateway-polling-and-revocation",
+      "status": "passed"
+    }
+  ],
+  "sourceDatabaseUnchanged": true,
+  "seconds": 98.06,
+  "temporaryDatabaseRemoved": true
+}

@@ -128,10 +128,6 @@ def python_components() -> tuple[list[dict], list[dict], list[dict]]:
             if package
             else []
         )
-        # Older PyPI packages often publish a license classifier without the
-        # newer License-Expression/License metadata fields.
-        if not license_name and len(classifiers) == 1:
-            license_name = classifiers[0]
         # Metadata may contain a full license; retain a concise inventory, not arbitrary package text.
         license_name = (
             license_name
@@ -221,29 +217,12 @@ def node_components() -> tuple[list[dict], list[dict], list[dict]]:
         resolved = entry.get("resolved", "")
         if not resolved.startswith("https://registry.npmjs.org/"):
             raise SystemExit("Unreviewed Node registry source: " + name)
-        package_license = entry.get("license")
-        if not package_license:
-            legacy_licenses = entry.get("licenses", [])
-            if isinstance(legacy_licenses, list) and len(legacy_licenses) == 1:
-                package_license = legacy_licenses[0].get("type")
-        if not package_license:
-            installed_manifest = ROOT / "web" / path / "package.json"
-            try:
-                installed_data = json.loads(installed_manifest.read_text("utf-8"))
-            except (OSError, json.JSONDecodeError):
-                installed_data = {}
-            if installed_data.get("version") == entry["version"]:
-                package_license = installed_data.get("license")
-                if not package_license:
-                    legacy_licenses = installed_data.get("licenses", [])
-                    if isinstance(legacy_licenses, list) and len(legacy_licenses) == 1:
-                        package_license = legacy_licenses[0].get("type")
         licenses.append(
             {
                 "name": name,
                 "version": entry["version"],
                 "scope": "development" if entry.get("dev") else "runtime",
-                "declaredLicense": package_license or "NOASSERTION",
+                "declaredLicense": entry.get("license", "NOASSERTION"),
                 "registry": "https://registry.npmjs.org",
                 "optional": entry.get("optional", False),
                 "review": "Locked metadata inventory; optional platform packages may be absent",
@@ -267,8 +246,8 @@ def node_components() -> tuple[list[dict], list[dict], list[dict]]:
                 {"name": "codemark:lockfile", "value": "web/package-lock.json"},
             ],
         }
-        if package_license:
-            component["licenses"] = [{"license": {"name": package_license}}]
+        if entry.get("license"):
+            component["licenses"] = [{"license": {"name": entry["license"]}}]
         algorithm, encoded = entry["integrity"].split(" ", 1)[0].split("-", 1)
         if algorithm in {"sha256", "sha384", "sha512"}:
             component["hashes"] = [

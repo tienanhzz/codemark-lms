@@ -1,6 +1,70 @@
 # BUILD-033 — Hosted CI, security and release acceptance
 
-**Status:** Active — hosted CI coverage expanded; the GitHub Actions run and production security/recovery gates remain unverified.
+**Status:** Active — implementation and local recovery/realtime acceptance completed; final production, browser, owner approvals and a hosted run of the new changes remain open.
+
+## Current acceptance — 2026-11-16
+
+- Completed an encrypted PostgreSQL snapshot backup and two independent isolated
+  restores: all **99 tables / 64 rows** matched their source-snapshot content
+  fingerprints. Wrong-key and tampered-archive rejection passed. The source
+  database was read-only throughout the drill.
+- Exercised legacy/v2 MFA rewrap on a disposable restored copy, including immutable
+  dry-run, repeat-apply no-op, missing-key failure and recovered-key decryption.
+  The production maintenance command now skips already-current rows on repeat apply.
+  No actual user's MFA key or password was rotated.
+- Added reproducible recovery and gateway acceptance runners, safe local target
+  guards, private encrypted artifacts, source fingerprints, failure-aware reports
+  and CI wiring. See [recovery evidence](BUILD-033-recovery.json),
+  [realtime acceptance](BUILD-034.md) and [deployment/recovery runbook](../../deployment/README.md).
+- Added production Redis ACL/TLS/CA guards and a TLS/mTLS gateway deployment
+  template. These are implemented controls/templates; actual production network
+  enforcement and certificate acceptance still require the deployment environment.
+- Fixed production same-origin Socket.IO polling, including a Next.js
+  trailing-slash redirect loop. A live production-build proxy check now passes and
+  is included in CI after web build. The active local runtime was rebuilt/restarted;
+  readiness and `/operations` return 200 and the Admin API still requires authentication.
+- Local verification: 171 unique API tests passed (170 in the complete run and the
+  temporary-directory-blocked SMTP test passed on its separate rerun), 72 web tests,
+  23 focused final API regression tests, strict mypy over 68 source files, Ruff,
+  TypeScript, production build, security configuration checks and contract validation
+  (199 paths / 230 operations). Browser access approval timed out; visual, mobile,
+  keyboard and authenticated `/operations` acceptance remain pending.
+
+The exact current baseline commit `051d239610bab0d7ef69bcada6a7cf16915d7e05`
+has three successful hosted workflows, verified through the GitHub runs collection
+using its **full SHA**, including the previously unverified HSTS additions:
+
+| Workflow | Verified result |
+| --- | --- |
+| Master kit rebuild | [Success](https://github.com/tienanhzz/codemark-lms/actions/runs/43821034116) |
+| Project CI | [Success](https://github.com/tienanhzz/codemark-lms/actions/runs/43821034056) |
+| Secret scan | [Success](https://github.com/tienanhzz/codemark-lms/actions/runs/43821034169) |
+
+Those hosted runs cover the committed baseline. This increment is still an
+uncommitted working-tree change, so the new recovery/gateway/proxy CI steps have
+**not** run on GitHub yet. Earlier empty results came from querying PR-only status
+wrappers or a short SHA; they did not establish a failed or missing push run.
+
+## Remaining release acceptance
+
+BUILD-033 cannot truthfully be marked Done under its original production-release
+scope until the following evidence exists for the actual deployment:
+
+- A production host/domain and service inventory; verified browser/service TLS,
+  IPv4/IPv6 egress deny/allow probes and least-privilege service/database identities.
+- Managed key custody, off-host encrypted backup retention, approved RPO/RTO and
+  a production restore/rotation exercise with the retained key inventory. Local
+  drill keys are deliberately identified as drill-only and are not production custody.
+- Security-owner review against the versioned [OWASP ASVS 5.0.0 Level 2 target](https://asvs.owasp.org/),
+  scoped privacy review and legal/provenance acceptance of dependencies.
+- Authenticated visual/keyboard/mobile review, incident/retention ownership and
+  final release approval. No reviewer identity, SLA, retention period or approval
+  has been invented.
+- Push/review and successful hosted CI/secret scanning for the resulting new commit.
+
+The scoped [security review and release checklist](BUILD-033-release-review.md)
+records the available evidence and the exact external gaps. The earlier sections
+below are retained as the history of previous increments.
 
 ## Implemented in this increment
 
@@ -33,7 +97,7 @@
 - 2026-11-16: Refreshed dependency evidence using the pinned auditor environment. PyPI reported 64 packages and zero vulnerability records; npm reported zero findings in both runtime and full lockfile scopes. Regenerated the CycloneDX 1.6 SBOM (310 components), foundation inventory, license metadata, and validation report; schema and local-source asset checks pass. 53 licenses remain `NOASSERTION`, so legal/provenance acceptance is not complete.
 - 2026-11-16: Improved foundation inventory fallbacks for PyPI license classifiers, legacy npm `licenses` metadata and version-matched installed npm manifests. Regeneration now reports zero `NOASSERTION` package licenses; this is metadata completion only and does not grant legal approval. Ruff and CycloneDX validation pass.
 
-## Not yet accepted
+## Earlier unaccepted items (superseded where evidenced above)
 
 - The Master Kit rebuild, Project CI and Secret Scan workflows passed on implementation commit `574eb67`: [Master Kit rebuild](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927535), [Project CI](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927345), and [Secret Scan](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927383). The secret scan reported no findings. Hosted acceptance is still needed for the subsequent HSTS commits, including `9287f99`.
 - Authenticated browser visual, keyboard and mobile review of the new `/operations` release panel remains pending.
@@ -44,4 +108,9 @@
 
 ## Scope boundary
 
-This increment changes CI wiring, production configuration validation and response headers, MFA ciphertext versioning and rewrap tooling, and the Admin release-evidence interface. It does not deploy the application, alter local databases or running services, create credentials, or claim a hosted result for the HSTS additions. The project remains unsuitable for production until the remaining release gates above are completed and evidenced.
+The current increment implements the release/realtime fixes, runs isolated recovery
+and gateway drills and rebuilds/restarts the local application. Drill databases
+and keys are temporary/test-only; existing user credentials and application data
+are not rewrapped, reseeded or reset. No production service, firewall, identity or
+credential was changed. BUILD-033 remains Active until its external release gates
+are completed and evidenced.

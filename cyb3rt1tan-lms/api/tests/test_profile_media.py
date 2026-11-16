@@ -264,7 +264,7 @@ def test_teaching_team_email_photo_and_cross_course_privacy(clients):
     with factory.begin() as db:
         db.add(CourseMembership(course_id=course["id"], user_id=student_id, status="active"))
     with TestClient(app) as teacher_client:
-        th = login(teacher_client, "teacher")
+        th = login(teacher_client, "teacher@example.test")
         photo = upload(teacher_client, th).json()
         value = student.get(path)
         validate("CourseStaffProfiles", value.json())

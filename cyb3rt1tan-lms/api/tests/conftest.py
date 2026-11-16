@@ -36,6 +36,7 @@ def clients() -> Iterator[tuple[TestClient, TestClient, sessionmaker[Session]]]:
             db.add(
                 User(
                     username=name,
+                    institutional_id="9999000001" if name == "student" else None,
                     official_name=name.title(),
                     email=name + "@example.test",
                     roles=roles,
