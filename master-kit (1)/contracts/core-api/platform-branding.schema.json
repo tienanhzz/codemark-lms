@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/platform-branding.schema.json",
+  "title": "Public Platform Branding",
+  "type": "object",
+  "required": ["logoAssetId", "logoUrl", "mediaType", "width", "height"],
+  "properties": {
+    "logoAssetId": { "type": "string", "format": "uuid" },
+    "logoUrl": {
+      "type": "string",
+      "pattern": "^/branding/assets/[0-9a-f-]{36}$"
+    },
+    "mediaType": { "const": "image/png" },
+    "width": { "const": 1024 },
+    "height": { "const": 1024 }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/teacher-rank-policy.schema.json",
+  "title": "Teacher and Teaching Assistant Rank Policy",
+  "type": "object",
+  "required": ["policyVersion", "tiers"],
+  "properties": {
+    "policyVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "tiers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/tier"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "tier": {
+      "type": "object",
+      "required": ["id", "name", "minimumSeasonPoints", "promotionTasks"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimumSeasonPoints": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "promotionTasks": {
+          "type": "object",
+          "required": ["teacher", "teachingAssistant"],
+          "properties": {
+            "teacher": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/task"
+              }
+            },
+            "teachingAssistant": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/task"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "task": {
+      "type": "object",
+      "required": ["id", "title", "description", "completion"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "completion": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/metricCompletion"
+            },
+            {
+              "$ref": "#/$defs/manualReviewCompletion"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "metricCompletion": {
+      "type": "object",
+      "required": ["type", "metricKey", "operator", "target"],
+      "properties": {
+        "type": {
+          "const": "metric"
+        },
+        "metricKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operator": {
+          "enum": ["gte"]
+        },
+        "target": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "manualReviewCompletion": {
+      "type": "object",
+      "required": ["type", "evidenceDescription"],
+      "properties": {
+        "type": {
+          "const": "manualReview"
+        },
+        "evidenceDescription": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

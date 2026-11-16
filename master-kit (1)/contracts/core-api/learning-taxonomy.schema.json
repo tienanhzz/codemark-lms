@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/learning-taxonomy.schema.json",
+  "title": "Learning Categories and Tags",
+  "type": "object",
+  "required": ["catalogVersion", "categories", "tags"],
+  "properties": {
+    "catalogVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/category"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/tag"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "category": {
+      "type": "object",
+      "required": ["id", "name", "parentId", "status", "sortOrder"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/localizedName"
+        },
+        "parentId": {
+          "anyOf": [
+            {"$ref": "#/$defs/id"},
+            {"type": "null"}
+          ]
+        },
+        "status": {
+          "enum": ["active", "retired"]
+        },
+        "sortOrder": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "tag": {
+      "type": "object",
+      "required": ["id", "name", "parentId", "appliesTo", "selectable", "status", "sortOrder"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/localizedName"
+        },
+        "parentId": {
+          "anyOf": [
+            {"$ref": "#/$defs/id"},
+            {"type": "null"}
+          ]
+        },
+        "appliesTo": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["lesson", "question"]
+          }
+        },
+        "selectable": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": ["active", "retired"]
+        },
+        "sortOrder": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "localizedName": {
+      "type": "object",
+      "required": ["en", "vi"],
+      "properties": {
+        "en": {
+          "type": "string",
+          "minLength": 1
+        },
+        "vi": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

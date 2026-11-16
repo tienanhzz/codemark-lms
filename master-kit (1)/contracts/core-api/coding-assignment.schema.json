@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/coding-assignment.schema.json",
+  "title": "Coding Assignment Question Selection",
+  "description": "Published assignments retain exact immutable question-version references, not just mutable question IDs.",
+  "type": "object",
+  "required": ["assignmentId", "title", "status", "selection", "items"],
+  "properties": {
+    "assignmentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": ["draft", "published", "closed", "archived"]
+    },
+    "selection": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/manualSelection"
+        },
+        {
+          "$ref": "#/$defs/tagSelection"
+        }
+      ]
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/assignmentItem"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "manualSelection": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": {
+          "const": "manual"
+        }
+      },
+      "additionalProperties": false
+    },
+    "tagSelection": {
+      "type": "object",
+      "required": ["mode", "tagIds", "match"],
+      "properties": {
+        "mode": {
+          "const": "tags"
+        },
+        "tagIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          }
+        },
+        "match": {
+          "enum": ["any", "all"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "assignmentItem": {
+      "type": "object",
+      "required": ["position", "questionId", "questionVersionId", "points"],
+      "properties": {
+        "position": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "questionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "questionVersionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "points": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

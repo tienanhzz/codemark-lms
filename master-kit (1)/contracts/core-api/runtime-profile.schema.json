@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/runtime-profile.schema.json",
+  "title": "Approved Runtime Profile Version",
+  "description": "Admin-managed, immutable runtime profile. Limits in a run request may only be reduced from these caps.",
+  "type": "object",
+  "required": [
+    "profileId",
+    "version",
+    "language",
+    "languageVersion",
+    "imageDigest",
+    "allowedLibraries",
+    "resourceCaps",
+    "sandbox",
+    "status"
+  ],
+  "properties": {
+    "profileId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "language": {
+      "enum": ["java", "c", "cpp", "python"]
+    },
+    "languageVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "compilerImage": {
+      "type": "string",
+      "minLength": 1
+    },
+    "imageDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "allowedLibraries": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "resourceCaps": {
+      "type": "object",
+      "required": ["wallTimeMs", "cpuTimeMs", "memoryBytes", "maxSourceBytes"],
+      "properties": {
+        "wallTimeMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cpuTimeMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "memoryBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxSourceBytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "sandbox": {
+      "type": "object",
+      "required": [
+        "network",
+        "nonRootUser",
+        "readOnlyRootFilesystem",
+        "dropAllCapabilities",
+        "ephemeralWorkspace",
+        "secretMounts"
+      ],
+      "properties": {
+        "network": {
+          "const": "disabled"
+        },
+        "nonRootUser": {
+          "const": true
+        },
+        "readOnlyRootFilesystem": {
+          "const": true
+        },
+        "dropAllCapabilities": {
+          "const": true
+        },
+        "ephemeralWorkspace": {
+          "const": true
+        },
+        "secretMounts": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "enum": ["draft", "test", "active", "deprecated"]
+    },
+    "endOfLifeAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

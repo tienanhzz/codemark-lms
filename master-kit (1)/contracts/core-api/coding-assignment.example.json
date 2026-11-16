@@ -1,0 +1,18 @@
+{
+  "assignmentId": "week-1-practice",
+  "title": "Week 1: Arrays and Hash Maps",
+  "status": "published",
+  "selection": {
+    "mode": "tags",
+    "tagIds": ["arrays", "hash-maps-sets"],
+    "match": "any"
+  },
+  "items": [
+    {
+      "position": 1,
+      "questionId": "two-sum",
+      "questionVersionId": "two-sum-v1",
+      "points": 10
+    }
+  ]
+}

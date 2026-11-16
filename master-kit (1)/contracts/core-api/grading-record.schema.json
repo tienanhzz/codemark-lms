@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/grading-record.schema.json",
+  "title": "Append-Only Submission Grade Revision",
+  "description": "A single grading revision bound to immutable assessment, question, and rubric versions. Corrections create new revisions rather than overwriting history.",
+  "type": "object",
+  "required": [
+    "gradingRecordId",
+    "submissionId",
+    "assessmentVersionId",
+    "questionVersionId",
+    "revision",
+    "status",
+    "maximumPoints",
+    "score",
+    "graderId",
+    "createdAt"
+  ],
+  "properties": {
+    "gradingRecordId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "submissionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assessmentVersionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "questionVersionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rubricId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rubricVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": ["draft", "graded", "published", "superseded"]
+    },
+    "maximumPoints": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "criterionResults": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/criterionResult"
+      }
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0
+    },
+    "override": {
+      "type": "object",
+      "required": ["score", "reason"],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "additionalProperties": false
+    },
+    "graderId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "previousRecordId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "criterionResult": {
+      "type": "object",
+      "required": ["criterionId", "checked", "awardedPoints"],
+      "properties": {
+        "criterionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checked": {
+          "type": "boolean"
+        },
+        "awardedPoints": {
+          "type": "number",
+          "minimum": 0
+        },
+        "graderNote": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

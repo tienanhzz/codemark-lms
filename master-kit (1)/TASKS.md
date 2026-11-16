@@ -1,0 +1,55 @@
+# TASKS
+
+## Active
+- [x] Initialize mandatory governance/reporting files.
+- [x] Define modular monorepo skeleton.
+- [x] Add initial contract-first API scaffolding.
+- [x] Create first architecture ADR.
+- [x] Specify Redis infrastructure boundaries, configurable teacher/TA ranks, and shared learning-content taxonomy.
+- [x] Define contracts and starter data for hierarchical tags, multi-tag coding questions, and tag-filtered assignment snapshots.
+- [x] Define the initial PostgreSQL relational data model for LMS content, assignments, rank, audit, and outbox.
+- [x] Audit the four nominated UI/UX skill sources; record pins, licenses, compatibility, dependencies, and security findings.
+- [x] Add project-authored Animate UI integration guidance, with UI/UX Pro Max as design direction; pin and audit the upstream source without importing it.
+- [x] Capture role-based screen requirements for accounts, courses, question types, assessments, exams, student learning, EXP/Coin, clans, reports, and administration.
+- [x] Record initial integration scope: CSV plus email invitation/local login; no SSO or Moodle integration.
+- [x] Reconcile the logical model and current discovery contracts with `PRODUCT_REQUIREMENTS.md` (expanded roles, CSV/local auth, category/tag split, question types, non-seasonal EXP tracks, and domain entity coverage).
+- [x] Specify default-deny role/course access policy and audited course permission grant contracts.
+- [x] Define versioned question content contracts for all supported question types and immutable assessment delivery snapshots.
+- [x] Define rubric grading, grade publication/review, approved runtime profiles, and isolated code-runner message boundaries.
+- [x] Define strict private question-authoring configs for all supported question types and validate cross-type consistency.
+- [x] Specify API boundaries for account provisioning, attendance, exam incidents/appeals, economy/marketplace/clans, and notification recovery.
+- [ ] Finalize Phase 2 module contracts, data model, and policy hierarchy.
+- [x] Convert API routes into OpenAPI 3.1 and add course, achievements, reports, and administration boundaries.
+- [x] Add GitHub Actions validation for OpenAPI, JSON Schemas/examples, route consistency, taxonomy/rank, scoring totals, and patch whitespace.
+- [ ] Configure GitHub branch protection to require the contract-validation status check.
+- [ ] Expand executable semantic tests for authorization, privacy, immutability, idempotency, and other domain invariants beyond the current contract examples.
+- [x] Record user-approved Python backend and Next.js/Tailwind/Font Awesome frontend direction; create a design-system proposal and interactive theme preview before palette approval.
+- [x] Define application coding conventions for Python, Next.js/TypeScript, API contract use, tests, security, accessibility, and CI tooling baseline in `cyb3rt1tan-lms/docs/CODING_CONVENTIONS.md`.
+- [x] Specify per-user locale/theme/color-palette preferences and account-scoped API routes; update the preview with an eight-palette Settings page and per-preview-user preference persistence.
+- [x] Establish project security standards for package-manager dependency installation, locally bundled runtime assets/no third-party runtime APIs, default-deny network egress, standard cryptography, and non-sequential public references.
+- [x] Specify a permission-scoped individual Student Learning Overview and student-progress report for Admin and authorized course staff.
+- [x] Approve the Python 3.13/FastAPI/SQLAlchemy/Alembic backend foundation and Next.js/React/Tailwind/Font Awesome frontend stack in ADR-0005.
+- [x] Select and review the Python Socket.IO runtime/client packages and implement Redis-backed multi-instance realtime delivery with a transactional outbox.
+- [x] Select Redis Streams for runner job dispatch using the existing Python Redis client and PostgreSQL transactional outbox (ADR-0009); package review is not needed because no dependency was added.
+- [x] Implement the Redis Streams consumer-group admission path, `XAUTOCLAIM` recovery, metadata-only dead-lettering, durable job identity, idempotent result persistence, and a payload-free queue snapshot including dead-letter depth and concurrent duplicate verification.
+- [x] Add a read-only host prerequisite preflight for the former Linux/gVisor runner proposal; it does not launch containers or qualify a host/isolation and is not an active release gate.
+- [x] Require production Redis connections to use TLS and named, non-default ACL credentials; deployment ACL permissions and durability still need validation.
+- [x] Document safe Redis runner queue recovery and retention constraints; operational dashboards, alerts, and deployment validation remain pending.
+- [x] Add payload-free PostgreSQL outbox and Redis stream/group/dead-letter/consumer-count metrics; expose them through a read-only, no-store Admin/MFA-protected endpoint. Dashboards and alert delivery remain pending.
+- [ ] Validate production Redis durability/ACL/retention and operational alerts/recovery if/when dormant queue plumbing is activated for an approved use; no worker identity or execution service is currently approved.
+- [ ] Review role-based dashboard prototype and approve brand palette, light/dark default, typography, and density before frontend scaffolding.
+- [x] Package Local Autograder as a reusable Python library with optional CLI for trusted C, Java, and Python source; provide I/O, unit, structural, Java advanced-feature, and non-executing configurable static-policy checks. Keep execution separate from LMS/API/UI and never execute learner code (ADR-0010).
+- [ ] Student-code execution, automated grading, and runtime-profile activation remain disabled; any future untrusted execution requires a new product/security decision. Separately specify database migrations, media scanning, and retention/legal-hold jobs.
+- [ ] Integrate the existing AES-GCM `ResourceReferenceCodec` with an approved production key provider/secret manager and document operational key rotation; retain context binding and tamper tests.
+- [ ] Establish dependency provenance/license review, lockfile integrity, SBOM generation, vulnerability scanning, and runtime egress verification.
+- [ ] Extend CI to validate package lockfiles and verify the built runtime contains no remote CDN/image/font/script/style references or unapproved third-party calls.
+- [ ] Implement core domain modules and persistence model.
+- [ ] Implement account invitation/password/MFA and audited CSV import/export (no SSO/Moodle in initial scope).
+- [ ] Implement PostgreSQL-backed taxonomy administration, tag validation, content/assignment queries, and the shared Admin Course Rules template with course-level Teacher overrides.
+- [ ] Implement PostgreSQL-backed EXP/Coin ledgers, student/staff rank tracks, missions, achievements, shop, marketplace, and clan policies.
+- [ ] Implement background workers and Redis-backed job consumers; runner admission/recovery plumbing is implemented, while code execution and other background jobs remain pending.
+- [ ] Implement role-specific dashboards, course workflows, taxonomy/question authoring, Admin logo upload with local square crop preview, attendance, assessment/exam monitoring, and Redis-backed realtime alerts.
+- [ ] Implement the interactive Student Learning Overview and permission-scoped student-progress report/export with reauthorization and privacy tests.
+- [ ] Implement generated adapters for Copilot, Claude Code, and Cursor.
+- [ ] Implement CLI and local dashboard using shared Core APIs.
+- [ ] Implement approval, audit, backup/restore, and security services.

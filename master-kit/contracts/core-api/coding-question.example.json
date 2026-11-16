@@ -1,0 +1,8 @@
+{
+  "questionId": "two-sum",
+  "title": "Two Sum",
+  "prompt": "Given an array of integers and a target value, return the indices of two values whose sum equals the target.",
+  "difficulty": "beginner",
+  "tagIds": ["arrays", "hash-maps-sets"],
+  "status": "published"
+}

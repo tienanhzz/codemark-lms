@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/writing-rubric.schema.json",
+  "title": "Versioned Writing Rubric",
+  "description": "Manual-scoring criteria are immutable with their question version. Criterion checkboxes award the configured criterion points.",
+  "type": "object",
+  "required": ["rubricId", "version", "criteria", "maximumPoints"],
+  "properties": {
+    "rubricId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/criterion"
+      }
+    },
+    "maximumPoints": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "criterion": {
+      "type": "object",
+      "required": ["criterionId", "title", "points", "position"],
+      "properties": {
+        "criterionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "description": {
+          "type": "string"
+        },
+        "points": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "position": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

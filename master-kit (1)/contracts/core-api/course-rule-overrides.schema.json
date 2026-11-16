@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/course-rule-overrides.schema.json",
+  "title": "Course Rules Overrides",
+  "type": "object",
+  "required": ["expectedTemplateVersion", "overrides", "customRules"],
+  "properties": {
+    "expectedTemplateVersion": { "type": "integer", "minimum": 1 },
+    "overrides": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["ruleId", "action"],
+            "properties": {
+              "ruleId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+              "action": { "const": "disable" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["ruleId", "action", "title", "body"],
+            "properties": {
+              "ruleId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+              "action": { "const": "override" },
+              "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+              "body": { "type": "string", "minLength": 1, "maxLength": 5000 }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "customRules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ruleId", "category", "title", "body", "position"],
+        "properties": {
+          "ruleId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+          "category": {
+            "type": "string",
+            "enum": [
+              "attendance",
+              "assignmentSubmission",
+              "practice",
+              "assessment",
+              "classroomConduct",
+              "communication",
+              "other"
+            ]
+          },
+          "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "body": { "type": "string", "minLength": 1, "maxLength": 5000 },
+          "position": { "type": "integer", "minimum": 0 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

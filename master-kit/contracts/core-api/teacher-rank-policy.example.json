@@ -1,0 +1,291 @@
+{
+  "policyVersion": 1,
+  "tiers": [
+    {
+      "id": "iron",
+      "name": "Iron",
+      "minimumSeasonPoints": 0,
+      "promotionTasks": {
+        "teacher": [],
+        "teachingAssistant": []
+      }
+    },
+    {
+      "id": "bronze",
+      "name": "Bronze",
+      "minimumSeasonPoints": 100,
+      "promotionTasks": {
+        "teacher": [
+          {
+            "id": "teacher-onboarding",
+            "title": "Complete teacher onboarding",
+            "description": "Complete required teaching and platform onboarding.",
+            "completion": {
+              "type": "manualReview",
+              "evidenceDescription": "Onboarding completion recorded by an authorized administrator."
+            }
+          }
+        ],
+        "teachingAssistant": [
+          {
+            "id": "ta-onboarding",
+            "title": "Complete Teaching Assistant onboarding",
+            "description": "Complete required support and platform onboarding.",
+            "completion": {
+              "type": "manualReview",
+              "evidenceDescription": "Onboarding completion recorded by an authorized administrator."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "silver",
+      "name": "Silver",
+      "minimumSeasonPoints": 250,
+      "promotionTasks": {
+        "teacher": [
+          {
+            "id": "teacher-five-sessions",
+            "title": "Deliver five learning sessions",
+            "description": "Deliver five completed sessions during the active season.",
+            "completion": {
+              "type": "metric",
+              "metricKey": "teacher.completedSessions",
+              "operator": "gte",
+              "target": 5
+            }
+          }
+        ],
+        "teachingAssistant": [
+          {
+            "id": "ta-ten-support-sessions",
+            "title": "Support ten learning sessions",
+            "description": "Provide verified support in ten completed sessions during the active season.",
+            "completion": {
+              "type": "metric",
+              "metricKey": "teachingAssistant.completedSupportSessions",
+              "operator": "gte",
+              "target": 10
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "minimumSeasonPoints": 450,
+      "promotionTasks": {
+        "teacher": [
+          {
+            "id": "teacher-quality-feedback",
+            "title": "Maintain strong learner feedback",
+            "description": "Reach an average feedback score of at least 4.2 out of 5 with the configured minimum response count.",
+            "completion": {
+              "type": "metric",
+              "metricKey": "teacher.qualifiedAverageFeedback",
+              "operator": "gte",
+              "target": 4.2
+            }
+          }
+        ],
+        "teachingAssistant": [
+          {
+            "id": "ta-quality-feedback",
+            "title": "Maintain strong support feedback",
+            "description": "Reach an average support feedback score of at least 4.2 out of 5 with the configured minimum response count.",
+            "completion": {
+              "type": "metric",
+              "metricKey": "teachingAssistant.qualifiedAverageFeedback",
+              "operator": "gte",
+              "target": 4.2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "platinum",
+      "name": "Platinum",
+      "minimumSeasonPoints": 700,
+      "promotionTasks": {
+        "teacher": [
+          {
+            "id": "teacher-approved-course",
+            "title": "Publish an approved course",
+            "description": "Have at least one course approved and published during the active season.",
+            "completion": {
+              "type": "metric",
+              "metricKey": "teacher.approvedCourses",
+              "operator": "gte",
+              "target": 1
+            }
+          }
+        ],
+        "teachingAssistant": [
+          {
+            "id": "ta-response-sla",
+            "title": "Meet the support response target",
+            "description": "Meet at least 90% of the response-time target over the configured minimum number of support requests.",
+            "completion": {
+              "type": "metric",
+              "metricKey": "teachingAssistant.qualifiedResponseSlaRate",
+              "operator": "gte",
+              "target": 0.9
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "emerald",
+      "name": "Emerald",
+      "minimumSeasonPoints": 1000,
+      "promotionTasks": {
+        "teacher": [
+          {
+            "id": "teacher-thirty-sessions",
+            "title": "Deliver thirty learning sessions",
+            "description": "Deliver thirty completed sessions during the active season.",
+            "completion": {
+              "type": "metric",
+              "metricKey": "teacher.completedSessions",
+              "operator": "gte",
+              "target": 30
+            }
+          }
+        ],
+        "teachingAssistant": [
+          {
+            "id": "ta-forty-support-sessions",
+            "title": "Support forty learning sessions",
+            "description": "Provide verified support in forty completed sessions during the active season.",
+            "completion": {
+              "type": "metric",
+              "metricKey": "teachingAssistant.completedSupportSessions",
+              "operator": "gte",
+              "target": 40
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "diamond",
+      "name": "Diamond",
+      "minimumSeasonPoints": 1400,
+      "promotionTasks": {
+        "teacher": [
+          {
+            "id": "teacher-advanced-certification",
+            "title": "Complete advanced teaching certification",
+            "description": "Complete one approved advanced teaching or subject-matter certification.",
+            "completion": {
+              "type": "manualReview",
+              "evidenceDescription": "Certificate verified by an authorized administrator."
+            }
+          }
+        ],
+        "teachingAssistant": [
+          {
+            "id": "ta-advanced-certification",
+            "title": "Complete advanced support certification",
+            "description": "Complete one approved advanced learner-support certification.",
+            "completion": {
+              "type": "manualReview",
+              "evidenceDescription": "Certificate verified by an authorized administrator."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "master",
+      "name": "Master",
+      "minimumSeasonPoints": 1900,
+      "promotionTasks": {
+        "teacher": [
+          {
+            "id": "teacher-peer-review",
+            "title": "Complete peer teaching review",
+            "description": "Receive an approved peer review of one course or teaching session.",
+            "completion": {
+              "type": "manualReview",
+              "evidenceDescription": "Peer review outcome and reviewer are recorded."
+            }
+          }
+        ],
+        "teachingAssistant": [
+          {
+            "id": "ta-peer-review",
+            "title": "Complete peer support review",
+            "description": "Receive an approved peer review of learner-support work.",
+            "completion": {
+              "type": "manualReview",
+              "evidenceDescription": "Peer review outcome and reviewer are recorded."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "grandmaster",
+      "name": "Grandmaster",
+      "minimumSeasonPoints": 2500,
+      "promotionTasks": {
+        "teacher": [
+          {
+            "id": "teacher-mentor",
+            "title": "Mentor a teaching colleague",
+            "description": "Complete one documented mentoring cycle with an approved colleague.",
+            "completion": {
+              "type": "manualReview",
+              "evidenceDescription": "Mentoring completion is confirmed by the mentee or program owner."
+            }
+          }
+        ],
+        "teachingAssistant": [
+          {
+            "id": "ta-mentor",
+            "title": "Mentor a Teaching Assistant colleague",
+            "description": "Complete one documented mentoring cycle with an approved colleague.",
+            "completion": {
+              "type": "manualReview",
+              "evidenceDescription": "Mentoring completion is confirmed by the mentee or program owner."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "challenger",
+      "name": "Challenger",
+      "minimumSeasonPoints": 3200,
+      "promotionTasks": {
+        "teacher": [
+          {
+            "id": "teacher-program-contribution",
+            "title": "Contribute to teaching quality",
+            "description": "Complete one approved contribution to course quality or teaching practice.",
+            "completion": {
+              "type": "manualReview",
+              "evidenceDescription": "Contribution and its impact are reviewed by an authorized administrator."
+            }
+          }
+        ],
+        "teachingAssistant": [
+          {
+            "id": "ta-program-contribution",
+            "title": "Contribute to learner-support quality",
+            "description": "Complete one approved contribution to learner-support quality or practice.",
+            "completion": {
+              "type": "manualReview",
+              "evidenceDescription": "Contribution and its impact are reviewed by an authorized administrator."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

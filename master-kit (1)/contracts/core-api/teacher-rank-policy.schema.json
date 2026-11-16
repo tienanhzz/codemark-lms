@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/rank-policy.schema.json",
+  "title": "Student and Staff Rank Policy",
+  "description": "Two non-seasonal rank tracks derived from the user's current EXP balance.",
+  "type": "object",
+  "required": ["policyVersion", "tracks"],
+  "properties": {
+    "policyVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "tracks": {
+      "type": "object",
+      "required": ["student", "staff"],
+      "properties": {
+        "student": {
+          "$ref": "#/$defs/studentTrack"
+        },
+        "staff": {
+          "$ref": "#/$defs/staffTrack"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "studentTrack": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/studentTier"
+      }
+    },
+    "staffTrack": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/staffTier"
+      }
+    },
+    "studentTier": {
+      "type": "object",
+      "required": ["id", "name", "minimumExp"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimumExp": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "description": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "icon": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "staffTier": {
+      "type": "object",
+      "required": ["id", "name", "minimumExp", "promotionTasks"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimumExp": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "description": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "icon": {
+          "type": "string",
+          "minLength": 1
+        },
+        "promotionTasks": {
+          "type": "object",
+          "required": [
+            "teacher",
+            "teachingAssistant",
+            "admin",
+            "administrativeAssistant",
+            "researchAssistant"
+          ],
+          "properties": {
+            "teacher": {
+              "$ref": "#/$defs/taskList"
+            },
+            "teachingAssistant": {
+              "$ref": "#/$defs/taskList"
+            },
+            "admin": {
+              "$ref": "#/$defs/taskList"
+            },
+            "administrativeAssistant": {
+              "$ref": "#/$defs/taskList"
+            },
+            "researchAssistant": {
+              "$ref": "#/$defs/taskList"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "taskList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    },
+    "task": {
+      "type": "object",
+      "required": ["id", "title", "description", "completion"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "completion": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/metricCompletion"
+            },
+            {
+              "$ref": "#/$defs/manualReviewCompletion"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "metricCompletion": {
+      "type": "object",
+      "required": ["type", "metricKey", "operator", "target"],
+      "properties": {
+        "type": {
+          "const": "metric"
+        },
+        "metricKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operator": {
+          "enum": ["gte"]
+        },
+        "target": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "manualReviewCompletion": {
+      "type": "object",
+      "required": ["type", "evidenceDescription"],
+      "properties": {
+        "type": {
+          "const": "manualReview"
+        },
+        "evidenceDescription": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

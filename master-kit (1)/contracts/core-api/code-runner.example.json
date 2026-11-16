@@ -1,0 +1,20 @@
+{
+  "jobId": "run-2026-000042",
+  "idempotencyKey": "attempt-123-question-v1-revision-4",
+  "attemptId": "attempt-123",
+  "questionVersionId": "two-sum-v1",
+  "profileId": "java-21",
+  "profileVersion": 1,
+  "sourceFiles": [
+    {
+      "relativePath": "Main.java",
+      "content": "class Main { }"
+    }
+  ],
+  "testCaseSetId": "two-sum-tests-v1",
+  "limits": {
+    "wallTimeMs": 3000,
+    "cpuTimeMs": 2000,
+    "memoryBytes": 134217728
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "expectedTemplateVersion": 3,
+  "overrides": [
+    {
+      "ruleId": "attendance",
+      "action": "override",
+      "title": "Attendance and check-in",
+      "body": "Check in during the first ten minutes of each scheduled session."
+    },
+    {
+      "ruleId": "practice",
+      "action": "disable"
+    }
+  ],
+  "customRules": [
+    {
+      "ruleId": "lab-equipment",
+      "category": "classroomConduct",
+      "title": "Lab equipment",
+      "body": "Bring a laptop that can run the course-approved development tools.",
+      "position": 10
+    }
+  ]
+}

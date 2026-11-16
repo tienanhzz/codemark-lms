@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/code-runner.schema.json",
+  "title": "Isolated Code Runner Contract",
+  "description": "Internal job and result envelopes for execution in an isolated, approved runtime. Student callers cannot choose images, limits, libraries, or network policy.",
+  "oneOf": [
+    { "$ref": "#/$defs/job" },
+    { "$ref": "#/$defs/result" }
+  ],
+  "$defs": {
+    "job": {
+      "type": "object",
+      "required": ["jobId", "idempotencyKey", "profileId", "profileVersion", "sourceFiles", "testCaseSetId", "limits"],
+      "properties": {
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attemptId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "questionVersionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profileId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profileVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sourceFiles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/sourceFile"
+          }
+        },
+        "testCaseSetId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limits": {
+          "$ref": "#/$defs/limits"
+        }
+      },
+      "additionalProperties": false
+    },
+    "result": {
+      "type": "object",
+      "required": ["jobId", "status", "finishedAt"],
+      "properties": {
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": ["completed", "compileError", "runtimeError", "resourceLimit", "infrastructureFailure"]
+        },
+        "finishedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "testResults": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/testResult"
+          }
+        },
+        "resourceUsage": {
+          "type": "object",
+          "properties": {
+            "wallTimeMs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "cpuTimeMs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "peakMemoryBytes": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "sanitizedDiagnostic": {
+          "type": "string",
+          "maxLength": 4000
+        }
+      },
+      "additionalProperties": false
+    },
+    "sourceFile": {
+      "type": "object",
+      "required": ["relativePath", "content"],
+      "properties": {
+        "relativePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 1048576
+        }
+      },
+      "additionalProperties": false
+    },
+    "limits": {
+      "type": "object",
+      "required": ["wallTimeMs", "cpuTimeMs", "memoryBytes"],
+      "properties": {
+        "wallTimeMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cpuTimeMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "memoryBytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "testResult": {
+      "type": "object",
+      "required": ["testCaseId", "passed", "awardedPoints"],
+      "properties": {
+        "testCaseId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "awardedPoints": {
+          "type": "number",
+          "minimum": 0
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "feedback": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

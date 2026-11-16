@@ -1,0 +1,20 @@
+{
+  "rubricId": "essay-clarity-v1",
+  "version": 1,
+  "maximumPoints": 10,
+  "criteria": [
+    {
+      "criterionId": "thesis",
+      "title": "Clear thesis",
+      "description": "Presents a focused, relevant position.",
+      "points": 4,
+      "position": 1
+    },
+    {
+      "criterionId": "evidence",
+      "title": "Relevant evidence",
+      "points": 6,
+      "position": 2
+    }
+  ]
+}
