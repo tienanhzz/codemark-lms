@@ -114,7 +114,7 @@ with SessionLocal() as db:
         for message in audit_messages
     )
     assert all(
-        message.status == "pending" and message.attempts == 0 for message in messages
+        message.status == "pending" and message.attempts == 0 for message in audit_messages
     )
     assert (
         db.scalar(
