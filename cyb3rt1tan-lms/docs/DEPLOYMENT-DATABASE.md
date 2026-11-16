@@ -16,7 +16,9 @@ PostgreSQL 17 is authoritative. Local development uses the existing loopback ins
 
 PostgreSQL connections use pre-ping, recycle after 1800 seconds and a five-second connect timeout. Total connection capacity must account for every API instance/process and the server limit. SQL parameters are hidden, and database configuration repr excludes the URL.
 
-Production configuration requires a `postgresql+psycopg` URL with `sslmode=verify-full` and `sslrootcert`, explicit runtime credentials, HTTPS APP_ORIGIN and Secure cookies. Certificate validity is checked by the driver when connecting; no plaintext/TLS downgrade fallback exists. Production internal HTTP/service TLS, secret delivery/rotation, firewall/egress, storage encryption and release verification remain separate deployment gates.
+Production configuration requires a `postgresql+psycopg` URL with `sslmode=verify-full` and `sslrootcert`, explicit runtime credentials, HTTPS APP_ORIGIN, Secure cookies, a LOGIN_HMAC_KEY of at least 32 bytes, and at least one independent 32-byte MFA key. The legacy `MFA_ENCRYPTION_KEY` must be base64-encoded when used. A versioned `MFA_ENCRYPTION_KEYS` JSON map plus `MFA_ACTIVE_KEY_ID` encrypts new MFA secrets with a key ID; every key that still protects stored ciphertext must remain configured. Missing or malformed application keys fail startup without printing their values. Certificate validity is checked by the driver when connecting; no plaintext/TLS downgrade fallback exists. Production internal HTTP/service TLS, secret delivery/rotation, firewall/egress, storage encryption and release verification remain separate deployment gates.
+
+Versioned ciphertext uses AES-GCM with the key ID bound into authenticated additional data. Existing v1 ciphertext still requires `MFA_ENCRYPTION_KEY`; switching the active key does not re-encrypt existing rows. The guarded rewrap utility is implemented below, but must be run and its results reviewed. Retain old keys until the rewrap, verified zero-old-key inventory, and a separate recovery/rotation drill are accepted.
 
 ## Migration identity and privileges
 
@@ -55,5 +57,21 @@ The outbox is durable storage only at this stage. No Redis client, background di
 ```
 
 The upgrade helper only accepts the expected loopback `codemark_lms`, creates a private backup with the existing `.env` ACL **before** pg_dump writes, upgrades/checks Alembic, and verifies users/sessions/audit/courses row-count parity. Backup files stay ignored in `.local/backups`; local ACL protection is not encryption or a restore drill.
+
+## MFA key rewrap
+
+`api/scripts/rewrap-mfa-secrets.py` defaults to a read-only dry-run. From the API directory, with production settings and the full old/new keyring injected through the approved secret provider, first run:
+
+```powershell
+python scripts/rewrap-mfa-secrets.py
+```
+
+Review the aggregate readable/rewrap counts and confirm the backup and maintenance window independently. Immediately before apply, create and verify a restorable backup, then run:
+
+```powershell
+python scripts/rewrap-mfa-secrets.py --apply --confirm APPLY-MFA-KEY-REWRAP --backup-verified
+```
+
+The script requires `APP_ENV=production` and a versioned active key. It locks MFA rows, decrypts with configured old keys, encrypts under `MFA_ACTIVE_KEY_ID`, verifies each replacement, and commits changes plus one count-only audit/outbox event atomically. Any decryption, verification, or audit failure rolls the transaction back. Keep old keys configured until the rewrap and a separate recovery/rotation drill have been reviewed. The utility has not yet been run against production data.
 
 For tests, run `verify-postgres.py`, `verify-identity-postgres.py`, `verify-courses-postgres.py`, then `verify-persistence-postgres.py`. The first resets only the explicitly guarded `codemark_lms_test`; its migration URL is pinned to that same test target. Tests cover migration cycles/drift, rollback, concurrent outbox retries, immutability and payload-free operational access. No email or learner code runs.

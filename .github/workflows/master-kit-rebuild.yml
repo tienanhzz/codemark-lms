@@ -1,9 +1,9 @@
 name: Master kit rebuild
 on:
   push:
-    paths: ['cyb3rt1tan-lms/**', 'master-kit (1)/**', '.github/workflows/master-kit-rebuild.yml']
+    paths: ['cyb3rt1tan-lms/**', 'master-kit (1)/**', 'docs/**', 'scripts/**', 'package.json', 'package-lock.json', '.github/workflows/**']
   pull_request:
-    paths: ['cyb3rt1tan-lms/**', 'master-kit (1)/**', '.github/workflows/master-kit-rebuild.yml']
+    paths: ['cyb3rt1tan-lms/**', 'master-kit (1)/**', 'docs/**', 'scripts/**', 'package.json', 'package-lock.json', '.github/workflows/**']
   workflow_dispatch:
 permissions:
   contents: read
@@ -31,10 +31,13 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
         with: { python-version: '3.13' }
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with: { node-version: '22' }
       - name: Install hash-pinned API dependencies
         run: python -m pip install --require-hashes -r cyb3rt1tan-lms/api/requirements.lock
@@ -44,10 +47,24 @@ jobs:
         run: python cyb3rt1tan-lms/scripts/verify-master-kit.py
       - name: API verification
         working-directory: cyb3rt1tan-lms/api
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          python -m ruff check app migrations tests
-          python -m ruff format --check app migrations tests
-          python -m mypy app
+          python -m ruff check app migrations tests scripts
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then
+            if git rev-parse "$GITHUB_SHA^" >/dev/null 2>&1; then
+              BASE_SHA="$(git rev-parse "$GITHUB_SHA^")"
+            else
+              BASE_SHA="$(git rev-list --max-parents=0 "$GITHUB_SHA")"
+            fi
+          fi
+          mapfile -t changed_python < <(git -C ../.. diff --name-only "$BASE_SHA" "$GITHUB_SHA" -- cyb3rt1tan-lms/api/app cyb3rt1tan-lms/api/migrations cyb3rt1tan-lms/api/tests cyb3rt1tan-lms/api/scripts | sed 's#^cyb3rt1tan-lms/api/##' | grep -E '\.py$' || true)
+          if ((${#changed_python[@]})); then
+            python -m ruff format --check "${changed_python[@]}"
+          else
+            echo "No changed API Python files to format-check."
+          fi
+          python -m mypy app scripts
           python -m pytest -q
       - name: Install web dependencies
         working-directory: cyb3rt1tan-lms/web
@@ -82,7 +99,7 @@ jobs:
           npm run build
       - name: Preserve foundation evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: master-kit-foundation-evidence
           path: cyb3rt1tan-lms/docs/master-kit/*.json

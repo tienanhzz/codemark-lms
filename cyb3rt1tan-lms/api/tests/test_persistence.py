@@ -48,6 +48,8 @@ def test_production_rejects_tls_cookie_origin_and_unbounded_pool_configuration(c
         "DATABASE_URL": "postgresql+psycopg://user:private-password@db/lms?sslmode=verify-full&sslrootcert=/approved/ca.pem",
         "APP_ORIGIN": "https://lms.example.test",
         "COOKIE_SECURE": "true",
+        "LOGIN_HMAC_KEY": "unit-test-login-hmac-key-at-least-32-bytes",
+        "MFA_ENCRYPTION_KEY": "dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHQ=",
         **change,
     }
     with pytest.raises(ValueError) as error:
@@ -89,6 +91,8 @@ def test_migration_target_cannot_cross_database_even_in_local_mode(monkeypatch):
                 "DATABASE_URL": "postgresql+psycopg://runtime:private@localhost/lms?sslmode=verify-full&sslrootcert=/ca",
                 "APP_ORIGIN": "https://lms.example.test",
                 "COOKIE_SECURE": "true",
+                "LOGIN_HMAC_KEY": "unit-test-login-hmac-key-at-least-32-bytes",
+                "MFA_ENCRYPTION_KEY": "dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHQ=",
             }
         ),
     )

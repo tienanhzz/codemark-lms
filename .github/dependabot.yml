@@ -1,0 +1,58 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns:
+          - '*'
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm-root:
+        patterns:
+          - '*'
+  - package-ecosystem: npm
+    directory: /codemark-lms
+    schedule:
+      interval: weekly
+    groups:
+      npm-codemark:
+        patterns:
+          - '*'
+  - package-ecosystem: npm
+    directory: /cyb3rt1tan-lms/web
+    schedule:
+      interval: weekly
+    groups:
+      npm-master:
+        patterns:
+          - '*'
+  - package-ecosystem: maven
+    directory: /backend
+    schedule:
+      interval: weekly
+    groups:
+      maven-root:
+        patterns:
+          - '*'
+  - package-ecosystem: maven
+    directory: /codemark-lms/backend
+    schedule:
+      interval: weekly
+    groups:
+      maven-codemark:
+        patterns:
+          - '*'
+  - package-ecosystem: pip
+    directory: /cyb3rt1tan-lms/api
+    schedule:
+      interval: weekly
+    groups:
+      python-api:
+        patterns:
+          - '*'

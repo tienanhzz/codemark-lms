@@ -13,16 +13,14 @@ from fastapi import HTTPException
 from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 
+from .configuration import MfaKeySettings, mfa_key_settings
 from .models import MfaChallenge, MfaMethod, MfaPolicy, RecoveryCode, User, now
 from .security import digest, utc
 
 
-def cipher() -> AESGCM:
+def key_settings() -> MfaKeySettings:
     try:
-        key = base64.b64decode(os.environ.get("MFA_ENCRYPTION_KEY", ""), validate=True)
-        if len(key) != 32:
-            raise ValueError("Invalid key length")
-        return AESGCM(key)
+        return mfa_key_settings(os.environ)
     except (ValueError, TypeError):
         raise HTTPException(503, "mfa_not_configured") from None
 
@@ -34,16 +32,46 @@ def required(db: Session, user: User) -> bool:
     )
 
 
-def secret(method: MfaMethod) -> str:
+def decrypt_secret(user_id: str, encrypted: str) -> str:
     try:
-        payload = base64.b64decode(method.encrypted_secret, validate=True)
-        return (
-            cipher()
-            .decrypt(payload[:12], payload[12:], f"codemark:mfa:v1:{method.user_id}".encode())
-            .decode()
-        )
-    except (ValueError, InvalidTag):
+        settings = key_settings()
+        if encrypted.startswith("v2."):
+            _, key_id, encoded = encrypted.split(".", 2)
+            key = settings.keys[key_id]
+            payload = base64.b64decode(encoded, validate=True)
+            aad = f"codemark:mfa:v2:{key_id}:{user_id}".encode()
+        else:
+            if settings.legacy_key is None:
+                raise ValueError("Legacy MFA key is not configured.")
+            key = settings.legacy_key
+            payload = base64.b64decode(encrypted, validate=True)
+            aad = f"codemark:mfa:v1:{user_id}".encode()
+        return AESGCM(key).decrypt(payload[:12], payload[12:], aad).decode()
+    except (ValueError, KeyError, InvalidTag):
         raise HTTPException(503, "mfa_key_unavailable") from None
+
+
+def secret(method: MfaMethod) -> str:
+    return decrypt_secret(method.user_id, method.encrypted_secret)
+
+
+def encrypt_secret(user_id: str, value: str) -> str:
+    settings = key_settings()
+    if settings.active_id is None:
+        if settings.legacy_key is None:
+            raise HTTPException(503, "mfa_not_configured")
+        nonce = secrets.token_bytes(12)
+        payload = nonce + AESGCM(settings.legacy_key).encrypt(
+            nonce, value.encode(), f"codemark:mfa:v1:{user_id}".encode()
+        )
+        return base64.b64encode(payload).decode()
+
+    key_id = settings.active_id
+    nonce = secrets.token_bytes(12)
+    payload = nonce + AESGCM(settings.keys[key_id]).encrypt(
+        nonce, value.encode(), f"codemark:mfa:v2:{key_id}:{user_id}".encode()
+    )
+    return f"v2.{key_id}." + base64.b64encode(payload).decode()
 
 
 def begin(db: Session, user: User) -> dict[str, str]:
@@ -51,10 +79,7 @@ def begin(db: Session, user: User) -> dict[str, str]:
     if existing and existing.confirmed:
         raise HTTPException(409, "mfa_already_enabled")
     seed = pyotp.random_base32()
-    nonce = secrets.token_bytes(12)
-    encrypted = base64.b64encode(
-        nonce + cipher().encrypt(nonce, seed.encode(), f"codemark:mfa:v1:{user.id}".encode())
-    ).decode()
+    encrypted = encrypt_secret(user.id, seed)
     expires = now() + timedelta(minutes=10)
     if existing:
         existing.encrypted_secret = encrypted
