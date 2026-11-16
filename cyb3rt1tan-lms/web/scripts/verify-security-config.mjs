@@ -9,12 +9,26 @@ async function contentSecurityPolicy(environment) {
     .find((header) => header.key === 'Content-Security-Policy')?.value;
 }
 
+async function securityHeaders(environment) {
+  process.env.NODE_ENV = environment;
+  const { default: config } = await import(`../next.config.mjs?headers=${environment}`);
+  const rules = await config.headers();
+  return rules.flatMap((rule) => rule.headers);
+}
+
 const production = await contentSecurityPolicy('production');
 assert.ok(production, 'production CSP must be configured');
 assert.match(production, /connect-src 'self'/);
 assert.doesNotMatch(production, /127\.0\.0\.1|localhost|ws:\/\//);
 assert.match(production, /frame-ancestors 'none'/);
 assert.match(production, /object-src 'none'/);
+const productionHeaders = await securityHeaders('production');
+assert.equal(
+  productionHeaders.find((header) => header.key === 'Strict-Transport-Security')?.value,
+  'max-age=31536000',
+  'production responses must advertise one year of HSTS',
+);
+assert.ok(productionHeaders.some((header) => header.key === 'X-Content-Type-Options' && header.value === 'nosniff'));
 
 const development = await contentSecurityPolicy('development');
 assert.ok(development, 'development CSP must be configured');
