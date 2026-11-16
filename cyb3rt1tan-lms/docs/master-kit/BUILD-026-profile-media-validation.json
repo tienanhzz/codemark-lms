@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-11-15T10:08:18.278340+00:00",
+  "result": "pass",
+  "database": "codemark_lms_test",
+  "mainDatabaseMutations": false,
+  "realSMTP": false,
+  "concurrentAvatarStatuses": [
+    200,
+    409
+  ],
+  "supportAllowlistReasonRevision": true,
+  "privateSanitizedPNG": true,
+  "emailPrivacy": true,
+  "coursePhotoReauthorization": true,
+  "hiddenCoursesExcluded": true,
+  "atomicAuditOutbox": true,
+  "browserVisualQA": false
+}

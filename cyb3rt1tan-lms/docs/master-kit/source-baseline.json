@@ -1,0 +1,292 @@
+{
+  "execution": "local-master-kit-2026-11-14",
+  "capturedAt": "2026-11-15T11:12:33.679104+00:00",
+  "source": "master-kit (1)",
+  "files": [
+    {
+      "path": "adr/ADR-0001-modular-monorepo-and-contract-first.md",
+      "sha256": "331b0ea855d3d2441ba98b2722c09e24cac7f08c08f48d7b6ba2b7502da8b900",
+      "bytes": 689
+    },
+    {
+      "path": "adr/ADR-0002-redis-for-jobs-realtime-and-ephemeral-state.md",
+      "sha256": "cd3c784d44e4f2aac347976e997e280749bbd364fcdd0571ceabac5fe41740b5",
+      "bytes": 3696
+    },
+    {
+      "path": "adr/ADR-0003-configurable-teacher-and-ta-ranks.md",
+      "sha256": "5c67989ae136f1a531f1f2a3fe10c4c96bf077b75db60948a003bc54f89c940f",
+      "bytes": 2679
+    },
+    {
+      "path": "adr/ADR-0004-learning-content-tags-and-assignment-filters.md",
+      "sha256": "56fae7172dab7da00f12988e8021b2e0fe2f716a657056f4923b683746ac5982",
+      "bytes": 3753
+    },
+    {
+      "path": "adr/ADR-0005-python-backend-and-ui-stack.md",
+      "sha256": "d81b1226f81a384de1b00879c55e5769e0032f9dc119ee19a88734aed24e247e",
+      "bytes": 5086
+    },
+    {
+      "path": "adr/ADR-0006-offline-dependencies-and-opaque-resource-references.md",
+      "sha256": "5802b0ec6378f6e84e57cae91bc5fd9e49c2738280dfd908669557c401973490",
+      "bytes": 3057
+    },
+    {
+      "path": "adr/ADR-0007-postgresql-and-private-object-storage.md",
+      "sha256": "390cc1c083e9b4b8c4c288fd6fb31a9a9bd9acace0f3c12d77ce9ee15bee0f59",
+      "bytes": 3308
+    },
+    {
+      "path": "adr/ADR-0008-gvisor-code-runner-isolation.md",
+      "sha256": "bc9d2d91889e6a4644c9dc1bdd555c939fff8af33b6c9ad96afd9f5d25f0d827",
+      "bytes": 7283
+    },
+    {
+      "path": "adr/ADR-0009-redis-streams-runner-job-queue.md",
+      "sha256": "467ef08331d9c4fdda8a2e04018f09fbc2bd722c2bf0c77d959d37a1dce4f384",
+      "bytes": 7708
+    },
+    {
+      "path": "adr/ADR-0010-local-trusted-source-autograder.md",
+      "sha256": "353393fa89b90ccce55bdb6a434c9d92e08c380281104df775cc7eed3fe058bb",
+      "bytes": 4484
+    },
+    {
+      "path": "ARCHITECTURE.md",
+      "sha256": "39011f9902882436b4131ab4a6d295e327e4d81d034a9986ba141cbe83a61a67",
+      "bytes": 8159
+    },
+    {
+      "path": "BUILDING_PROCESS.md",
+      "sha256": "7f84922c0104cabcde97c1429d1eea670ea4afca88cbe092ef223b2b76246f31",
+      "bytes": 75772
+    },
+    {
+      "path": "CODING_CONVENTIONS.md",
+      "sha256": "edcd5d37232b300271778efc5c635b07067577b160efc8044e740804771d2ffb",
+      "bytes": 10739
+    },
+    {
+      "path": "contracts/core-api/access-policy.example.json",
+      "sha256": "0a2fe7728fc04322b271ddfbffbac5c99dd40102cc71ed0a71fb250de1f8c80b",
+      "bytes": 1353
+    },
+    {
+      "path": "contracts/core-api/access-policy.schema.json",
+      "sha256": "a5d980fd949778557a955662990acc86873fffd8b974ce14256e0a21073b88c6",
+      "bytes": 2168
+    },
+    {
+      "path": "contracts/core-api/API_CONTRACTS.md",
+      "sha256": "00f572295a4def7adcbf2d266f1d52d57419bc8328b9e204adfba6a3419c9a07",
+      "bytes": 48213
+    },
+    {
+      "path": "contracts/core-api/assessment-version.example.json",
+      "sha256": "6cd91d916b7becb905841655a9b088860060ab65ec1b89df4716a539757d3d3e",
+      "bytes": 1120
+    },
+    {
+      "path": "contracts/core-api/assessment-version.schema.json",
+      "sha256": "57115445a671587c13ae5e4451c25b89c2ca160aa1e7da75a9befbe895632a1d",
+      "bytes": 5562
+    },
+    {
+      "path": "contracts/core-api/code-runner.example.json",
+      "sha256": "eb4b016bb30daf3a4a5b260173223dea10c1f7f87ffa1eaed35b573b329b1e57",
+      "bytes": 446
+    },
+    {
+      "path": "contracts/core-api/code-runner.schema.json",
+      "sha256": "ee324224f810daf7f953be8e961bc9e5db37187dbc147213f59c23c27e53d0dd",
+      "bytes": 4114
+    },
+    {
+      "path": "contracts/core-api/coding-assignment.example.json",
+      "sha256": "d0fd0da4f2ff49c6075d39777b8289e580774ebb0681bbc8d4eadef9ccba0346",
+      "bytes": 355
+    },
+    {
+      "path": "contracts/core-api/coding-assignment.schema.json",
+      "sha256": "6dcececbdfd8b662a4e5e5b7178d7c078c3a2dbc07a47b8e24334321bc33a945",
+      "bytes": 2282
+    },
+    {
+      "path": "contracts/core-api/coding-question.example.json",
+      "sha256": "a30c536576a8354a2350fa4ad8bbebfb93a5c7dc82352762fed96dde8d44cfbd",
+      "bytes": 401
+    },
+    {
+      "path": "contracts/core-api/coding-question.schema.json",
+      "sha256": "a08c4f2c23c0c804cd19aa3a258c3ae20a35552c0d1174fda3800510f698f50b",
+      "bytes": 1687
+    },
+    {
+      "path": "contracts/core-api/course-rule-overrides.example.json",
+      "sha256": "b8937a688e77531dd7b59f0b4c43210324412dd74056ad231b5f968dc951bf78",
+      "bytes": 561
+    },
+    {
+      "path": "contracts/core-api/course-rule-overrides.schema.json",
+      "sha256": "3766f9b98bad4f3c445f63b5d5d12dc78de01ba5dd058f0b2121168ca7b7f2aa",
+      "bytes": 2166
+    },
+    {
+      "path": "contracts/core-api/course-rule-template.example.json",
+      "sha256": "080580a02c75cdea418af0033eab0a39e62cda3c36e324d3923e6a831666573b",
+      "bytes": 1437
+    },
+    {
+      "path": "contracts/core-api/course-rule-template.schema.json",
+      "sha256": "a740b10bd69850c69fedce807a8bfc284f7f77380c06c1627e02c705c13a4d00",
+      "bytes": 1193
+    },
+    {
+      "path": "contracts/core-api/data-model.md",
+      "sha256": "2d59929dfceacda8dc80d4ffd8338b86114e379fe382eee483415e3c0fe23a37",
+      "bytes": 44481
+    },
+    {
+      "path": "contracts/core-api/grading-record.example.json",
+      "sha256": "6d79c21d010d4900cb6674814be6befbbb9118f0bf8134f114f4619f0acf3d32",
+      "bytes": 662
+    },
+    {
+      "path": "contracts/core-api/grading-record.schema.json",
+      "sha256": "276f5152039a760553fde08fcc9991aa4eb164d953936bf019123473ca7b1c50",
+      "bytes": 2714
+    },
+    {
+      "path": "contracts/core-api/learning-taxonomy.example.json",
+      "sha256": "737113b508997a3fa005e838e016c6594c59da6a6ee83f7a413af31b0b32d481",
+      "bytes": 21845
+    },
+    {
+      "path": "contracts/core-api/learning-taxonomy.schema.json",
+      "sha256": "40e20fab5bb911113d3e4de1faa317637c7002ce1a66e2e0ad30a47247b1a296",
+      "bytes": 2541
+    },
+    {
+      "path": "contracts/core-api/lesson.example.json",
+      "sha256": "d716f075a14f084654b28a8449657bf48eca7ae5986fa35910d1e8dcee8ac48f",
+      "bytes": 219
+    },
+    {
+      "path": "contracts/core-api/lesson.schema.json",
+      "sha256": "b4cc7281ef4e576593cae9241b5ac92932e139d86057da92fd3bd7a4675bdde5",
+      "bytes": 981
+    },
+    {
+      "path": "contracts/core-api/openapi.yaml",
+      "sha256": "c1e881c1ef9a6f64cfa7d2d3b674689d673fc430d6af75f09a57a494155e94a4",
+      "bytes": 273629
+    },
+    {
+      "path": "contracts/core-api/platform-branding.example.json",
+      "sha256": "56451284aa868e26fdc9e63b1880c6f93fa305763ea77e8c6da2e23eea83c083",
+      "bytes": 193
+    },
+    {
+      "path": "contracts/core-api/platform-branding.schema.json",
+      "sha256": "f3470e1cf77809d0e891d937c93ba59ca5b0c487cd5f6cbd15c0a10a19b78b44",
+      "bytes": 596
+    },
+    {
+      "path": "contracts/core-api/project-state.schema.json",
+      "sha256": "05725071e3be845583544254285c3bd09c413acc395f175491c4ae9d823a2b43",
+      "bytes": 746
+    },
+    {
+      "path": "contracts/core-api/question-authoring-config.example.json",
+      "sha256": "7e984b1dbdb79fb03fc772a961a7a2db02e8482637366a92a8c70f64d44377e8",
+      "bytes": 1461
+    },
+    {
+      "path": "contracts/core-api/question-authoring-config.schema.json",
+      "sha256": "c3d8db4c3a9727b1c112f311299af4a8f636301f9e27814137dd7df42bd4a4ae",
+      "bytes": 13784
+    },
+    {
+      "path": "contracts/core-api/question-content.schema.json",
+      "sha256": "96930ac80a09584da3d4d20009faa9ac58a33230c586ecf43a6b4a4ce2be5e3d",
+      "bytes": 6556
+    },
+    {
+      "path": "contracts/core-api/question-version.example.json",
+      "sha256": "1ce64dc6c993a8c858403e9258892916d9bab2686f2bcf9ea080dea75dade01c",
+      "bytes": 1795
+    },
+    {
+      "path": "contracts/core-api/question-version.schema.json",
+      "sha256": "86d31489a3b9b2b1886fff64463f5460c1f3e315fc8659dbffd2b0cfc255bbe7",
+      "bytes": 6962
+    },
+    {
+      "path": "contracts/core-api/runtime-profile.example.json",
+      "sha256": "c0b346f92d72a95199d107a99b3106c179ebc6715cd9bc959cc4c0028a2db903",
+      "bytes": 627
+    },
+    {
+      "path": "contracts/core-api/runtime-profile.schema.json",
+      "sha256": "2bbfe56fc98335f8fb6396fb11c6f1c5d5ede6941a6e95a07d74d57e2ac49c19",
+      "bytes": 2581
+    },
+    {
+      "path": "contracts/core-api/teacher-rank-policy.example.json",
+      "sha256": "92f99beb5a1a1d9cb9d68f6af4cdf323e062bd10d6727bc7bdd797a21dbe97f4",
+      "bytes": 4097
+    },
+    {
+      "path": "contracts/core-api/teacher-rank-policy.schema.json",
+      "sha256": "cdc18baaace4f0eaa1b2c00cebb1fa53ede9483479e3466161d0a4df3d6b61e9",
+      "bytes": 4776
+    },
+    {
+      "path": "contracts/core-api/user-preferences.example.json",
+      "sha256": "edacdc0dfb8aa8334e1c32b0e14c478e214ee6037bcb6532fa052b2b9d0251fe",
+      "bytes": 77
+    },
+    {
+      "path": "contracts/core-api/user-preferences.schema.json",
+      "sha256": "7dac69c14e47b6bc3212133fcbbe1ea09d006fb1b02ce20209b70ee67ab6cf80",
+      "bytes": 1450
+    },
+    {
+      "path": "contracts/core-api/writing-rubric.example.json",
+      "sha256": "b8772897ac83cad984faa20fb981a71b3daa6f41fd8604587121f8f623950892",
+      "bytes": 394
+    },
+    {
+      "path": "contracts/core-api/writing-rubric.schema.json",
+      "sha256": "091678d3b7454f79e6bce83e200cc78edf2a28a7e4902287077f228dfc26d3b9",
+      "bytes": 1455
+    },
+    {
+      "path": "DECISIONS.md",
+      "sha256": "83cddca3c1d38ce3524dfafe857af1c92814f61351ff5f186999938e26ae2992",
+      "bytes": 5124
+    },
+    {
+      "path": "DESIGN_SYSTEM_PROPOSAL.md",
+      "sha256": "072afee9f55b02dca9ba7e79ce9610e3a478f67ea954387af7d3afb84775c4e8",
+      "bytes": 7678
+    },
+    {
+      "path": "PRODUCT_REQUIREMENTS.md",
+      "sha256": "f5f8d5f00ef7140d9b1478dd90da599ea7d5b6fb04155e4ce38afa3fb8c64d48",
+      "bytes": 40622
+    },
+    {
+      "path": "ROADMAP.md",
+      "sha256": "1069e85eb342af08bd05ecc1543f82f9441e1bd53e7060b5f44c1c31a82bbdee",
+      "bytes": 2488
+    },
+    {
+      "path": "SECURITY_STANDARDS.md",
+      "sha256": "7acc14e1e262821aa222c154965decff6de8674f496162259870cbb8dc1274ac",
+      "bytes": 10669
+    }
+  ]
+}

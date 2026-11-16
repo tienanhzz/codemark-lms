@@ -1,0 +1,44 @@
+{
+  "buildId": "BUILD-002",
+  "checkedAt": "2026-11-14T19:36:24.870656+00:00",
+  "purpose": "Development/build dependency review only; no runtime external calls enabled.",
+  "python": {
+    "status": "pass",
+    "exitCode": 0,
+    "packagesReported": 58,
+    "vulnerabilityRecords": 0,
+    "skipped": [],
+    "source": "pip-audit 2.10.1 / PyPI advisory feed",
+    "report": "python-audit.json"
+  },
+  "node": {
+    "status": "pass",
+    "exitCode": 0,
+    "scope": "runtime (--omit=dev)",
+    "counts": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "source": "npm registry audit feed",
+    "report": "node-runtime-audit.json"
+  },
+  "nodeAll": {
+    "status": "pass",
+    "exitCode": 0,
+    "scope": "runtime and development",
+    "counts": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "report": "node-all-audit.json"
+  },
+  "releaseAcceptance": "pending: feed results do not establish production security, license approval or runtime egress"
+}

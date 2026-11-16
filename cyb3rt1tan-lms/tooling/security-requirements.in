@@ -1,0 +1,4 @@
+# Build-only vulnerability scanner. Never imported by API or web runtime.
+pip-audit==2.10.1
+# Already used by pip-audit; enable its local CycloneDX JSON schema validator.
+cyclonedx-python-lib[json-validation]==11.12.0

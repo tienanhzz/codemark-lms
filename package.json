@@ -9,7 +9,12 @@
     "seed:rank": "node scripts/seed-rank.mjs",
     "seed:teachers": "node scripts/seed-teachers.mjs",
     "test:backend": "node scripts/maven.mjs test",
-    "build:backend": "node scripts/maven.mjs package"
+    "build:backend": "node scripts/maven.mjs package",
+    "dev:master": "node cyb3rt1tan-lms/scripts/dev.mjs",
+    "build:master": "npm run build --prefix cyb3rt1tan-lms/web",
+    "typecheck:master": "npm run typecheck --prefix cyb3rt1tan-lms/web"
   },
-  "workspaces": ["frontend"]
+  "workspaces": [
+    "frontend"
+  ]
 }

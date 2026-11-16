@@ -1,0 +1,26 @@
+{
+  "buildId": "BUILD-001",
+  "execution": "local-master-kit-2026-11-14",
+  "checkedAt": "2026-11-15T11:12:33.679104+00:00",
+  "result": "pass",
+  "localLinksChecked": 24,
+  "readmeRoutesChecked": [
+    "/",
+    "/academic-catalogs",
+    "/accept-invitation#token=…",
+    "/accounts",
+    "/activity",
+    "/course-rules",
+    "/courses",
+    "/forgot-password",
+    "/imports",
+    "/mfa-policy",
+    "/operations",
+    "/profile",
+    "/reset-password#token=…",
+    "/security",
+    "/settings",
+    "/v1"
+  ],
+  "runtimeOrBrowserVerification": false
+}

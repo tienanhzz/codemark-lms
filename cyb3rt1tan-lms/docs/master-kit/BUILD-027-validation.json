@@ -1,0 +1,37 @@
+{
+  "build": "BUILD-027",
+  "status": "done-local-functional-scope",
+  "date": "2026-11-15",
+  "migrationHead": "0010_course_academic_records",
+  "mainDatabase": {
+    "name": "codemark_lms",
+    "backupCreatedBeforeUpgrade": true,
+    "rowCountParity": ["users", "sessions", "audit_events", "courses"],
+    "reseeding": false
+  },
+  "validation": {
+    "apiTestsPassed": 98,
+    "webTestsPassed": 46,
+    "ruff": "passed",
+    "typescript": "passed",
+    "productionBuild": "passed",
+    "postgresMigrationCycle": "passed",
+    "postgresCourseWorkflow": "passed",
+    "postgresSchemaDrift": "passed",
+    "contract": {
+      "paths": 172,
+      "operations": 199,
+      "schemas": 19,
+      "examples": 17,
+      "sourceDocuments": 57
+    },
+    "http": {
+      "workspaceRoutes": 54,
+      "foundationRoutes": 15,
+      "authenticationBoundary": "passed",
+      "securityHeaders": "passed"
+    }
+  },
+  "browserVisualKeyboardMobileQa": "pending",
+  "knownNonBlockingWarning": "Starlette TestClient reports httpx deprecation"
+}

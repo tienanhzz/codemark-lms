@@ -1,0 +1,1072 @@
+{
+  "catalogVersion": 1,
+  "categories": [
+    {
+      "id": "programming-fundamentals",
+      "name": {
+        "en": "Programming Fundamentals",
+        "vi": "Lập trình cơ bản"
+      },
+      "parentId": null,
+      "status": "active",
+      "sortOrder": 10
+    },
+    {
+      "id": "software-design",
+      "name": {
+        "en": "Software Design",
+        "vi": "Thiết kế phần mềm"
+      },
+      "parentId": null,
+      "status": "active",
+      "sortOrder": 20
+    },
+    {
+      "id": "data-structures-algorithms",
+      "name": {
+        "en": "Data Structures and Algorithms",
+        "vi": "Cấu trúc dữ liệu và giải thuật"
+      },
+      "parentId": null,
+      "status": "active",
+      "sortOrder": 30
+    },
+    {
+      "id": "databases-backend",
+      "name": {
+        "en": "Databases and Backend",
+        "vi": "Cơ sở dữ liệu và backend"
+      },
+      "parentId": null,
+      "status": "active",
+      "sortOrder": 40
+    },
+    {
+      "id": "testing-quality",
+      "name": {
+        "en": "Testing and Quality",
+        "vi": "Kiểm thử và chất lượng"
+      },
+      "parentId": null,
+      "status": "active",
+      "sortOrder": 50
+    },
+    {
+      "id": "mathematics",
+      "name": {
+        "en": "Mathematics",
+        "vi": "Toán học"
+      },
+      "parentId": null,
+      "status": "active",
+      "sortOrder": 60
+    }
+  ],
+  "tags": [
+    {
+      "id": "variables-data-types",
+      "name": {
+        "en": "Variables and Data Types",
+        "vi": "Biến và kiểu dữ liệu"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "operators-expressions",
+      "name": {
+        "en": "Operators and Expressions",
+        "vi": "Toán tử và biểu thức"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 20,
+      "selectable": true
+    },
+    {
+      "id": "input-output",
+      "name": {
+        "en": "Input and Output",
+        "vi": "Nhập và xuất dữ liệu"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 30,
+      "selectable": true
+    },
+    {
+      "id": "conditionals",
+      "name": {
+        "en": "Conditionals",
+        "vi": "Câu lệnh điều kiện"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 40,
+      "selectable": true
+    },
+    {
+      "id": "loops",
+      "name": {
+        "en": "Loops",
+        "vi": "Vòng lặp"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 50,
+      "selectable": true
+    },
+    {
+      "id": "nested-loops",
+      "name": {
+        "en": "Nested Loops",
+        "vi": "Vòng lặp lồng nhau"
+      },
+      "parentId": "loops",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "arrays",
+      "name": {
+        "en": "Arrays",
+        "vi": "Mảng"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 60,
+      "selectable": true
+    },
+    {
+      "id": "multidimensional-arrays",
+      "name": {
+        "en": "Multidimensional Arrays",
+        "vi": "Mảng nhiều chiều"
+      },
+      "parentId": "arrays",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "strings",
+      "name": {
+        "en": "Strings",
+        "vi": "Chuỗi"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 70,
+      "selectable": true
+    },
+    {
+      "id": "functions",
+      "name": {
+        "en": "Functions",
+        "vi": "Hàm"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 80,
+      "selectable": true
+    },
+    {
+      "id": "recursion",
+      "name": {
+        "en": "Recursion",
+        "vi": "Đệ quy"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 90,
+      "selectable": true
+    },
+    {
+      "id": "scope-lifetime",
+      "name": {
+        "en": "Scope and Lifetime",
+        "vi": "Phạm vi và vòng đời biến"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 100,
+      "selectable": true
+    },
+    {
+      "id": "pointers-references",
+      "name": {
+        "en": "Pointers and References",
+        "vi": "Con trỏ và tham chiếu"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 110,
+      "selectable": true
+    },
+    {
+      "id": "error-handling",
+      "name": {
+        "en": "Error Handling",
+        "vi": "Xử lý lỗi"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 120,
+      "selectable": true
+    },
+    {
+      "id": "file-io",
+      "name": {
+        "en": "File I/O",
+        "vi": "Đọc ghi tệp"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 130,
+      "selectable": true
+    },
+    {
+      "id": "object-oriented-programming",
+      "name": {
+        "en": "Object-Oriented Programming",
+        "vi": "Lập trình hướng đối tượng"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "classes-objects",
+      "name": {
+        "en": "Classes and Objects",
+        "vi": "Lớp và đối tượng"
+      },
+      "parentId": "object-oriented-programming",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "encapsulation",
+      "name": {
+        "en": "Encapsulation",
+        "vi": "Tính đóng gói"
+      },
+      "parentId": "object-oriented-programming",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 20,
+      "selectable": true
+    },
+    {
+      "id": "inheritance",
+      "name": {
+        "en": "Inheritance",
+        "vi": "Tính kế thừa"
+      },
+      "parentId": "object-oriented-programming",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 30,
+      "selectable": true
+    },
+    {
+      "id": "polymorphism",
+      "name": {
+        "en": "Polymorphism",
+        "vi": "Tính đa hình"
+      },
+      "parentId": "object-oriented-programming",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 40,
+      "selectable": true
+    },
+    {
+      "id": "abstraction",
+      "name": {
+        "en": "Abstraction",
+        "vi": "Tính trừu tượng"
+      },
+      "parentId": "object-oriented-programming",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 50,
+      "selectable": true
+    },
+    {
+      "id": "interfaces",
+      "name": {
+        "en": "Interfaces",
+        "vi": "Giao diện"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 20,
+      "selectable": true
+    },
+    {
+      "id": "design-patterns",
+      "name": {
+        "en": "Design Patterns",
+        "vi": "Mẫu thiết kế"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 30,
+      "selectable": true
+    },
+    {
+      "id": "clean-code-refactoring",
+      "name": {
+        "en": "Clean Code and Refactoring",
+        "vi": "Mã sạch và tái cấu trúc"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 40,
+      "selectable": true
+    },
+    {
+      "id": "complexity-analysis",
+      "name": {
+        "en": "Complexity Analysis",
+        "vi": "Phân tích độ phức tạp"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "searching",
+      "name": {
+        "en": "Searching",
+        "vi": "Tìm kiếm"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 20,
+      "selectable": true
+    },
+    {
+      "id": "sorting",
+      "name": {
+        "en": "Sorting",
+        "vi": "Sắp xếp"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 30,
+      "selectable": true
+    },
+    {
+      "id": "linked-lists",
+      "name": {
+        "en": "Linked Lists",
+        "vi": "Danh sách liên kết"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 40,
+      "selectable": true
+    },
+    {
+      "id": "stacks",
+      "name": {
+        "en": "Stacks",
+        "vi": "Ngăn xếp"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 50,
+      "selectable": true
+    },
+    {
+      "id": "queues",
+      "name": {
+        "en": "Queues",
+        "vi": "Hàng đợi"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 60,
+      "selectable": true
+    },
+    {
+      "id": "hash-maps-sets",
+      "name": {
+        "en": "Hash Maps and Sets",
+        "vi": "Bảng băm và tập hợp"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 70,
+      "selectable": true
+    },
+    {
+      "id": "trees",
+      "name": {
+        "en": "Trees",
+        "vi": "Cây"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 80,
+      "selectable": true
+    },
+    {
+      "id": "binary-search-trees",
+      "name": {
+        "en": "Binary Search Trees",
+        "vi": "Cây tìm kiếm nhị phân"
+      },
+      "parentId": "trees",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "heaps-priority-queues",
+      "name": {
+        "en": "Heaps and Priority Queues",
+        "vi": "Heap và hàng đợi ưu tiên"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 90,
+      "selectable": true
+    },
+    {
+      "id": "graphs",
+      "name": {
+        "en": "Graphs",
+        "vi": "Đồ thị"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 100,
+      "selectable": true
+    },
+    {
+      "id": "tries",
+      "name": {
+        "en": "Tries",
+        "vi": "Cây tiền tố"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 110,
+      "selectable": true
+    },
+    {
+      "id": "union-find",
+      "name": {
+        "en": "Union-Find",
+        "vi": "Cấu trúc hợp nhất tập hợp"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 120,
+      "selectable": true
+    },
+    {
+      "id": "two-pointers",
+      "name": {
+        "en": "Two Pointers",
+        "vi": "Hai con trỏ"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 130,
+      "selectable": true
+    },
+    {
+      "id": "sliding-window",
+      "name": {
+        "en": "Sliding Window",
+        "vi": "Cửa sổ trượt"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 140,
+      "selectable": true
+    },
+    {
+      "id": "prefix-sums",
+      "name": {
+        "en": "Prefix Sums",
+        "vi": "Tổng tiền tố"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 150,
+      "selectable": true
+    },
+    {
+      "id": "greedy",
+      "name": {
+        "en": "Greedy Algorithms",
+        "vi": "Thuật toán tham lam"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 160,
+      "selectable": true
+    },
+    {
+      "id": "backtracking",
+      "name": {
+        "en": "Backtracking",
+        "vi": "Quay lui"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 170,
+      "selectable": true
+    },
+    {
+      "id": "dynamic-programming",
+      "name": {
+        "en": "Dynamic Programming",
+        "vi": "Quy hoạch động"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 180,
+      "selectable": true
+    },
+    {
+      "id": "divide-and-conquer",
+      "name": {
+        "en": "Divide and Conquer",
+        "vi": "Chia để trị"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 190,
+      "selectable": true
+    },
+    {
+      "id": "bit-manipulation",
+      "name": {
+        "en": "Bit Manipulation",
+        "vi": "Thao tác bit"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 200,
+      "selectable": true
+    },
+    {
+      "id": "breadth-first-search",
+      "name": {
+        "en": "Breadth-First Search",
+        "vi": "Tìm kiếm theo chiều rộng"
+      },
+      "parentId": "graphs",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "depth-first-search",
+      "name": {
+        "en": "Depth-First Search",
+        "vi": "Tìm kiếm theo chiều sâu"
+      },
+      "parentId": "graphs",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 20,
+      "selectable": true
+    },
+    {
+      "id": "shortest-paths",
+      "name": {
+        "en": "Shortest Paths",
+        "vi": "Đường đi ngắn nhất"
+      },
+      "parentId": "graphs",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 30,
+      "selectable": true
+    },
+    {
+      "id": "topological-sorting",
+      "name": {
+        "en": "Topological Sorting",
+        "vi": "Sắp xếp topo"
+      },
+      "parentId": "graphs",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 40,
+      "selectable": true
+    },
+    {
+      "id": "sql",
+      "name": {
+        "en": "SQL",
+        "vi": "SQL"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "relational-databases",
+      "name": {
+        "en": "Relational Databases",
+        "vi": "Cơ sở dữ liệu quan hệ"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 20,
+      "selectable": true
+    },
+    {
+      "id": "joins-aggregation",
+      "name": {
+        "en": "Joins and Aggregation",
+        "vi": "Phép nối và tổng hợp dữ liệu"
+      },
+      "parentId": "sql",
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "indexes-transactions",
+      "name": {
+        "en": "Indexes and Transactions",
+        "vi": "Chỉ mục và giao dịch"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 30,
+      "selectable": true
+    },
+    {
+      "id": "http-rest-apis",
+      "name": {
+        "en": "HTTP and REST APIs",
+        "vi": "HTTP và REST API"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 40,
+      "selectable": true
+    },
+    {
+      "id": "json-data-formats",
+      "name": {
+        "en": "JSON and Data Formats",
+        "vi": "JSON và định dạng dữ liệu"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 50,
+      "selectable": true
+    },
+    {
+      "id": "debugging",
+      "name": {
+        "en": "Debugging",
+        "vi": "Gỡ lỗi"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "unit-testing",
+      "name": {
+        "en": "Unit Testing",
+        "vi": "Kiểm thử đơn vị"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 20,
+      "selectable": true
+    },
+    {
+      "id": "integration-testing",
+      "name": {
+        "en": "Integration Testing",
+        "vi": "Kiểm thử tích hợp"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 30,
+      "selectable": true
+    },
+    {
+      "id": "test-driven-development",
+      "name": {
+        "en": "Test-Driven Development",
+        "vi": "Phát triển hướng kiểm thử"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 40,
+      "selectable": true
+    },
+    {
+      "id": "code-review",
+      "name": {
+        "en": "Code Review",
+        "vi": "Rà soát mã nguồn"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 50,
+      "selectable": true
+    },
+    {
+      "id": "performance-optimization",
+      "name": {
+        "en": "Performance Optimization",
+        "vi": "Tối ưu hiệu năng"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 60,
+      "selectable": true
+    },
+    {
+      "id": "secure-coding",
+      "name": {
+        "en": "Secure Coding",
+        "vi": "Lập trình an toàn"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 70,
+      "selectable": true
+    },
+    {
+      "id": "concurrency",
+      "name": {
+        "en": "Concurrency",
+        "vi": "Lập trình đồng thời"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 80,
+      "selectable": true
+    },
+    {
+      "id": "discrete-mathematics",
+      "name": {
+        "en": "Discrete Mathematics",
+        "vi": "Toán rời rạc"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 10,
+      "selectable": true
+    },
+    {
+      "id": "number-theory",
+      "name": {
+        "en": "Number Theory",
+        "vi": "Lý thuyết số"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 20,
+      "selectable": true
+    },
+    {
+      "id": "combinatorics",
+      "name": {
+        "en": "Combinatorics",
+        "vi": "Tổ hợp"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 30,
+      "selectable": true
+    },
+    {
+      "id": "probability",
+      "name": {
+        "en": "Probability",
+        "vi": "Xác suất"
+      },
+      "parentId": null,
+      "appliesTo": [
+        "lesson",
+        "question"
+      ],
+      "status": "active",
+      "sortOrder": 40,
+      "selectable": true
+    }
+  ]
+}
