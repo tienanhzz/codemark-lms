@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { api } from '../lib/api';
 import { courseError, translate, type Locale } from '../lib/courseApi';
+import { positionalRankTiers, rankAppearance } from '../lib/rankAppearance';
+import { RankBadge } from './RankBadge';
 
 type RoleTask = { taskKey: string; staffRole: string; title: string; requirementType: 'metric' | 'manual_review'; eventKey: string | null; targetCount: number | null };
 type RequirementProgress = RoleTask & { progress: number; completed: boolean; requestStatus: string | null; canRequest: boolean };
@@ -101,9 +103,16 @@ export function RanksWorkspace({ locale, roles }: { locale: Locale; roles: strin
   return <section className="panel ranks-workspace">
     <div className="panel-heading"><div><p className="eyebrow">BUILD-031</p><h2>{t('Ranks & progression', 'Hạng và tiến trình')}</h2><p>{t('Ranks follow lifetime EXP and the active versioned policy. Staff promotion can also require verified metrics or an Admin-reviewed task.', 'Hạng dựa trên EXP tích lũy và chính sách đang áp dụng. Thăng hạng nhân sự có thể cần chỉ số tin cậy hoặc nhiệm vụ được Admin duyệt.')}</p></div><button type="button" className="button secondary" disabled={busy} onClick={() => void load()}>{t('Refresh', 'Tải lại')}</button></div>
     {error && <div className="alert alert-error" role="alert">{error}</div>}{notice && <p className="alert alert-success" role="status">{notice}</p>}
-    {wallet && <div className="wallet-rank-grid">{wallet.ranks.map(rank => <article key={rank.track} className="wallet-rank-card">
+    {wallet && wallet.ranks.length > 0 && wallet.ranks.every(rank => rank.policyVersion === null) && <section className="rank-position-legend" aria-label={t('Leaderboard rank tiers', 'Các bậc bảng xếp hạng')}>
+      <h3>{t('Leaderboard ranks', 'Hạng trên bảng xếp hạng')}</h3>
+      <p>{t('Without an active EXP policy, leaderboard tiers follow position. EXP progression is shown separately when a policy is activated.', 'Khi chưa có chính sách EXP hoạt động, bậc trên bảng xếp hạng dựa theo vị trí. Tiến trình EXP được hiển thị riêng khi chính sách được kích hoạt.')}</p>
+      <ol>{positionalRankTiers.map(tier => <li key={tier.key} style={rankAppearance(tier)?.style}>
+        <RankBadge tier={tier} size="hero" /><span>{t('Position', 'Vị trí')} <strong>{tier.positions}</strong></span>
+      </li>)}</ol>
+    </section>}
+    {wallet && <div className="wallet-rank-grid">{wallet.ranks.map(rank => <article key={rank.track} className={`wallet-rank-card${rank.current ? ' rank-surface' : ''}`} style={rankAppearance(rank.current)?.style}>
       <span>{rank.track === 'student' ? t('Student track', 'Nhánh học viên') : t('Staff track', 'Nhánh nhân sự')}</span>
-      <strong>{rank.current?.name || t('No active policy', 'Chưa có chính sách')}</strong>
+      {rank.current ? <RankBadge tier={rank.current} /> : <strong>{t('No active policy', 'Chưa có chính sách')}</strong>}
       <p>{rank.exp.toLocaleString(locale)} EXP{rank.next ? ` · ${t('Next', 'Tiếp theo')}: ${rank.next.name} (${rank.next.thresholdExp.toLocaleString(locale)} EXP)` : ''}</p>
       {rank.progressPercent !== null && <progress max={100} value={rank.progressPercent} aria-label={t('Progress to next rank', 'Tiến độ lên hạng')} />}
       {rank.nextRequirements?.map(task => {
@@ -119,7 +128,7 @@ export function RanksWorkspace({ locale, roles }: { locale: Locale; roles: strin
       <h3>{t('Versioned policies', 'Chính sách theo phiên bản')}</h3>
       {!policies.length ? <p className="course-empty">{t('No rank policy exists yet.', 'Chưa có chính sách xếp hạng.')}</p> : <div className="rank-policy-list">{policies.map(policy => <article key={policy.id} className="rank-policy-card">
         <div><h4>{policy.track === 'student' ? t('Student', 'Học viên') : t('Staff', 'Nhân sự')} · v{policy.version}</h4><span className="state-badge">{policy.status}</span></div>
-        <ol>{policy.tiers.map(tier => <li key={tier.key}><strong>{tier.name}</strong><span>{tier.thresholdExp.toLocaleString(locale)} EXP</span><small>{tier.description || tier.key}</small>{tier.roleTasks?.map(task => <small key={`${task.staffRole}-${task.taskKey}`}>{task.staffRole}: {task.title} · {task.requirementType === 'metric' ? `${task.eventKey} × ${task.targetCount}` : t('review required', 'cần duyệt')}</small>)}</li>)}</ol>
+        <ol>{policy.tiers.map(tier => <li key={tier.key} className="rank-surface" style={rankAppearance(tier)?.style}><RankBadge tier={tier} /><span>{tier.thresholdExp.toLocaleString(locale)} EXP</span><small>{tier.description || tier.key}</small>{tier.roleTasks?.map(task => <small key={`${task.staffRole}-${task.taskKey}`}>{task.staffRole}: {task.title} · {task.requirementType === 'metric' ? `${task.eventKey} × ${task.targetCount}` : t('review required', 'cần duyệt')}</small>)}</li>)}</ol>
         {policy.status === 'draft' && <button type="button" className="button primary" disabled={busy} onClick={() => void activate(policy)}>{t('Activate policy', 'Kích hoạt chính sách')}</button>}
       </article>)}</div>}
       <h3>{t('Pending staff task reviews', 'Nhiệm vụ nhân sự chờ duyệt')}</h3>

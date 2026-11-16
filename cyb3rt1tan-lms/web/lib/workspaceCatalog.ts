@@ -249,7 +249,7 @@ export const previewPages: PreviewPage[] = [
   },
   {
     id: 'calendar',
-    title: ['Calendar', 'Lịch học'],
+    title: ['Weekly timetable', 'Thời khóa biểu tuần'],
     intro: [
       'Plan your study week around sessions and due work.',
       'Sắp xếp tuần học theo lịch dạy và các hạn công việc.',
@@ -791,8 +791,8 @@ previewPages.push(
     id: 'leaderboard',
     title: ['Leaderboards', 'Bảng xếp hạng'],
     intro: [
-      'Compare practice scores using nicknames, with an explicit scoring formula.',
-      'So sánh điểm luyện tập bằng biệt danh, với công thức tính điểm rõ ràng.',
+      'Compare student and teacher EXP recorded in the ledger; equal EXP shares a rank.',
+      'Xếp hạng sinh viên và giảng viên theo tổng EXP trong sổ điểm; bằng EXP thì đồng hạng.',
     ],
     group: 'community',
     roles: learning,
@@ -1022,7 +1022,7 @@ previewPages.push(
     ],
     group: 'community',
     roles: learning,
-    icon: 'fa-calendar-star',
+      icon: 'fa-calendar-days',
     kind: 'list',
     columns: [
       ['Event', 'Sự kiện'],

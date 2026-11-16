@@ -174,7 +174,7 @@ def test_required_mfa_has_prelogin_challenge_and_no_session_until_confirmed(clie
         == 200
     )
     response = student.post(
-        "/v1/auth/login", headers=ORIGIN, json={"username": "student", "password": PASSWORD}
+        "/v1/auth/login", headers=ORIGIN, json={"username": "9999000001", "password": PASSWORD}
     )
     assert response.status_code == 202
     assert student.get("/v1/me").status_code == 401

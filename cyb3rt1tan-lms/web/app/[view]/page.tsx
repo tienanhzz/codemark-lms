@@ -3,6 +3,8 @@ import { Workspace } from '../../components/Workspace';
 import { PasswordRecovery } from '../../components/PasswordRecovery';
 import { previewPages } from '../../lib/workspaceCatalog';
 const views = [
+  'login',
+  'dashboard',
   'activity',
   'courses',
   'academic-catalogs',

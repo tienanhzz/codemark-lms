@@ -214,10 +214,18 @@ def authenticate(
     code: str | None,
     recovery: str | None,
 ) -> dict[str, object]:
-    username = username.strip().lower()
+    identifier = username.strip()
+    username = identifier.lower()
     network = request.client.host if request.client else "local"
     buckets = throttle(db, "account:" + username, "network:" + network)
-    user = db.scalar(select(User).where(User.username == username))
+    by_name = db.scalar(select(User).where(User.username == username))
+    by_code = db.scalar(select(User).where(User.institutional_id == identifier))
+    user = None
+    if by_code is not None and "student" in by_code.roles:
+        if by_name is None or by_name.id == by_code.id:
+            user = by_code
+    elif by_name is not None and "student" not in by_name.roles:
+        user = by_name
     if user is None:
         try:
             passwords.verify(dummy_hash, password)

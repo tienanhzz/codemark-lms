@@ -336,11 +336,13 @@ from .courses import router as course_router
 from .csv_imports import router as csv_router
 from .economy import router as economy_router
 from .learning_overview import router as learning_overview_router
+from .leaderboard import router as leaderboard_router
 from .lesson_progress import router as lesson_progress_router
 from .marketplace import router as marketplace_router
 from .marketplace_disputes import router as marketplace_disputes_router
 from .mfa_routes import router as mfa_router
 from .missions import router as missions_router
+from .home import router as home_router
 from .notifications import router as notifications_router
 from .operations import router as operations_router
 from .practice import router as practice_router
@@ -355,11 +357,14 @@ from .shop import router as shop_router
 from .staff_events import router as staff_events_router
 from .taxonomy import router as taxonomy_router
 from .teaching_team import router as team_router
+from .timetable import router as timetable_router
 
 app.include_router(accounts_router)
+app.include_router(home_router)
 app.include_router(achievements_router)
 app.include_router(attendance_router)
 app.include_router(learning_overview_router)
+app.include_router(leaderboard_router)
 app.include_router(lesson_progress_router)
 app.include_router(reports_router)
 app.include_router(assessments_router)
@@ -386,6 +391,7 @@ app.include_router(avatars_router)
 app.include_router(branding_router)
 app.include_router(support_router)
 app.include_router(team_router)
+app.include_router(timetable_router)
 app.include_router(taxonomy_router)
 app.include_router(questions_router)
 app.include_router(question_assets_router)

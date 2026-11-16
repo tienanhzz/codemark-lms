@@ -13,7 +13,7 @@ ORIGIN = {"Origin": "http://127.0.0.1:3100"}
 
 def _login(client: TestClient, username: str) -> dict[str, str]:
     assert client.post(
-        "/v1/auth/login", headers=ORIGIN, json={"username": username, "password": PASSWORD}
+        "/v1/auth/login", headers=ORIGIN, json={"username": "9999000001" if username == "student" else username, "password": PASSWORD}
     ).status_code == 200
     return {**ORIGIN, "X-CSRF-Token": client.cookies["lms_csrf"]}
 

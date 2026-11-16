@@ -30,6 +30,24 @@ class Base(DeclarativeBase):
     pass
 
 
+class HomeAnnouncement(Base):
+    """Explicit public posts, separate from recipient-scoped notifications."""
+
+    __tablename__ = "home_announcements"
+    __table_args__ = (
+        CheckConstraint("length(title) BETWEEN 1 AND 180", name="ck_home_announcement_title"),
+        CheckConstraint("length(body) BETWEEN 1 AND 10000", name="ck_home_announcement_body"),
+        Index("ix_home_announcements_created_at", "created_at", "id"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    title: Mapped[str] = mapped_column(String(180))
+    body: Mapped[str] = mapped_column(String(10000))
+    author_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"))
+    author_role: Mapped[str] = mapped_column(String(20))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
 class User(Base):
     __tablename__ = "users"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))

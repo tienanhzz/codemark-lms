@@ -1,5 +1,6 @@
 ﻿import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { Workspace } from '../components/Workspace';
 import { WorkspacePreview } from '../components/WorkspacePreview';
@@ -45,11 +46,159 @@ function serve(roles: string[]) {
         metrics: { courses: 0, assessments: 0, accounts: 1 },
       };
     if (path === '/courses?pageSize=100') return { items: [] };
+    if (path.startsWith('/leaderboard?')) return { items: [], total: 0, track: 'student' };
+    if (path.startsWith('/timetable?')) return { items: [] };
     if (path.startsWith('/learning-overview/me?')) return { period: { fromAt: '', toAt: '' }, items: [] };
     throw new Error('Unexpected ' + path);
   });
 }
 describe('Workspace shell and clearly isolated previews', () => {
+  it('opens the real weekly timetable from the renamed menu item', async () => {
+    serve(['student']);
+    render(<Workspace initialView="calendar" />);
+    await screen.findByRole('heading', { level: 1, name: /Weekly timetable/ });
+    const link = within(document.querySelector('.sidebar nav')!).getByRole('link', { name: 'Weekly timetable' });
+    expect(link.getAttribute('aria-current')).toBe('page');
+    await waitFor(() => expect(transport.api.mock.calls.some(([path]) => path.startsWith('/timetable?'))).toBe(true));
+    expect(screen.queryByText('Interface preview · sample data')).toBeNull();
+  });
+  it('collapses the ranking rail independently and restores that preference after navigation', async () => {
+    window.sessionStorage.clear();
+    serve(['student']);
+    const user = userEvent.setup();
+    const first = render(<Workspace initialView="dashboard" />);
+    const collapse = await screen.findByRole('button', { name: 'Hide rankings' });
+    const rail = screen.getByRole('complementary', { name: 'Quick rankings' });
+    await user.click(collapse);
+    expect(rail.getAttribute('aria-hidden')).toBe('true');
+    expect(rail.hasAttribute('inert')).toBe(true);
+    expect(screen.getByRole('button', { name: 'Show rankings' }).getAttribute('aria-expanded')).toBe('false');
+    expect(screen.getByRole('button', { name: 'Collapse sidebar' }).getAttribute('aria-expanded')).toBe('true');
+    first.unmount();
+    render(<Workspace initialView="settings" />);
+    await screen.findByRole('button', { name: 'Show rankings' });
+    await user.click(screen.getByRole('button', { name: 'Show rankings' }));
+    expect(screen.getByRole('complementary', { name: 'Quick rankings' }).getAttribute('aria-hidden')).toBe('false');
+    window.sessionStorage.clear();
+  });
+  it('restores the menu scroll position when navigation remounts the workspace', async () => {
+    window.sessionStorage.clear();
+    serve(['student']);
+    const first = render(<Workspace initialView="dashboard" />);
+    await screen.findByRole('heading', { name: /Welcome back/ });
+    const menu = document.querySelector('.sidebar nav')!;
+    menu.scrollTop = 550;
+    fireEvent.scroll(menu);
+    first.unmount();
+    render(<Workspace initialView="settings" />);
+    await screen.findByRole('heading', { level: 1, name: /Appearance & language/ });
+    expect(document.querySelector('.sidebar nav')!.scrollTop).toBe(550);
+    window.sessionStorage.clear();
+  });
+  it('keeps saved menu positions separate for each account and tolerates unavailable storage', async () => {
+    window.sessionStorage.setItem('codemark:sidebar-scroll:other-user', '550');
+    serve(['student']);
+    const first = render(<Workspace initialView="dashboard" />);
+    await screen.findByRole('heading', { name: /Welcome back/ });
+    expect(document.querySelector('.sidebar nav')!.scrollTop).toBe(0);
+    first.unmount();
+    const read = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('Storage unavailable'); });
+    const write = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Storage unavailable'); });
+    try {
+      render(<Workspace initialView="dashboard" />);
+      await screen.findByRole('heading', { name: /Welcome back/ });
+      fireEvent.scroll(document.querySelector('.sidebar nav')!);
+      expect(screen.getByRole('main')).toBeTruthy();
+    } finally {
+      read.mockRestore();
+      write.mockRestore();
+      window.sessionStorage.clear();
+    }
+  });
+  it('labels menu groups and provides an available icon for community course events', async () => {
+    serve(['student']);
+    render(<Workspace initialView="dashboard" />);
+    const community = await screen.findByRole('region', { name: 'COMMUNITY' });
+    expect(community.classList.contains('nav-group')).toBe(true);
+    const events = within(community).getByRole('link', { name: /Course events/ });
+    expect(events.querySelector('i')!.classList.contains('fa-calendar-days')).toBe(true);
+    expect(within(community).getByRole('link', { name: /Missions & reward policies/ })).toBeTruthy();
+  });
+  it('places quick rankings beside the workspace and omits the duplicate on the full leaderboard', async () => {
+    serve(['student']);
+    const { unmount } = render(<Workspace initialView="dashboard" />);
+    const rail = await screen.findByRole('complementary', { name: 'Quick rankings' });
+    expect(rail.parentElement?.contains(screen.getByRole('main'))).toBe(true);
+    expect(within(rail).getByRole('link', { name: /Player Rank/ }).getAttribute('href')).toBe('/leaderboard');
+    unmount();
+    render(<Workspace initialView="leaderboard" />);
+    await screen.findByRole('region', { name: 'Leaderboard' });
+    expect(screen.queryByRole('complementary', { name: 'Quick rankings' })).toBeNull();
+  });
+  it('opens authorized page suggestions inline with Ctrl K and filters without a modal', async () => {
+    serve(['student']);
+    const user = userEvent.setup();
+    render(<Workspace initialView="dashboard" />);
+    const search = await screen.findByRole('combobox', { name: 'Find a page…' });
+    expect(search.getAttribute('aria-expanded')).toBe('false');
+    await user.keyboard('{Control>}k{/Control}');
+    expect(document.activeElement).toBe(search);
+    const results = screen.getByRole('listbox', { name: 'Find a page…' });
+    expect(search.closest('header')?.contains(results)).toBe(true);
+    expect(document.querySelector('.search-dialog')).toBeNull();
+    expect(within(results).queryByRole('option', { name: 'Academic catalogs' })).toBeNull();
+    await user.type(search, 'Courses');
+    expect(within(results).getAllByRole('option')).toHaveLength(1);
+    expect(within(results).getByRole('option', { name: 'Courses' }).getAttribute('href')).toBe('/courses');
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('listbox')).toBeNull();
+    expect(document.activeElement).toBe(search);
+    await user.click(search);
+    expect(screen.getByRole('listbox')).toBeTruthy();
+    await user.click(screen.getByRole('heading', { name: /Welcome back/ }));
+    expect(screen.queryByRole('listbox')).toBeNull();
+  });
+  it('selects a matching page from the field with the arrow keys and Enter', async () => {
+    serve(['student']);
+    transport.push.mockClear();
+    const user = userEvent.setup();
+    render(<Workspace initialView="dashboard" />);
+    const search = await screen.findByRole('combobox', { name: 'Find a page…' });
+    await user.type(search, 'Courses');
+    await user.keyboard('{ArrowDown}');
+    const selected = screen.getByRole('option', { name: 'Courses', selected: true });
+    expect(search.getAttribute('aria-activedescendant')).toBe(selected.id);
+    await user.keyboard('{Enter}');
+    expect(transport.push).toHaveBeenCalledWith('/courses');
+    expect(screen.queryByRole('listbox')).toBeNull();
+  });
+  it('simplifies navigation and saves the language selected from the workspace header', async () => {
+    serve(['admin']);
+    const read = transport.api.getMockImplementation()!;
+    transport.api.mockImplementation(async (path: string, method?: string, body?: unknown) => {
+      if (path === '/me/preferences' && method === 'PUT') return body;
+      return read(path);
+    });
+    const user = userEvent.setup();
+    render(<Workspace initialView="dashboard" />);
+    await screen.findByRole('heading', { name: /Welcome back/ });
+    expect(document.querySelector('.workspace-pill')).toBeNull();
+    expect(screen.queryByText('Private by design')).toBeNull();
+    const sidebar = document.getElementById('workspace-navigation')!;
+    expect(sidebar.firstElementChild?.className).toBe('brand-link');
+    expect(sidebar.children[1]?.className).toBe('sidebar-account');
+    const toggle = screen.getByRole('button', { name: 'Collapse sidebar' });
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    await user.click(toggle);
+    expect(screen.getByRole('button', { name: 'Expand sidebar' }).getAttribute('aria-expanded')).toBe('false');
+    expect(sidebar.getAttribute('aria-hidden')).toBe('true');
+    expect(sidebar.hasAttribute('inert')).toBe(true);
+    await user.click(screen.getByRole('button', { name: 'Expand sidebar' }));
+    expect(sidebar.getAttribute('aria-hidden')).toBe('false');
+    await user.click(screen.getByRole('button', { name: 'Tiếng Việt' }));
+    await screen.findByRole('button', { name: 'English' });
+    expect(transport.api).toHaveBeenCalledWith('/me/preferences', 'PUT', expect.objectContaining({ locale: 'vi' }));
+  });
   it('creates and downloads a scoped progress report', async () => {
     const user = userEvent.setup();
     transport.api.mockImplementation(async (path: string, method?: string) => {
@@ -350,7 +499,7 @@ describe('Workspace shell and clearly isolated previews', () => {
       if (path.startsWith('/learning-overview/me?')) return { period: { fromAt: '2026-11-01T00:00:00Z', toAt: '2026-11-15T00:00:00Z' }, items: [] };
       throw new Error('Unexpected ' + path);
     });
-    render(<Workspace />);
+    render(<Workspace initialView="dashboard" />);
     await screen.findByRole('heading', { name: 'Student Learning Overview' });
     expect(await screen.findByText('No learning activity in the selected period.')).toBeTruthy();
     expect(screen.queryByRole('link', { name: 'Accounts' })).toBeNull();
@@ -358,7 +507,7 @@ describe('Workspace shell and clearly isolated previews', () => {
   });  it('closes the mobile drawer with Escape and restores trigger focus', async () => {
     serve(['student']);
     const user = userEvent.setup();
-    render(<Workspace />);
+    render(<Workspace initialView="dashboard" />);
     const menu = await screen.findByRole('button', { name: 'Open navigation' });
     await user.click(menu);
     expect(menu.getAttribute('aria-expanded')).toBe('true');
