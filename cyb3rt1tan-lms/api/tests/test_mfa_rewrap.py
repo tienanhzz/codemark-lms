@@ -26,7 +26,7 @@ def _set_keyring(monkeypatch, active: str) -> None:
 
 def test_rewrap_reads_legacy_and_versioned_rows_and_writes_active_key(clients, monkeypatch):
     _, _, factory = clients
-    legacy_secret = "JBSWY3DPEHPK3PXP"
+    legacy_secret = "seed-alpha"
     _encoded_legacy_key = _encoded(b"l" * 32)
     monkeypatch.setenv("MFA_ENCRYPTION_KEY", _encoded_legacy_key)
     monkeypatch.delenv("MFA_ENCRYPTION_KEYS", raising=False)
@@ -36,7 +36,7 @@ def test_rewrap_reads_legacy_and_versioned_rows_and_writes_active_key(clients, m
     legacy_ciphertext = mfa.encrypt_secret(user_ids[0], legacy_secret)
 
     _set_keyring(monkeypatch, "old")
-    versioned_ciphertext = mfa.encrypt_secret(user_ids[1], "GEZDGNBVGY3TQOJQ")
+    versioned_ciphertext = mfa.encrypt_secret(user_ids[1], "seed-beta")
     with factory.begin() as db:
         for user_id, ciphertext in zip(user_ids, [legacy_ciphertext, versioned_ciphertext]):
             db.add(
@@ -63,7 +63,7 @@ def test_rewrap_reads_legacy_and_versioned_rows_and_writes_active_key(clients, m
     with factory() as db:
         rows = db.scalars(select(MfaMethod)).all()
         assert all(row.encrypted_secret.startswith("v2.new.") for row in rows)
-        assert {mfa.secret(row) for row in rows} == {legacy_secret, "GEZDGNBVGY3TQOJQ"}
+        assert {mfa.secret(row) for row in rows} == {legacy_secret, "seed-beta"}
 
 
 def test_rewrap_preflights_all_rows_and_rejects_missing_old_key(clients, monkeypatch):
