@@ -25,7 +25,12 @@ if (
 ):
     raise SystemExit("Persistence integration requires codemark_lms_test.")
 os.environ.update(
-    {"DATABASE_URL": target, "MIGRATION_DATABASE_URL": target, "SMTP_APPROVED": "false"}
+    {
+        "APP_ENV": "test",
+        "DATABASE_URL": target,
+        "MIGRATION_DATABASE_URL": target,
+        "SMTP_APPROVED": "false",
+    }
 )
 sys.path.insert(0, str(root / "api"))
 from app.database import SessionLocal, engine
