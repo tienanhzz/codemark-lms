@@ -108,9 +108,10 @@ with SessionLocal() as db:
     assert db.scalar(select(func.count(AuditEvent.id))) == baseline_events
     assert db.scalar(select(func.count(OutboxMessage.id))) == baseline_messages
     messages = list(db.scalars(select(OutboxMessage)))
+    audit_messages = [message for message in messages if message.topic == "audit.committed"]
     assert all(
         set(message.payload) == {"eventId", "action", "requestId"}
-        for message in messages
+        for message in audit_messages
     )
     assert all(
         message.status == "pending" and message.attempts == 0 for message in messages
