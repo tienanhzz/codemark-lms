@@ -7,7 +7,8 @@
     "build": "node ../scripts/next.mjs build --webpack",
     "start": "node ../scripts/next.mjs start --hostname 127.0.0.1 --port 3100",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "verify:security-config": "node scripts/verify-security-config.mjs"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "6.7.2",

@@ -91,6 +91,9 @@ jobs:
           .local/audit-venv/bin/python -m pip install --require-hashes -r tooling/security-requirements.lock
           .local/audit-venv/bin/python scripts/validate-sbom.py
           python scripts/audit-dependencies.py --auditor-python .local/audit-venv/bin/python
+      - name: Verify production CSP excludes development endpoints
+        working-directory: cyb3rt1tan-lms/web
+        run: npm run verify:security-config
       - name: Web verification
         working-directory: cyb3rt1tan-lms/web
         run: |

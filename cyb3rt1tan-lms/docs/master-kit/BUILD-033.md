@@ -11,6 +11,7 @@
 - Added a weekly and push/PR Gitleaks secret scan, pinned to its immutable v3.0.0 commit. The scan has read-only repository access and does not post comments or upload findings as an artifact.
 - Added weekly Dependabot update groups for GitHub Actions, npm, Maven and the Python API dependencies across the repository's active project trees.
 - Upgraded workflow actions to Node 24 compatible release lines and disabled persisted checkout credentials in jobs that only need source reads.
+- Production CSP now allows browser connections only to same-origin endpoints; loopback API and WebSocket sources are included only during development. Added a config verifier for both environments.
 - Production startup now rejects missing/short LOGIN_HMAC_KEY values and missing, malformed or matching MFA_ENCRYPTION_KEY values. Error messages do not include key material.
 - MFA ciphertext now supports a versioned AES-GCM key ID through `MFA_ENCRYPTION_KEYS` and `MFA_ACTIVE_KEY_ID`; legacy v1 records continue to use `MFA_ENCRYPTION_KEY`.
 - Added `api/scripts/rewrap-mfa-secrets.py`. It defaults to a read-only dry-run; apply is limited to production, requires a versioned active key, an explicit confirmation phrase and `--backup-verified`, locks MFA rows, verifies decrypt/re-encrypt round trips, and writes a count-only audit event in the same transaction.
@@ -24,6 +25,7 @@
 - 2026-11-16: Updated the rebuild workflow to scope Ruff formatting enforcement to changed API Python files, preserving full-project lint/mypy and the complete test/build jobs. Workflow YAML parses locally; GitHub-hosted execution is still pending.
 - 2026-11-16: Added direct tests for legacy/v2 ciphertext reads, dry-run immutability, active-key rewrap, corrupted ciphertext rejection and missing-old-key rejection. Extracted the rewrap logic into an app module, linted and type-checked the maintenance CLI, and extended CI Ruff/mypy coverage to API scripts. Full API suite: 164 passed.
 - 2026-11-16: Hosted acceptance passed on commit `f178a99`: [Master Kit rebuild](https://github.com/tienanhzz/codemark-lms/actions/runs/43817238477), [Project CI](https://github.com/tienanhzz/codemark-lms/actions/runs/43817238501), and [Secret Scan](https://github.com/tienanhzz/codemark-lms/actions/runs/43817238539) all concluded success. PostgreSQL identity integration, dependency inventory/audit, and web verification completed in the rebuild workflow. The integration run exposed and fixed stale outbox verifier assumptions; Gitleaks initially flagged a test-only TOTP fixture, which was replaced with a non-secret marker before the passing scan.
+- 2026-11-16: Static security review found the production CSP permitted browser connections to `127.0.0.1:8100` and `ws://127.0.0.1:8100`. Restricted those sources to development and added `verify:security-config`; the verifier and production Next.js build pass. Formal ASVS owner review remains open.
 
 ## Not yet accepted
 
