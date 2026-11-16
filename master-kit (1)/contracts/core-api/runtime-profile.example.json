@@ -1,0 +1,24 @@
+{
+  "profileId": "java-21",
+  "version": 1,
+  "language": "java",
+  "languageVersion": "21",
+  "compilerImage": "registry.example.invalid/lms/java-runner",
+  "imageDigest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "allowedLibraries": [],
+  "resourceCaps": {
+    "wallTimeMs": 10000,
+    "cpuTimeMs": 8000,
+    "memoryBytes": 268435456,
+    "maxSourceBytes": 1048576
+  },
+  "sandbox": {
+    "network": "disabled",
+    "nonRootUser": true,
+    "readOnlyRootFilesystem": true,
+    "dropAllCapabilities": true,
+    "ephemeralWorkspace": true,
+    "secretMounts": false
+  },
+  "status": "test"
+}

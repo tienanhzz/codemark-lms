@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-11-14T19:42:08.231940+00:00",
+  "result": "pass",
+  "database": "codemark_lms_test",
+  "realSMTP": false,
+  "mainDatabaseMutations": false,
+  "concurrentResetStatuses": [
+    204,
+    400
+  ],
+  "digestOnlyToken": true,
+  "profileRevisionCooldown": true,
+  "personalSessionRevocation": true,
+  "atomicAuditOutbox": true,
+  "browserVisualQA": false
+}

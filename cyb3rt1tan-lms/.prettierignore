@@ -1,0 +1,4 @@
+node_modules/
+.next/
+.venv/
+web/lib/contracts.ts

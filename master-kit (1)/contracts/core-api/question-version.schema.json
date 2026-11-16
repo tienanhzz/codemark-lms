@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/question-version.schema.json",
+  "title": "Immutable Question Version",
+  "description": "Authoring representation for a versioned question. Private grading configuration is kept separate from student-facing question projections.",
+  "type": "object",
+  "required": [
+    "questionId",
+    "questionVersionId",
+    "versionNumber",
+    "questionType",
+    "title",
+    "prompt",
+    "categoryId",
+    "difficulty",
+    "usageTypes",
+    "tagIds",
+    "contentSchemaVersion",
+    "content",
+    "authoringConfig",
+    "status"
+  ],
+  "properties": {
+    "questionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "questionVersionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "versionNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "questionType": {
+      "enum": [
+        "code",
+        "writing",
+        "sentenceRewriting",
+        "multipleChoice",
+        "multipleSelect",
+        "shortAnswer",
+        "fillInTheBlank",
+        "matching",
+        "ordering",
+        "trueFalseNotGiven",
+        "readingSet",
+        "listeningSet"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "categoryId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["newbie", "noob", "wannabe", "gatekeeper", "legendary"],
+      "description": "Five ordered levels: Newbie (1), Noob (2), Wannabe (3), Gatekeeper (4), Legendary (5)."
+    },
+    "usageTypes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["practice", "practical", "exam"]
+      }
+    },
+    "tagIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      }
+    },
+    "contentSchemaVersion": {
+      "const": "1.0"
+    },
+    "content": {
+      "$ref": "./question-content.schema.json",
+      "description": "Question-type-specific public content. contentType must match questionType."
+    },
+    "authoringConfig": {
+      "$ref": "./question-authoring-config.schema.json",
+      "description": "Private answer keys, rubric, test cases, reference solution, and scoring configuration. Never include in student-facing responses."
+    },
+    "status": {
+      "enum": ["draft", "published", "archived"]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "questionType": { "const": "code" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "code" } } }, "authoringConfig": { "properties": { "configType": { "const": "code" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "writing" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "writing" } } }, "authoringConfig": { "properties": { "configType": { "const": "writing" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "sentenceRewriting" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "sentenceRewriting" } } }, "authoringConfig": { "properties": { "configType": { "const": "sentenceRewriting" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "multipleChoice" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "multipleChoice" } } }, "authoringConfig": { "properties": { "configType": { "const": "multipleChoice" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "multipleSelect" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "multipleSelect" } } }, "authoringConfig": { "properties": { "configType": { "const": "multipleSelect" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "shortAnswer" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "shortAnswer" } } }, "authoringConfig": { "properties": { "configType": { "const": "shortAnswer" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "fillInTheBlank" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "fillInTheBlank" } } }, "authoringConfig": { "properties": { "configType": { "const": "fillInTheBlank" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "matching" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "matching" } } }, "authoringConfig": { "properties": { "configType": { "const": "matching" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "ordering" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "ordering" } } }, "authoringConfig": { "properties": { "configType": { "const": "ordering" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "trueFalseNotGiven" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "trueFalseNotGiven" } } }, "authoringConfig": { "properties": { "configType": { "const": "trueFalseNotGiven" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "readingSet" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "readingSet" } } }, "authoringConfig": { "properties": { "configType": { "const": "readingSet" } } } } }
+    },
+    {
+      "if": { "properties": { "questionType": { "const": "listeningSet" } }, "required": ["questionType"] },
+      "then": { "properties": { "content": { "properties": { "contentType": { "const": "listeningSet" } } }, "authoringConfig": { "properties": { "configType": { "const": "listeningSet" } } } } }
+    },
+    {
+      "if": {
+        "properties": { "questionType": { "const": "code" } },
+        "required": ["questionType"]
+      },
+      "then": {
+        "required": ["authoringConfig"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "questionType": {
+            "enum": ["readingSet", "listeningSet"]
+          }
+        },
+        "required": ["questionType"]
+      },
+      "then": {
+        "required": ["authoringConfig"]
+      }
+    }
+  ],
+  "additionalProperties": false
+}

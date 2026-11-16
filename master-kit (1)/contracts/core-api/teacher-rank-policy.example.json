@@ -1,0 +1,63 @@
+{
+  "policyVersion": 1,
+  "tracks": {
+    "student": [
+      {"id":"foundation","name":"Foundation","minimumExp":0,"description":"Starting tier","color":"#87909B","icon":"foundation"},
+      {"id":"developing","name":"Developing","minimumExp":100,"description":"Building consistent learning habits","color":"#A87555","icon":"developing"},
+      {"id":"proficient","name":"Proficient","minimumExp":250,"description":"Demonstrates reliable course progress","color":"#9A9FA8","icon":"proficient"},
+      {"id":"advanced","name":"Advanced","minimumExp":450,"description":"Shows strong and sustained learning","color":"#D7A928","icon":"advanced"},
+      {"id":"distinguished","name":"Distinguished","minimumExp":700,"description":"Achieves advanced learning milestones","color":"#47A68B","icon":"distinguished"},
+      {"id":"scholar","name":"Scholar","minimumExp":1000,"description":"Example top tier; thresholds and names are admin-managed","color":"#8B72C7","icon":"scholar"}
+    ],
+    "staff": [
+      {
+        "id":"iron","name":"Iron","minimumExp":0,
+        "promotionTasks":{"teacher":[],"teachingAssistant":[],"admin":[],"administrativeAssistant":[],"researchAssistant":[]}
+      },
+      {
+        "id":"bronze","name":"Bronze","minimumExp":100,
+        "promotionTasks":{
+          "teacher":[{"id":"teacher-onboarding","title":"Complete teacher onboarding","description":"Complete required teaching and platform onboarding.","completion":{"type":"manualReview","evidenceDescription":"Onboarding completion recorded by an authorized administrator."}}],
+          "teachingAssistant":[{"id":"ta-onboarding","title":"Complete Teaching Assistant onboarding","description":"Complete required support and platform onboarding.","completion":{"type":"manualReview","evidenceDescription":"Onboarding completion recorded by an authorized administrator."}}],
+          "admin":[],"administrativeAssistant":[],"researchAssistant":[]
+        }
+      },
+      {
+        "id":"silver","name":"Silver","minimumExp":250,
+        "promotionTasks":{
+          "teacher":[{"id":"teacher-five-sessions","title":"Deliver five learning sessions","description":"Deliver five completed sessions.","completion":{"type":"metric","metricKey":"teacher.completedSessions","operator":"gte","target":5}}],
+          "teachingAssistant":[{"id":"ta-ten-support-sessions","title":"Support ten learning sessions","description":"Provide verified support in ten completed sessions.","completion":{"type":"metric","metricKey":"teachingAssistant.completedSupportSessions","operator":"gte","target":10}}],
+          "admin":[],"administrativeAssistant":[],"researchAssistant":[]
+        }
+      },
+      {
+        "id":"gold","name":"Gold","minimumExp":450,
+        "promotionTasks":{"teacher":[],"teachingAssistant":[],"admin":[],"administrativeAssistant":[],"researchAssistant":[]}
+      },
+      {
+        "id":"platinum","name":"Platinum","minimumExp":700,
+        "promotionTasks":{"teacher":[],"teachingAssistant":[],"admin":[],"administrativeAssistant":[],"researchAssistant":[]}
+      },
+      {
+        "id":"emerald","name":"Emerald","minimumExp":1000,
+        "promotionTasks":{"teacher":[],"teachingAssistant":[],"admin":[],"administrativeAssistant":[],"researchAssistant":[]}
+      },
+      {
+        "id":"diamond","name":"Diamond","minimumExp":1400,
+        "promotionTasks":{"teacher":[],"teachingAssistant":[],"admin":[],"administrativeAssistant":[],"researchAssistant":[]}
+      },
+      {
+        "id":"master","name":"Master","minimumExp":1900,
+        "promotionTasks":{"teacher":[],"teachingAssistant":[],"admin":[],"administrativeAssistant":[],"researchAssistant":[]}
+      },
+      {
+        "id":"grandmaster","name":"Grandmaster","minimumExp":2500,
+        "promotionTasks":{"teacher":[],"teachingAssistant":[],"admin":[],"administrativeAssistant":[],"researchAssistant":[]}
+      },
+      {
+        "id":"challenger","name":"Challenger","minimumExp":3200,
+        "promotionTasks":{"teacher":[],"teachingAssistant":[],"admin":[],"administrativeAssistant":[],"researchAssistant":[]}
+      }
+    ]
+  }
+}

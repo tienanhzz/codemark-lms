@@ -1,0 +1,12 @@
+{
+  "questionId": "two-sum",
+  "questionVersionId": "two-sum-v1",
+  "versionNumber": 1,
+  "questionType": "code",
+  "title": "Two Sum",
+  "prompt": "Given an array of integers and a target value, return the indices of two values whose sum equals the target.",
+  "difficulty": "wannabe",
+  "categoryId": "data-structures-algorithms",
+  "tagIds": ["arrays", "hash-maps-sets"],
+  "status": "published"
+}

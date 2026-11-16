@@ -1,0 +1,27 @@
+{
+  "gradingRecordId": "grade-submission-123-r1",
+  "submissionId": "submission-123",
+  "assessmentVersionId": "midterm-programming-v1",
+  "questionVersionId": "essay-clarity-v1",
+  "rubricId": "essay-clarity",
+  "rubricVersion": 1,
+  "revision": 1,
+  "status": "graded",
+  "maximumPoints": 10,
+  "criterionResults": [
+    {
+      "criterionId": "thesis",
+      "checked": true,
+      "awardedPoints": 4
+    },
+    {
+      "criterionId": "evidence",
+      "checked": false,
+      "awardedPoints": 0,
+      "graderNote": "Evidence does not support the stated position."
+    }
+  ],
+  "score": 4,
+  "graderId": "teacher-42",
+  "createdAt": "2026-11-06T00:00:00Z"
+}

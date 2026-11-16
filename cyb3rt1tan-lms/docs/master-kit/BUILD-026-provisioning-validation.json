@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-11-14T19:42:09.933846+00:00",
+  "result": "pass",
+  "database": "codemark_lms_test",
+  "mainDatabaseMutations": false,
+  "realSMTP": false,
+  "concurrentCommitStatuses": [
+    200,
+    409
+  ],
+  "extendedAccountCSV": true,
+  "assistantEnrollmentBoundary": true,
+  "auditedCSVandXLSX": true,
+  "exportExpiryStalenessAuthorization": true,
+  "formulaSafety": true,
+  "browserVisualQA": false
+}

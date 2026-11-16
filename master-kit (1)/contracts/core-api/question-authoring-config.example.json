@@ -1,0 +1,61 @@
+{
+  "configType": "code",
+  "referenceSolutionAssetId": "asset-solution-123",
+  "harness": {
+    "templateId": "java-method-harness",
+    "templateVersion": 1,
+    "studentAnswerPlaceholder": "{{ STUDENT_ANSWER }}",
+    "testCasePlaceholder": "{{ TESTCASES }}"
+  },
+  "classRequirements": {
+    "package": {
+      "mode": "forbidden"
+    },
+    "className": "Solution",
+    "attributes": [],
+    "constructors": [],
+    "methods": [
+      {
+        "name": "twoSum",
+        "parameterTypes": ["int[]", "int"],
+        "returnType": "int[]",
+        "visibility": "public",
+        "expectedExceptions": []
+      }
+    ],
+    "expectedExceptions": []
+  },
+  "testCases": [
+    {
+      "testCaseId": "basic",
+      "position": 1,
+      "representation": "inputOutput",
+      "input": "4 9 2 7 11 15",
+      "expectedOutput": "0 1",
+      "display": "useAsExample",
+      "points": 5
+    },
+    {
+      "testCaseId": "hidden-boundary",
+      "position": 2,
+      "representation": "harnessSnippet",
+      "harnessSnippet": "assertArrayEquals(new int[]{0, 1}, solution.twoSum(new int[]{2, 7}, 9));",
+      "expectedOutput": "",
+      "display": "hide",
+      "points": 5
+    }
+  ],
+  "scoring": {
+    "mode": "perTestCase",
+    "maximumPoints": 10,
+    "showCheckButton": true,
+    "wrongCheckPenalty": 0,
+    "scoreFloor": 0,
+    "maxCheckAttempts": 10
+  },
+  "executionLimits": {
+    "wallTimeMs": 3000,
+    "cpuTimeMs": 2000,
+    "memoryBytes": 134217728
+  }
+}

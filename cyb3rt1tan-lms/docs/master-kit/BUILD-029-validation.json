@@ -1,0 +1,22 @@
+{
+  "build": "BUILD-029",
+  "localStatus": "Implemented",
+  "validatedAt": "2026-11-15",
+  "source": "D:/CodeMark/master-kit (1)/BUILDING_PROCESS.md",
+  "implementedSlice": "versioned assignment/exam delivery, objective practice, manual grading and release, late penalties, and connected bilingual screens",
+  "evidence": {
+    "apiSuite": "118 passed (includes attendance increment)",
+    "webSuite": "53 passed",
+    "typescript": "passed",
+    "productionBuild": "passed",
+    "ruff": "passed",
+    "mypy": "43 modules passed",
+    "mainDatabase": "codemark_lms confirmed at 0019_assessment_grading before attendance migration; guarded upgrade advanced to 0020_attendance with schema/row parity"
+  },
+  "remaining": [
+    "authenticated Admin import of canonical taxonomy into the main catalog",
+    "browser visual, keyboard, and mobile inspection",
+    "codemark_lms_test integration script requires a fresh dedicated catalog; existing data was preserved"
+  ],
+  "safetyBoundary": "Student-code execution and automatic code grading remain disabled."
+}

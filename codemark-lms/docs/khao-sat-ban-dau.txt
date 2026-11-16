@@ -1,0 +1,79 @@
+﻿\frontend\app\(app)\account\page.tsx:88: {user.email}
+\frontend\app\(app)\admin\ip-blacklist\page.tsx:68: if (!confirm(`Remove ${row.network} from the blacklist?`)) return;
+\frontend\app\(app)\admin\sessions\page.tsx:21: email: string;
+\frontend\app\(app)\admin\sessions\page.tsx:53: if (!confirm(`Revoke the active session for ${row.name}?`)) return;
+\frontend\app\(app)\admin\sessions\page.tsx:102: <p className="text-xs text-slate-400">{row.email}</p>
+\frontend\app\(app)\admin\users\page.tsx:70: email: form.get("email"),
+\frontend\app\(app)\admin\users\page.tsx:112: if (!confirm(`Delete ${target.name} (${target.email})?`)) return;
+\frontend\app\(app)\admin\users\page.tsx:145: placeholder="Search name or email"
+\frontend\app\(app)\admin\users\page.tsx:191: <p className="text-xs text-slate-400">{user.email}</p>
+\frontend\app\(app)\admin\users\page.tsx:232: <Modal
+\frontend\app\(app)\admin\users\page.tsx:251: <Field label="Email">
+\frontend\app\(app)\admin\users\page.tsx:252: <Input name="email" type="email" required />
+\frontend\app\(app)\admin\users\page.tsx:269: <Modal
+\frontend\app\(app)\admin\users\page.tsx:289: <Field label="Email">
+\frontend\app\(app)\admin\users\page.tsx:290: <Input value={editing.email} disabled />
+\frontend\app\(app)\assessments\[id]\page.tsx:179: if (!confirm("Delete this question and its test cases?")) return;
+\frontend\app\(app)\assessments\[id]\page.tsx:520: <p className="text-xs text-slate-400">{attempt.student?.email}</p>
+\frontend\app\(app)\assessments\[id]\page.tsx:556: <Modal
+\frontend\app\(app)\assessments\[id]\page.tsx:626: <Modal
+\frontend\app\(app)\assessments\[id]\page.tsx:714: <Modal
+\frontend\app\(app)\attempts\[id]\page.tsx:407: if (confirm("Submit this attempt? You cannot change answers afterwards.")) {
+\frontend\app\(app)\attempts\[id]\page.tsx:615: if (confirm("Submit this attempt?")) submit(false);
+\frontend\app\(app)\attempts\[id]\page.tsx:633: if (confirm("Leave this page? Your saved answers remain on the server.")) {
+\frontend\app\(app)\courses\page.tsx:72: const [ownerEmail, setOwnerEmail] = useState("");
+\frontend\app\(app)\courses\page.tsx:117: if (user?.role === "admin" && ownerEmail.trim()) {
+\frontend\app\(app)\courses\page.tsx:119: `/api/users/search?q=${encodeURIComponent(ownerEmail.trim())}`,
+\frontend\app\(app)\courses\page.tsx:122: (candidate) => candidate.email.toLowerCase() === ownerEmail.trim().toLowerCase(),
+\frontend\app\(app)\courses\page.tsx:129: setOwnerEmail("");
+\frontend\app\(app)\courses\page.tsx:261: <Modal
+\frontend\app\(app)\courses\page.tsx:295: label="Owner email (optional)"
+\frontend\app\(app)\courses\page.tsx:300: value={ownerEmail}
+\frontend\app\(app)\courses\page.tsx:301: onChange={(event) => setOwnerEmail(event.target.value)}
+\frontend\app\(app)\courses\page.tsx:302: type="email"
+\frontend\app\(app)\monitor\[id]\page.tsx:263: confirm(
+\frontend\app\login\page.tsx:25: await login(String(form.get("email") || ""), String(form.get("password") || ""));
+\frontend\app\login\page.tsx:30: ? "Invalid email or password."
+\frontend\app\login\page.tsx:92: <Field label="Email">
+\frontend\app\login\page.tsx:94: name="email"
+\frontend\app\login\page.tsx:95: type="email"
+\frontend\components\AppShell.tsx:93: "fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-[#102c36] text-slate-300 transition-transform duration-200 lg:visible lg:translate-x-0",
+\frontend\components\AppShell.tsx:131: className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
+\frontend\components\AuthProvider.tsx:18: login: (email: string, password: string) => Promise<User>;
+\frontend\components\AuthProvider.tsx:45: const login = useCallback(async (email: string, password: string) => {
+\frontend\components\AuthProvider.tsx:48: body: { email, password },
+\frontend\components\ui.tsx:298: <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/50 p-4 backdrop-blur-sm">
+\frontend\components\course\AnnouncementsTab.tsx:67: if (!confirm("Delete this announcement?")) return;
+\frontend\components\course\AnnouncementsTab.tsx:122: <Modal
+\frontend\components\course\AssessmentsTab.tsx:174: <Modal
+\frontend\components\course\AttendanceTab.tsx:107: if (!confirm("Close this attendance session?")) return;
+\frontend\components\course\AttendanceTab.tsx:267: <Modal
+\frontend\components\course\AttendanceTab.tsx:327: <Modal
+\frontend\components\course\CourseOverview.tsx:79: if (!confirm("Remove this meeting from the weekly schedule?")) return;
+\frontend\components\course\CourseOverview.tsx:115: if (!confirm(`Delete ${course.code} and all of its content? This cannot be undone.`))
+\frontend\components\course\CourseOverview.tsx:325: <Modal
+\frontend\components\course\DiscussionsTab.tsx:97: if (!confirm("Delete this discussion post?")) return;
+\frontend\components\course\GradebookTab.tsx:67: <p className="text-xs text-slate-400">{row.student.email}</p>
+\frontend\components\course\LeaveTab.tsx:74: const note = prompt(
+\frontend\components\course\LeaveTab.tsx:119: type="file"
+\frontend\components\course\LessonsTab.tsx:75: if (!confirm(`Delete lesson “${lesson.title}”?`)) return;
+\frontend\components\course\LessonsTab.tsx:165: <Modal
+\frontend\components\course\RosterTab.tsx:56: email: form.get("email"),
+\frontend\components\course\RosterTab.tsx:83: if (!confirm(`Remove ${entry.user.name} from ${course.code}?`)) return;
+\frontend\components\course\RosterTab.tsx:101: <Card title="Add member" subtitle="Search by the exact account email">
+\frontend\components\course\RosterTab.tsx:103: <Field label="Email">
+\frontend\components\course\RosterTab.tsx:104: <Input name="email" type="email" required placeholder="student@school.example" />
+\frontend\components\course\RosterTab.tsx:141: <p className="text-xs text-slate-400">{entry.user.email}</p>
+\backend\src\main\java\com\codemark\lms\Access.java:121: .list(User.class, "where e.email=?1", Api.text(b, "email", "").trim().toLowerCase())
+\backend\src\main\java\com\codemark\lms\AdminController.java:50: (u.name.toLowerCase().contains(term) || u.email.toLowerCase().contains(term))
+\backend\src\main\java\com\codemark\lms\AdminController.java:74: u.email = text(b, "email", u.email);
+\backend\src\main\java\com\codemark\lms\AdminController.java:78: u.email != null
+\backend\src\main\java\com\codemark\lms\AdminController.java:79: && u.email.contains("@")
+\backend\src\main\java\com\codemark\lms\AdminController.java:85: u.email = u.email.trim().toLowerCase();
+\backend\src\main\java\com\codemark\lms\CourseController.java:206: store.list(User.class, "where e.email=?1", required(b, "email").toLowerCase()).stream()
+\backend\src\main\java\com\codemark\lms\DemoSeed.java:102: User user(String email, String name, String role) {
+\backend\src\main\java\com\codemark\lms\DemoSeed.java:103: return store.list(User.class, "where e.email=?1", email).stream()
+\backend\src\main\java\com\codemark\lms\DemoSeed.java:108: u.email = email;
+\backend\src\main\java\com\codemark\lms\User.java:13: String email;
+\backend\src\main\java\com\codemark\lms\Views.java:20: return u == null ? null : map("id", u.id, "name", u.name, "email", u.email, "role", u.role);
+\backend\src\main\resources\demo-questions.json:196: "email",

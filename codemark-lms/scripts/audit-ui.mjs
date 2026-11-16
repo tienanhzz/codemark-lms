@@ -1,0 +1,5 @@
+import fs from 'node:fs';import path from 'node:path';import ts from 'typescript';
+function walk(p){return fs.readdirSync(p,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(p,e.name)):[path.join(p,e.name)]);}
+const values=new Set();
+for(const p of [...walk('frontend/app'),...walk('frontend/components')].filter(p=>p.endsWith('.tsx'))){const s=fs.readFileSync(p,'utf8');const a=ts.createSourceFile(p,s,99,true,ts.ScriptKind.TSX);function visit(n){if(ts.isJsxText(n)){const v=n.getText(a).trim();if(/[a-zA-Z]{3}/.test(v))values.add(v.replace(/\s+/g,' '));}if(ts.isStringLiteral(n)){const par=n.parent;if((ts.isJsxAttribute(par)&&['label','title','subtitle','description','hint','placeholder','alt','aria-label'].includes(par.name.getText(a)))||(ts.isPropertyAssignment(par)&&['label','title','subtitle','description'].includes(par.name.getText(a)))||(ts.isCallExpression(par)&&/set(Error|Notice)|confirmInline/.test(par.expression.getText(a))))values.add(n.text);}ts.forEachChild(n,visit);}visit(a);}
+console.log([...values].join('\n'));

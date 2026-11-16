@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/question-content.schema.json",
+  "title": "Student-Visible Question Content",
+  "description": "Discriminated public content for supported question types. Correctness data and private tests belong in authoringConfig, never in content.",
+  "oneOf": [
+    { "$ref": "#/$defs/code" },
+    { "$ref": "#/$defs/writing" },
+    { "$ref": "#/$defs/sentenceRewriting" },
+    { "$ref": "#/$defs/multipleChoice" },
+    { "$ref": "#/$defs/multipleSelect" },
+    { "$ref": "#/$defs/shortAnswer" },
+    { "$ref": "#/$defs/fillInTheBlank" },
+    { "$ref": "#/$defs/matching" },
+    { "$ref": "#/$defs/ordering" },
+    { "$ref": "#/$defs/trueFalseNotGiven" },
+    { "$ref": "#/$defs/readingSet" },
+    { "$ref": "#/$defs/listeningSet" }
+  ],
+  "$defs": {
+    "code": {
+      "type": "object",
+      "required": ["contentType", "submissionModes", "wrapperKind", "runtimeProfileId"],
+      "properties": {
+        "contentType": { "const": "code" },
+        "submissionModes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["editor", "file"] }
+        },
+        "wrapperKind": { "enum": ["class", "method", "program"] },
+        "runtimeProfileId": { "type": "string", "minLength": 1 },
+        "supportFilePaths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "writing": {
+      "type": "object",
+      "required": ["contentType", "responseMode"],
+      "properties": {
+        "contentType": { "const": "writing" },
+        "responseMode": { "enum": ["plainText", "richText", "file"] },
+        "maximumResponseLength": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "sentenceRewriting": {
+      "type": "object",
+      "required": ["contentType", "sourceText"],
+      "properties": {
+        "contentType": { "const": "sentenceRewriting" },
+        "sourceText": { "type": "string", "minLength": 1 },
+        "checkEnabled": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "multipleChoice": {
+      "allOf": [
+        { "$ref": "#/$defs/choices" },
+        {
+          "properties": {
+            "contentType": { "const": "multipleChoice" }
+          }
+        }
+      ]
+    },
+    "multipleSelect": {
+      "allOf": [
+        { "$ref": "#/$defs/choices" },
+        {
+          "properties": {
+            "contentType": { "const": "multipleSelect" }
+          }
+        }
+      ]
+    },
+    "choices": {
+      "type": "object",
+      "required": ["contentType", "choices"],
+      "properties": {
+        "contentType": { "enum": ["multipleChoice", "multipleSelect"] },
+        "choices": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["choiceId", "text"],
+            "properties": {
+              "choiceId": { "type": "string", "minLength": 1 },
+              "text": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "shortAnswer": {
+      "type": "object",
+      "required": ["contentType"],
+      "properties": {
+        "contentType": { "const": "shortAnswer" },
+        "maximumResponseLength": { "type": "integer", "minimum": 1 },
+        "normalization": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["trimWhitespace", "collapseWhitespace", "ignoreCase", "ignorePunctuation"] }
+        }
+      },
+      "additionalProperties": false
+    },
+    "fillInTheBlank": {
+      "type": "object",
+      "required": ["contentType", "text", "blankIds"],
+      "properties": {
+        "contentType": { "const": "fillInTheBlank" },
+        "text": { "type": "string", "minLength": 1 },
+        "blankIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "matching": {
+      "type": "object",
+      "required": ["contentType", "leftItems", "rightItems"],
+      "properties": {
+        "contentType": { "const": "matching" },
+        "leftItems": { "$ref": "#/$defs/promptItems" },
+        "rightItems": { "$ref": "#/$defs/promptItems" },
+        "randomizeRightItems": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "ordering": {
+      "type": "object",
+      "required": ["contentType", "items"],
+      "properties": {
+        "contentType": { "const": "ordering" },
+        "items": { "$ref": "#/$defs/promptItems" },
+        "randomizeItems": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "trueFalseNotGiven": {
+      "type": "object",
+      "required": ["contentType", "statement"],
+      "properties": {
+        "contentType": { "const": "trueFalseNotGiven" },
+        "statement": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "readingSet": {
+      "type": "object",
+      "required": ["contentType", "passage", "childQuestionVersionIds"],
+      "properties": {
+        "contentType": { "const": "readingSet" },
+        "passage": { "type": "string", "minLength": 1 },
+        "childQuestionVersionIds": { "$ref": "#/$defs/childQuestionIds" }
+      },
+      "additionalProperties": false
+    },
+    "listeningSet": {
+      "type": "object",
+      "required": ["contentType", "audioAssetId", "childQuestionVersionIds", "playLimit"],
+      "properties": {
+        "contentType": { "const": "listeningSet" },
+        "audioAssetId": { "type": "string", "minLength": 1 },
+        "childQuestionVersionIds": { "$ref": "#/$defs/childQuestionIds" },
+        "playLimit": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "promptItems": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["itemId", "text"],
+        "properties": {
+          "itemId": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "childQuestionIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

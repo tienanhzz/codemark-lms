@@ -1,0 +1,29 @@
+{
+  "buildId": "BUILD-002",
+  "checkedAt": "2026-11-15T12:09:21.038205+00:00",
+  "result": "pass",
+  "routes": [
+    "/",
+    "/activity",
+    "/profile",
+    "/security",
+    "/settings",
+    "/accounts",
+    "/imports",
+    "/profile-support",
+    "/mfa-policy",
+    "/accept-invitation",
+    "/forgot-password",
+    "/reset-password",
+    "/courses",
+    "/academic-catalogs",
+    "/course-rules"
+  ],
+  "localBundlesChecked": 12,
+  "apiReady": true,
+  "unauthenticatedProtectedEndpoints": "401",
+  "cspHeaders": "pass",
+  "authenticatedWorkflowVerification": false,
+  "browserVisualQA": false,
+  "accountOrDatabaseMutations": false
+}

@@ -1,0 +1,40 @@
+{
+  "checkedOn": "2026-11-15",
+  "result": "pass",
+  "localProduction": {
+    "apiHealth": "ready",
+    "webHealth": "pass",
+    "mainDatabase": "codemark_lms",
+    "migrationHead": "0008_protected_avatars",
+    "privatePreMigrationBackup": true,
+    "schemaDrift": false,
+    "userSessionAuditCourseCountParity": true,
+    "reseeding": false,
+    "adminPasswordChanged": false
+  },
+  "guardedQaHttp": {
+    "database": "codemark_lms_test",
+    "productionPagesAssetsCsp": 15,
+    "workspaceRoutes": 54,
+    "foundationRoutes": 15,
+    "avatarProfileSupportTeachingTeam": true,
+    "importsExportsEnrollment": true,
+    "realSmtp": false,
+    "browserVisualKeyboardMobile": false
+  },
+  "automated": {
+    "apiTests": 94,
+    "webDomTests": 42,
+    "ruff": "pass",
+    "mypyModules": 28,
+    "typescript": "pass",
+    "productionBuild": "pass",
+    "openapiPaths": 168,
+    "openapiOperations": 195
+  },
+  "pending": [
+    "Browser visual, keyboard and mobile QA",
+    "Real SMTP delivery verification",
+    "Hosted CI and BUILD-033 release gates"
+  ]
+}

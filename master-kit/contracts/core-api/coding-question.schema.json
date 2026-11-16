@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/coding-question.schema.json",
+  "title": "Coding Question Classification",
+  "description": "Coding question metadata relevant to discovery, classification, and assignment selection.",
+  "type": "object",
+  "required": ["questionId", "title", "prompt", "difficulty", "tagIds", "status"],
+  "properties": {
+    "questionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "difficulty": {
+      "enum": ["beginner", "intermediate", "advanced"]
+    },
+    "tagIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      }
+    },
+    "status": {
+      "enum": ["draft", "published", "archived"]
+    }
+  },
+  "additionalProperties": false
+}

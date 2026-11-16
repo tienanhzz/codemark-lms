@@ -1,0 +1,43 @@
+{
+  "assessmentId": "midterm-programming",
+  "assessmentVersionId": "midterm-programming-v1",
+  "versionNumber": 1,
+  "courseId": "intro-programming",
+  "assessmentTypeId": "midterm",
+  "title": "Midterm Programming Assessment",
+  "instructions": "Complete each assigned question before the deadline.",
+  "versionStatus": "draft",
+  "schedule": {
+    "opensAt": "2026-11-20T08:00:00Z",
+    "closesAt": "2026-11-20T11:00:00Z",
+    "durationMinutes": 120,
+    "timezone": "Asia/Ho_Chi_Minh"
+  },
+  "attemptPolicy": {
+    "maxAttempts": 1,
+    "lateSubmission": "reject",
+    "autosaveIntervalSeconds": 15,
+    "autoSubmitOnExpiry": true,
+    "latePenaltyTiers": []
+  },
+  "gradingPolicy": {
+    "mode": "perItem",
+    "maximumPoints": 100,
+    "publishRequiresCompleteGrading": true,
+    "allowScoreOverride": true,
+    "overrideRequiresReason": true
+  },
+  "feedbackPolicy": {
+    "showCorrectAnswers": false,
+    "showRubric": true,
+    "gradeReviewWindowDays": 7
+  },
+  "items": [
+    {
+      "position": 1,
+      "questionId": "two-sum",
+      "questionVersionId": "two-sum-v1",
+      "maximumPoints": 100
+    }
+  ]
+}

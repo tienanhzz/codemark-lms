@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/lesson.schema.json",
+  "title": "Lesson Classification Metadata",
+  "description": "Lesson metadata relevant to discovery and shared taxonomy classification.",
+  "type": "object",
+  "required": ["lessonId", "lessonVersionId", "versionNumber", "title", "tagIds", "status"],
+  "properties": {
+    "lessonId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lessonVersionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "versionNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tagIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      }
+    },
+    "status": {
+      "enum": ["draft", "published", "archived"]
+    }
+  },
+  "additionalProperties": false
+}

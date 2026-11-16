@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/coding-question.schema.json",
+  "title": "Question Classification Metadata",
+  "description": "Coding question metadata relevant to discovery, classification, and assignment selection.",
+  "type": "object",
+  "required": ["questionId", "questionVersionId", "versionNumber", "questionType", "title", "prompt", "categoryId", "difficulty", "tagIds", "status"],
+  "properties": {
+    "questionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "questionVersionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "versionNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "questionType": {
+      "enum": ["code", "writing", "sentenceRewriting", "multipleChoice", "multipleSelect", "shortAnswer", "fillInTheBlank", "matching", "ordering", "trueFalseNotGiven", "readingSet", "listeningSet"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "categoryId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["newbie", "noob", "wannabe", "gatekeeper", "legendary"],
+      "description": "Five ordered levels: Newbie (1), Noob (2), Wannabe (3), Gatekeeper (4), Legendary (5)."
+    },
+    "tagIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      }
+    },
+    "status": {
+      "enum": ["draft", "published", "archived"]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,10 @@
+{
+  "assignmentId": "week-1-practice",
+  "title": "Week 1: Arrays and Hash Maps",
+  "selection": {
+    "mode": "tags",
+    "tagIds": ["arrays", "hash-maps-sets"],
+    "match": "any"
+  },
+  "questionIds": ["two-sum"]
+}

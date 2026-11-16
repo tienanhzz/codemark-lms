@@ -1,0 +1,202 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+input[type="datetime-local"],
+input[type="date"],
+input[type="time"] {
+  min-height: 2.5rem;
+}
+
+.prose-lesson {
+  white-space: pre-wrap;
+  line-height: 1.65;
+}
+
+.workspace .dashboard-welcome > div {
+  margin-bottom: 0;
+}
+
+.workspace .dashboard-welcome h1 {
+  color: #fff;
+}
+
+.workspace .dashboard-welcome h1 i {
+  color: #99f6e4;
+}
+
+.workspace .dashboard-welcome p {
+  color: #cbd5e1;
+}
+
+.workspace table thead {
+  background: #f8fafc;
+}
+
+.workspace table th {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.workspace table tbody tr:hover {
+  background-color: #f0fdfa;
+}
+
+.workspace input[type="checkbox"],
+.workspace input[type="radio"] {
+  accent-color: #115e59;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .workspace-content {
+    animation: login-enter 280ms ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace *,
+  .workspace *::before,
+  .workspace *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Login only: short, one-time entrances; no animation loop or JS timers. */
+@keyframes login-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .login-scene .login-enter {
+    animation: login-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .login-scene .login-enter-intro {
+    animation-delay: 60ms;
+  }
+
+  .login-scene .login-enter-form {
+    animation-delay: 100ms;
+  }
+
+  .login-scene .login-enter-footer {
+    animation-delay: 140ms;
+  }
+
+  .login-scene .login-submit,
+  .login-scene .login-feature > i {
+    transition: transform 160ms ease-out, background-color 160ms ease-out;
+  }
+
+  .login-scene input {
+    transition: border-color 160ms ease-out, box-shadow 160ms ease-out;
+  }
+
+  .login-scene .login-submit:active:not(:disabled) {
+    transform: translateY(0) scale(0.99);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .login-scene .login-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .login-scene .login-feature:hover > i {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-scene input,
+  .login-scene .login-submit {
+    transition: none;
+  }
+}
+
+@keyframes drawer-in {from {opacity:0;transform:translateX(24px)} to {opacity:1;transform:translateX(0)}}
+.drawer-panel {animation: drawer-in .2s ease-out;}
+@media(prefers-reduced-motion:reduce){.drawer-panel{animation:none}}
+
+/* Trên desktop, chỉ mở rộng sidebar khi rê chuột hoặc dùng bàn phím. */
+@media (min-width: 1024px) {
+  .compact-sidebar { width: 5rem; }
+  .compact-sidebar .sidebar-label { display: none; }
+  .compact-sidebar:hover, .compact-sidebar:focus-within { width: 16rem; box-shadow: 12px 0 30px rgb(15 23 42 / 12%); }
+  .compact-sidebar:hover .sidebar-label, .compact-sidebar:focus-within .sidebar-label { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .compact-sidebar { transition: none; }
+}
+
+/* Home illustration: seamless loops using transforms and SVG strokes only. */
+.learning-motion-scene { font-family: inherit; }
+.learning-motion-satellite { transform-origin: 500px 270px; }
+.learning-motion[data-paused="true"] svg * { animation-play-state: paused !important; }
+.learning-motion [data-paused="true"] svg * { animation-play-state: paused !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .learning-motion-slide,
+  .learning-motion button span { transition: none !important; }
+}
+
+@keyframes learning-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes learning-orbit { to { stroke-dashoffset: -396; } }
+@keyframes learning-satellite { to { transform: rotate(360deg); } }
+@keyframes learning-beacon {
+  0%, 30%, 100% { opacity: .35; }
+  60%, 80% { opacity: 1; }
+}
+@keyframes learning-signal { to { stroke-dashoffset: -68; } }
+@keyframes learning-network { to { stroke-dashoffset: -160; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .learning-motion-float { animation: learning-float 6s ease-in-out infinite; }
+  .learning-motion-float-delayed { animation-delay: -2s; animation-duration: 7s; }
+  .learning-motion-float-slow { animation-delay: -4s; animation-duration: 8s; }
+  .learning-motion-monitor { animation: learning-float 9s ease-in-out infinite; }
+  .learning-motion-orbit { animation: learning-orbit 18s linear infinite; }
+  .learning-motion-satellite { animation: learning-satellite 36s linear infinite; }
+  .learning-motion-beacon { animation: learning-beacon 8s ease-in-out infinite; }
+  .learning-motion-stars { animation: learning-beacon 6s ease-in-out infinite; }
+  .learning-motion-signal { animation: learning-signal 6s linear infinite; }
+  .learning-motion-network { animation: learning-network 8s linear infinite; }
+}

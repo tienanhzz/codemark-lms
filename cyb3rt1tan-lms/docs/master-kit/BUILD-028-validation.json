@@ -1,0 +1,25 @@
+{
+  "build": "BUILD-028",
+  "localStatus": "Implemented, operational evidence pending",
+  "validatedAt": "2026-11-15",
+  "source": "D:/CodeMark/master-kit (1)/BUILDING_PROCESS.md",
+  "evidence": {
+    "apiTests": "112 passed",
+    "webTests": "49 passed",
+    "typescript": "passed",
+    "productionBuild": "passed",
+    "ruff": "passed",
+    "mypy": "35 modules passed",
+    "postgresMigrationCycle": "passed through 0015_runner_queue_admission",
+    "postgresCourseIntegration": "passed, including taxonomy merge, protected audio, Listening publication/access, Redis Streams flow using in-memory double, metadata-only dead-letter and immutable records",
+    "httpSmoke": "passed: 54 workspace routes, 15 foundation routes, 12 local bundles, API readiness and security headers",
+    "mainDatabase": "codemark_lms upgraded to 0015 with private backup and users/sessions/audit/courses count parity; local readiness endpoints returned HTTP 200",
+    "contracts": "OpenAPI 3.1: 172 paths, 199 operations; 19 schemas; 17 examples"
+  },
+  "remaining": [
+    "Live Redis service verification (queue remains disabled by default; no Redis server installed)",
+    "Verify/import the canonical catalog in the main local database without overwriting existing entries",
+    "Browser visual, keyboard, and mobile inspection"
+  ],
+  "safetyBoundary": "Student-code execution and runtime-profile activation remain disabled."
+}

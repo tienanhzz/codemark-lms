@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/assessment-version.schema.json",
+  "title": "Immutable Assessment Version",
+  "description": "Versioned assessment configuration and exact question-version delivery snapshot.",
+  "type": "object",
+  "required": [
+    "assessmentId",
+    "assessmentVersionId",
+    "versionNumber",
+    "courseId",
+    "title",
+    "versionStatus",
+    "schedule",
+    "attemptPolicy",
+    "gradingPolicy",
+    "items"
+  ],
+  "properties": {
+    "assessmentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assessmentVersionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "versionNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "courseId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assessmentTypeId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "instructions": {
+      "type": "string"
+    },
+    "versionStatus": {
+      "enum": ["draft", "published", "superseded"]
+    },
+    "schedule": {
+      "$ref": "#/$defs/schedule"
+    },
+    "attemptPolicy": {
+      "$ref": "#/$defs/attemptPolicy"
+    },
+    "gradingPolicy": {
+      "$ref": "#/$defs/gradingPolicy"
+    },
+    "feedbackPolicy": {
+      "$ref": "#/$defs/feedbackPolicy"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    },
+    "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "schedule": {
+      "type": "object",
+      "required": ["opensAt", "closesAt", "timezone"],
+      "properties": {
+        "opensAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "closesAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dueAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "attemptPolicy": {
+      "type": "object",
+      "required": ["maxAttempts", "lateSubmission"],
+      "properties": {
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lateSubmission": {
+          "enum": ["reject", "accept", "acceptWithPenalty"]
+        },
+        "autosaveIntervalSeconds": {
+          "type": "integer",
+          "minimum": 5
+        },
+        "autoSubmitOnExpiry": {
+          "type": "boolean"
+        },
+        "latePenaltyTiers": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "required": ["afterMinutes", "penaltyPercent"],
+            "properties": {
+              "afterMinutes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 525600
+              },
+              "penaltyPercent": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 100
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "lateSubmission": { "const": "acceptWithPenalty" }
+            },
+            "required": ["lateSubmission"]
+          },
+          "then": {
+            "properties": { "latePenaltyTiers": { "minItems": 1 } },
+            "required": ["latePenaltyTiers"]
+          },
+          "else": {
+            "properties": { "latePenaltyTiers": { "maxItems": 0 } }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "gradingPolicy": {
+      "type": "object",
+      "required": ["mode", "maximumPoints", "publishRequiresCompleteGrading"],
+      "properties": {
+        "mode": {
+          "enum": ["perItem", "allOrNothing"]
+        },
+        "maximumPoints": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "publishRequiresCompleteGrading": {
+          "type": "boolean"
+        },
+        "allowScoreOverride": {
+          "type": "boolean"
+        },
+        "overrideRequiresReason": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "feedbackPolicy": {
+      "type": "object",
+      "properties": {
+        "releaseAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "showCorrectAnswers": {
+          "type": "boolean"
+        },
+        "showRubric": {
+          "type": "boolean"
+        },
+        "gradeReviewWindowDays": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "item": {
+      "type": "object",
+      "required": ["position", "questionId", "questionVersionId", "maximumPoints"],
+      "properties": {
+        "position": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "questionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "questionVersionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maximumPoints": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sectionId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

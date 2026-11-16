@@ -1,0 +1,375 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/question-authoring-config.schema.json",
+  "title": "Private Question Authoring Configuration",
+  "description": "Strict, server-only scoring configuration. Never include this object in student projections or runner results.",
+  "oneOf": [
+    { "$ref": "#/$defs/code" },
+    { "$ref": "#/$defs/writing" },
+    { "$ref": "#/$defs/sentenceRewriting" },
+    { "$ref": "#/$defs/multipleChoice" },
+    { "$ref": "#/$defs/multipleSelect" },
+    { "$ref": "#/$defs/shortAnswer" },
+    { "$ref": "#/$defs/fillInTheBlank" },
+    { "$ref": "#/$defs/matching" },
+    { "$ref": "#/$defs/ordering" },
+    { "$ref": "#/$defs/trueFalseNotGiven" },
+    { "$ref": "#/$defs/readingSet" },
+    { "$ref": "#/$defs/listeningSet" }
+  ],
+  "$defs": {
+    "code": {
+      "type": "object",
+      "required": ["configType", "referenceSolutionAssetId", "testCases", "scoring"],
+      "properties": {
+        "configType": { "const": "code" },
+        "referenceSolutionAssetId": { "type": "string", "minLength": 1 },
+        "harness": {
+          "type": "object",
+          "properties": {
+            "templateId": { "type": "string", "minLength": 1 },
+            "templateVersion": { "type": "integer", "minimum": 1 },
+            "source": {
+              "type": "string",
+              "description": "Optional question-authored harness source; always treated as untrusted code and executed only in the isolated runner."
+            },
+            "studentAnswerPlaceholder": { "type": "string", "minLength": 1 },
+            "testCasePlaceholder": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
+        "classRequirements": {
+          "$ref": "#/$defs/classRequirements"
+        },
+        "testCases": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/codeTestCase" }
+        },
+        "scoring": {
+          "$ref": "#/$defs/codeScoring"
+        },
+        "executionLimits": {
+          "$ref": "#/$defs/executionLimits"
+        }
+      },
+      "additionalProperties": false
+    },
+    "classRequirements": {
+      "type": "object",
+      "properties": {
+        "package": {
+          "type": "object",
+          "required": ["mode"],
+          "properties": {
+            "mode": { "enum": ["required", "forbidden", "any"] },
+            "name": { "type": "string", "minLength": 1 }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "mode": { "const": "required" } }, "required": ["mode"] },
+              "then": { "required": ["name"] }
+            }
+          ],
+          "additionalProperties": false
+        },
+        "className": { "type": "string", "minLength": 1 },
+        "attributes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/attributeRequirement" }
+        },
+        "constructors": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/signatureRequirement" }
+        },
+        "methods": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/signatureRequirement" }
+        },
+        "expectedExceptions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "attributeRequirement": {
+      "type": "object",
+      "required": ["name", "type", "isMutable", "isOptional"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "type": { "enum": ["boolean", "byte", "short", "int", "long", "float", "double", "char", "string", "array", "object"] },
+        "isMutable": { "type": "boolean" },
+        "isOptional": { "type": "boolean" },
+        "constraints": {
+          "type": "object",
+          "properties": {
+            "minimum": { "type": "number" },
+            "maximum": { "type": "number" },
+            "minLength": { "type": "integer", "minimum": 0 },
+            "maxLength": { "type": "integer", "minimum": 0 },
+            "pattern": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "validators": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["isValidAttribute", "isValidMinimum", "isValidMaximum", "isValidLength", "isValidPattern"] }
+        },
+        "setterExceptions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "signatureRequirement": {
+      "type": "object",
+      "required": ["name", "parameterTypes", "visibility"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "parameterTypes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "returnType": { "type": "string", "minLength": 1 },
+        "visibility": { "enum": ["public", "protected", "packagePrivate", "private"] },
+        "expectedExceptions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "codeTestCase": {
+      "type": "object",
+      "required": ["testCaseId", "position", "representation", "display", "points"],
+      "properties": {
+        "testCaseId": { "type": "string", "minLength": 1 },
+        "position": { "type": "integer", "minimum": 1 },
+        "representation": { "enum": ["inputOutput", "harnessSnippet"] },
+        "input": { "type": "string" },
+        "harnessSnippet": { "type": "string" },
+        "expectedOutput": { "type": "string" },
+        "display": { "enum": ["useAsExample", "show", "hide", "hideIfFail", "hideIfSuccess"] },
+        "points": { "type": "number", "minimum": 0 },
+        "timeoutOverrideMs": { "type": "integer", "minimum": 1 },
+        "memoryOverrideBytes": { "type": "integer", "minimum": 1 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "representation": { "const": "inputOutput" } }, "required": ["representation"] },
+          "then": { "required": ["input", "expectedOutput"] }
+        },
+        {
+          "if": { "properties": { "representation": { "const": "harnessSnippet" } }, "required": ["representation"] },
+          "then": { "required": ["harnessSnippet", "expectedOutput"] }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "codeScoring": {
+      "type": "object",
+      "required": ["mode", "maximumPoints", "showCheckButton", "wrongCheckPenalty", "scoreFloor"],
+      "properties": {
+        "mode": { "enum": ["perTestCase", "allOrNothing"] },
+        "maximumPoints": { "type": "number", "exclusiveMinimum": 0 },
+        "showCheckButton": { "type": "boolean" },
+        "wrongCheckPenalty": { "type": "number", "minimum": 0 },
+        "scoreFloor": { "const": 0 },
+        "maxCheckAttempts": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "executionLimits": {
+      "type": "object",
+      "required": ["wallTimeMs", "cpuTimeMs", "memoryBytes"],
+      "properties": {
+        "wallTimeMs": { "type": "integer", "minimum": 1 },
+        "cpuTimeMs": { "type": "integer", "minimum": 1 },
+        "memoryBytes": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "writing": {
+      "type": "object",
+      "required": ["configType", "rubric"],
+      "properties": {
+        "configType": { "const": "writing" },
+        "rubric": { "$ref": "./writing-rubric.schema.json" },
+        "graderNotePolicy": { "enum": ["private", "shareWithStudentAfterPublish"] }
+      },
+      "additionalProperties": false
+    },
+    "sentenceRewriting": {
+      "type": "object",
+      "required": ["configType", "acceptedAnswers", "normalization"],
+      "properties": {
+        "configType": { "const": "sentenceRewriting" },
+        "acceptedAnswers": { "$ref": "#/$defs/nonEmptyStringList" },
+        "normalization": { "$ref": "#/$defs/normalization" },
+        "checkEnabled": { "type": "boolean" },
+        "highlightNearestAnswer": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "multipleChoice": {
+      "type": "object",
+      "required": ["configType", "correctChoiceIds"],
+      "properties": {
+        "configType": { "const": "multipleChoice" },
+        "correctChoiceIds": { "$ref": "#/$defs/nonEmptyStringList" },
+        "explanation": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "multipleSelect": {
+      "type": "object",
+      "required": ["configType", "correctChoiceIds", "scoringMode"],
+      "properties": {
+        "configType": { "const": "multipleSelect" },
+        "correctChoiceIds": { "$ref": "#/$defs/nonEmptyStringList" },
+        "scoringMode": { "enum": ["allOrNothing", "partialCredit"] },
+        "incorrectSelectionPenalty": { "type": "number", "minimum": 0 },
+        "explanation": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "shortAnswer": {
+      "type": "object",
+      "required": ["configType", "acceptedAnswers", "normalization"],
+      "properties": {
+        "configType": { "const": "shortAnswer" },
+        "acceptedAnswers": { "$ref": "#/$defs/nonEmptyStringList" },
+        "normalization": { "$ref": "#/$defs/normalization" },
+        "fuzzyMatch": { "type": "boolean" },
+        "fuzzyThreshold": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "fuzzyMatch": { "const": true } }, "required": ["fuzzyMatch"] },
+          "then": { "required": ["fuzzyThreshold"] }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "fillInTheBlank": {
+      "type": "object",
+      "required": ["configType", "blanks", "scoringMode"],
+      "properties": {
+        "configType": { "const": "fillInTheBlank" },
+        "blanks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["blankId", "acceptedAnswers", "points"],
+            "properties": {
+              "blankId": { "type": "string", "minLength": 1 },
+              "acceptedAnswers": { "$ref": "#/$defs/nonEmptyStringList" },
+              "points": { "type": "number", "exclusiveMinimum": 0 },
+              "normalization": { "$ref": "#/$defs/normalization" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "scoringMode": { "enum": ["perBlank", "allOrNothing"] }
+      },
+      "additionalProperties": false
+    },
+    "matching": {
+      "type": "object",
+      "required": ["configType", "pairs", "scoringMode"],
+      "properties": {
+        "configType": { "const": "matching" },
+        "pairs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["leftItemId", "rightItemId", "points"],
+            "properties": {
+              "leftItemId": { "type": "string", "minLength": 1 },
+              "rightItemId": { "type": "string", "minLength": 1 },
+              "points": { "type": "number", "exclusiveMinimum": 0 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "scoringMode": { "enum": ["perPair", "allOrNothing"] }
+      },
+      "additionalProperties": false
+    },
+    "ordering": {
+      "type": "object",
+      "required": ["configType", "correctItemIds", "scoringMode"],
+      "properties": {
+        "configType": { "const": "ordering" },
+        "correctItemIds": { "$ref": "#/$defs/nonEmptyStringList" },
+        "scoringMode": { "enum": ["perPosition", "allOrNothing"] }
+      },
+      "additionalProperties": false
+    },
+    "trueFalseNotGiven": {
+      "type": "object",
+      "required": ["configType", "correctValue"],
+      "properties": {
+        "configType": { "const": "trueFalseNotGiven" },
+        "correctValue": { "enum": ["true", "false", "notGiven"] },
+        "explanation": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "readingSet": {
+      "type": "object",
+      "required": ["configType", "children"],
+      "properties": {
+        "configType": { "const": "readingSet" },
+        "children": { "$ref": "#/$defs/setChildren" }
+      },
+      "additionalProperties": false
+    },
+    "listeningSet": {
+      "type": "object",
+      "required": ["configType", "children"],
+      "properties": {
+        "configType": { "const": "listeningSet" },
+        "children": { "$ref": "#/$defs/setChildren" },
+        "transcriptAssetId": { "type": "string", "minLength": 1 },
+        "transcriptAccommodationOnly": { "const": true }
+      },
+      "additionalProperties": false
+    },
+    "setChildren": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["questionVersionId", "questionType", "points"],
+        "properties": {
+          "questionVersionId": { "type": "string", "minLength": 1 },
+          "questionType": {
+            "enum": ["multipleChoice", "multipleSelect", "shortAnswer", "fillInTheBlank", "matching", "ordering", "trueFalseNotGiven"]
+          },
+          "points": { "type": "number", "exclusiveMinimum": 0 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "nonEmptyStringList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "normalization": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["trimWhitespace", "collapseWhitespace", "ignoreCase", "ignorePunctuation", "unicodeNfc"] }
+    }
+  }
+}

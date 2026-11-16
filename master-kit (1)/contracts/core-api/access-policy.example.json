@@ -1,0 +1,66 @@
+{
+  "policyId": "lms-default-access",
+  "version": 1,
+  "status": "active",
+  "effectiveAt": "2026-11-06T00:00:00Z",
+  "globalRolePermissions": {
+    "student": [
+      "account.self.read"
+    ],
+    "teacher": [
+      "course.create"
+    ],
+    "teachingAssistant": [
+      "account.self.read"
+    ],
+    "admin": [
+      "platform.manage",
+      "account.manage",
+      "course.manage",
+      "policy.manage",
+      "runtimeProfile.manage",
+      "audit.read",
+      "data.export"
+    ],
+    "administrativeAssistant": [
+      "account.profile.manage",
+      "enrollment.manage"
+    ],
+    "researchAssistant": [
+      "researchDataset.read.anonymized"
+    ]
+  },
+  "courseRoleDefaults": {
+    "teacher": [
+      "course.read",
+      "course.rules.manage",
+      "roster.read",
+      "content.read",
+      "content.author",
+      "assessment.manage",
+      "grading.manage",
+      "attendance.manage",
+      "exam.monitor",
+      "data.export"
+    ],
+    "teachingAssistant": [
+      "course.read",
+      "roster.read",
+      "content.read",
+      "attendance.read"
+    ]
+  },
+  "coursePermissionKeys": [
+    "course.read",
+    "course.rules.manage",
+    "roster.read",
+    "content.read",
+    "content.author",
+    "assessment.manage",
+    "grading.manage",
+    "attendance.read",
+    "attendance.manage",
+    "exam.monitor",
+    "data.export"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/user-preferences.schema.json",
+  "title": "User Interface Preferences",
+  "description": "Per-user interface settings. These preferences affect presentation only and never grant access.",
+  "type": "object",
+  "required": ["locale", "theme", "colorPalette"],
+  "properties": {
+    "locale": {
+      "type": "string",
+      "enum": ["en", "vi"],
+      "description": "Preferred interface language."
+    },
+    "theme": {
+      "type": "string",
+      "enum": ["light", "dark"],
+      "description": "Preferred light or dark appearance."
+    },
+    "colorPalette": {
+      "type": "string",
+      "enum": [
+        "navy-cyan-gold",
+        "ocean-teal",
+        "indigo-cyan",
+        "forest-lime",
+        "rose-slate",
+        "sunset-coral",
+        "violet-amber",
+        "graphite-cyan"
+      ],
+      "description": "User-selected accent palette; all palette choices remain available to every user."
+    },
+    "timeZone": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "Optional IANA time zone used for display only."
+    },
+    "textScale": {
+      "type": "string",
+      "enum": ["default", "large"]
+    },
+    "highContrast": {
+      "type": "boolean"
+    },
+    "reducedMotion": {
+      "type": "boolean"
+    },
+    "captionsEnabled": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

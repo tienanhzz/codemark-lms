@@ -1,0 +1,64 @@
+{
+  "questionId": "two-sum",
+  "questionVersionId": "two-sum-v1",
+  "versionNumber": 1,
+  "questionType": "code",
+  "title": "Two Sum",
+  "prompt": "Return the indices of two values whose sum equals the target.",
+  "categoryId": "data-structures-algorithms",
+  "difficulty": "wannabe",
+  "usageTypes": ["practice", "practical"],
+  "tagIds": ["arrays", "hash-maps-sets"],
+  "contentSchemaVersion": "1.0",
+  "content": {
+    "contentType": "code",
+    "submissionModes": ["editor", "file"],
+    "wrapperKind": "method",
+    "runtimeProfileId": "java-21"
+  },
+  "authoringConfig": {
+    "configType": "code",
+    "referenceSolutionAssetId": "asset-solution-123",
+    "harness": {
+      "templateId": "java-method-harness",
+      "templateVersion": 1,
+      "studentAnswerPlaceholder": "{{ STUDENT_ANSWER }}",
+      "testCasePlaceholder": "{{ TESTCASES }}"
+    },
+    "testCases": [
+      {
+        "testCaseId": "basic",
+        "position": 1,
+        "representation": "inputOutput",
+        "input": "4 9 2 7 11 15",
+        "expectedOutput": "0 1",
+        "display": "useAsExample",
+        "points": 5
+      },
+      {
+        "testCaseId": "hidden-boundary",
+        "position": 2,
+        "representation": "harnessSnippet",
+        "harnessSnippet": "assertArrayEquals(new int[]{0, 1}, solution.twoSum(new int[]{2, 7}, 9));",
+        "expectedOutput": "",
+        "display": "hide",
+        "points": 5
+      }
+    ],
+    "scoring": {
+      "mode": "perTestCase",
+      "maximumPoints": 10,
+      "showCheckButton": true,
+      "wrongCheckPenalty": 0,
+      "scoreFloor": 0,
+      "maxCheckAttempts": 10
+    },
+    "executionLimits": {
+      "wallTimeMs": 3000,
+      "cpuTimeMs": 2000,
+      "memoryBytes": 134217728
+    }
+  },
+  "status": "draft",
+  "createdAt": "2026-11-06T00:00:00Z"
+}

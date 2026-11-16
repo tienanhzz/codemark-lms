@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://master-kit.local/contracts/access-policy.schema.json",
+  "title": "Versioned Access Policy",
+  "description": "Role-to-permission policy and course permission grants. Authorization is default-deny and evaluated server-side.",
+  "type": "object",
+  "required": ["policyId", "version", "status", "effectiveAt", "globalRolePermissions", "courseRoleDefaults", "coursePermissionKeys"],
+  "properties": {
+    "policyId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": ["draft", "active", "superseded"]
+    },
+    "effectiveAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "globalRolePermissions": {
+      "type": "object",
+      "required": ["student", "teacher", "teachingAssistant", "admin", "administrativeAssistant", "researchAssistant"],
+      "properties": {
+        "student": { "$ref": "#/$defs/permissionList" },
+        "teacher": { "$ref": "#/$defs/permissionList" },
+        "teachingAssistant": { "$ref": "#/$defs/permissionList" },
+        "admin": { "$ref": "#/$defs/permissionList" },
+        "administrativeAssistant": { "$ref": "#/$defs/permissionList" },
+        "researchAssistant": { "$ref": "#/$defs/permissionList" }
+      },
+      "additionalProperties": false
+    },
+    "courseRoleDefaults": {
+      "type": "object",
+      "required": ["teacher", "teachingAssistant"],
+      "properties": {
+        "teacher": { "$ref": "#/$defs/permissionList" },
+        "teachingAssistant": { "$ref": "#/$defs/permissionList" }
+      },
+      "additionalProperties": false
+    },
+    "coursePermissionKeys": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-zA-Z0-9]*(\\.[a-z][a-zA-Z0-9]*)+$"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "permissionList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-zA-Z0-9]*(\\.[a-z][a-zA-Z0-9]*)+$"
+      }
+    }
+  }
+}

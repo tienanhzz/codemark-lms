@@ -1,0 +1,46 @@
+{
+  "rules": [
+    {
+      "ruleId": "attendance",
+      "category": "attendance",
+      "title": "Attendance",
+      "body": "Attend scheduled sessions and follow the course attendance process.",
+      "position": 0
+    },
+    {
+      "ruleId": "assignment-submission",
+      "category": "assignmentSubmission",
+      "title": "Assignment submissions",
+      "body": "Submit work through the course workspace before the published deadline.",
+      "position": 1
+    },
+    {
+      "ruleId": "practice",
+      "category": "practice",
+      "title": "Practice",
+      "body": "Use practice activities to build skills; practice scores do not change official grades unless an assessment says otherwise.",
+      "position": 2
+    },
+    {
+      "ruleId": "assessment",
+      "category": "assessment",
+      "title": "Assessments",
+      "body": "Follow the instructions and timing shown on each published assessment.",
+      "position": 3
+    },
+    {
+      "ruleId": "classroom-conduct",
+      "category": "classroomConduct",
+      "title": "Classroom conduct",
+      "body": "Treat classmates and staff respectfully and do not submit another person's work as your own.",
+      "position": 4
+    },
+    {
+      "ruleId": "communication",
+      "category": "communication",
+      "title": "Communication",
+      "body": "Use the course communication channels for course-related questions and announcements.",
+      "position": 5
+    }
+  ]
+}
