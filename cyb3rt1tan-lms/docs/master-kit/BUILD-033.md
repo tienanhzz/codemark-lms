@@ -23,12 +23,13 @@
 - 2026-11-16: Local verification passed: API suite 164 tests, Ruff lint and strict mypy including maintenance scripts; web suite 64 tests, TypeScript typecheck and production build. The run found and fixed a stale MFA configuration call in the Admin identity-status endpoint, and updated production configuration fixtures for the new key guards. Full API Ruff format check still reports 57 pre-existing files outside this increment; changed Python files were formatted. `git diff --check` passed. No production service or database was touched.
 - 2026-11-16: Updated the rebuild workflow to scope Ruff formatting enforcement to changed API Python files, preserving full-project lint/mypy and the complete test/build jobs. Workflow YAML parses locally; GitHub-hosted execution is still pending.
 - 2026-11-16: Added direct tests for legacy/v2 ciphertext reads, dry-run immutability, active-key rewrap, corrupted ciphertext rejection and missing-old-key rejection. Extracted the rewrap logic into an app module, linted and type-checked the maintenance CLI, and extended CI Ruff/mypy coverage to API scripts. Full API suite: 164 passed.
+- 2026-11-16: Hosted acceptance passed on commit `f178a99`: [Master Kit rebuild](https://github.com/tienanhzz/codemark-lms/actions/runs/43817238477), [Project CI](https://github.com/tienanhzz/codemark-lms/actions/runs/43817238501), and [Secret Scan](https://github.com/tienanhzz/codemark-lms/actions/runs/43817238539) all concluded success. PostgreSQL identity integration, dependency inventory/audit, and web verification completed in the rebuild workflow. The integration run exposed and fixed stale outbox verifier assumptions; Gitleaks initially flagged a test-only TOTP fixture, which was replaced with a non-secret marker before the passing scan.
 
 ## Not yet accepted
 
-- No hosted GitHub Actions execution has been observed for these workflow changes; the CI result remains pending until GitHub reports a successful run.
+- The three hosted workflows passed on `f178a99`; later commits that only update evidence documentation still require their own CI run before their exact SHA is accepted.
 - Authenticated browser visual, keyboard and mobile review of the new `/operations` release panel remains pending.
-- The secret scanner has not yet run in GitHub; its first result and follow-up findings remain pending. Complete dependency provenance/license review and the ASVS security/privacy review also remain open.
+- Gitleaks completed with no findings on `f178a99`. Complete dependency provenance/license review beyond the automated inventory and the ASVS security/privacy review remain open.
 - Runtime egress restrictions, TLS deployment, least-privilege service/database identities, managed key custody, an executed legacy ciphertext rewrap and verified key rotation/recovery drills, encrypted backup retention and a verified restore drill remain open.
 - Deployment and release acceptance remain pending. Local health checks, unit tests and workflow definitions do not prove production readiness.
 
