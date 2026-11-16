@@ -12,7 +12,7 @@
 - Added weekly Dependabot update groups for GitHub Actions, npm, Maven and the Python API dependencies across the repository's active project trees.
 - Upgraded workflow actions to Node 24 compatible release lines and disabled persisted checkout credentials in jobs that only need source reads.
 - Production CSP now allows browser connections only to same-origin endpoints; loopback API and WebSocket sources are included only during development. Added a config verifier for both environments.
-- Web responses now advertise one year of HSTS; extended the security config verifier to assert the production HSTS and content-type protections.
+- Production web responses advertise one year of HSTS; development omits HSTS. The security config verifier asserts production CSP, HSTS and standard response headers, plus development-only loopback behavior.
 - Production startup now rejects missing/short LOGIN_HMAC_KEY values and missing, malformed or matching MFA_ENCRYPTION_KEY values. Error messages do not include key material.
 - MFA ciphertext now supports a versioned AES-GCM key ID through `MFA_ENCRYPTION_KEYS` and `MFA_ACTIVE_KEY_ID`; legacy v1 records continue to use `MFA_ENCRYPTION_KEY`.
 - Added `api/scripts/rewrap-mfa-secrets.py`. It defaults to a read-only dry-run; apply is limited to production, requires a versioned active key, an explicit confirmation phrase and `--backup-verified`, locks MFA rows, verifies decrypt/re-encrypt round trips, and writes a count-only audit event in the same transaction.
@@ -28,10 +28,11 @@
 - 2026-11-16: Hosted acceptance passed on commit `f178a99`: [Master Kit rebuild](https://github.com/tienanhzz/codemark-lms/actions/runs/43817238477), [Project CI](https://github.com/tienanhzz/codemark-lms/actions/runs/43817238501), and [Secret Scan](https://github.com/tienanhzz/codemark-lms/actions/runs/43817238539) all concluded success. PostgreSQL identity integration, dependency inventory/audit, and web verification completed in the rebuild workflow. The integration run exposed and fixed stale outbox verifier assumptions; Gitleaks initially flagged a test-only TOTP fixture, which was replaced with a non-secret marker before the passing scan.
 - 2026-11-16: Static security review found the production CSP permitted browser connections to `127.0.0.1:8100` and `ws://127.0.0.1:8100`. Restricted those sources to development and added `verify:security-config`; the verifier and production Next.js build pass. Formal ASVS owner review remains open.
 - 2026-11-16: Added the HSTS response header (`max-age=31536000`) and a production config assertion. Browser enforcement requires HTTPS at deployment; this local config check does not prove TLS is configured.
+- 2026-11-16: Restricted HSTS to production and expanded assertions for Referrer-Policy and frame/content-type protections. Web tests (64), production build and security config verification pass. The GitHub connector returned no workflow runs or status records for `9287f99`; hosted acceptance for that commit remains unverified. Local API/web services are stopped.
 
 ## Not yet accepted
 
-- The Master Kit rebuild, Project CI and Secret Scan workflows passed on implementation commit `574eb67`: [Master Kit rebuild](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927535), [Project CI](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927345), and [Secret Scan](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927383). The secret scan reported no findings. These results predate the HSTS addition in this working increment; the updated commit still needs hosted CI.
+- The Master Kit rebuild, Project CI and Secret Scan workflows passed on implementation commit `574eb67`: [Master Kit rebuild](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927535), [Project CI](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927345), and [Secret Scan](https://github.com/tienanhzz/codemark-lms/actions/runs/43818927383). The secret scan reported no findings. Hosted acceptance is still needed for the subsequent HSTS commits, including `9287f99`.
 - Authenticated browser visual, keyboard and mobile review of the new `/operations` release panel remains pending.
 - Complete dependency provenance/license review beyond the automated inventory and the ASVS security/privacy review remain open.
 - Runtime egress restrictions, TLS deployment, least-privilege service/database identities, managed key custody, an executed legacy ciphertext rewrap and verified key rotation/recovery drills, encrypted backup retention and a verified restore drill remain open.
@@ -39,4 +40,4 @@
 
 ## Scope boundary
 
-This increment changes CI wiring, production configuration validation and response headers, MFA ciphertext versioning and rewrap tooling, and the Admin release-evidence interface. It does not deploy the application, alter local databases or running services, create credentials, or claim a hosted result for the HSTS addition. The project remains unsuitable for production until the remaining release gates above are completed and evidenced.
+This increment changes CI wiring, production configuration validation and response headers, MFA ciphertext versioning and rewrap tooling, and the Admin release-evidence interface. It does not deploy the application, alter local databases or running services, create credentials, or claim a hosted result for the HSTS additions. The project remains unsuitable for production until the remaining release gates above are completed and evidenced.
