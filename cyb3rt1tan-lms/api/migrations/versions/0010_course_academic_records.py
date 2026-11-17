@@ -163,7 +163,9 @@ def upgrade() -> None:
 def downgrade() -> None:
     inspector = sa.inspect(op.get_bind())
     if op.get_bind().dialect.name == "postgresql":
-        op.execute("DROP TRIGGER IF EXISTS immutable_grade_scheme_truncate ON grade_scheme_versions")
+        op.execute(
+            "DROP TRIGGER IF EXISTS immutable_grade_scheme_truncate ON grade_scheme_versions"
+        )
         op.execute("DROP FUNCTION IF EXISTS reject_grade_scheme_truncate()")
         op.execute("DROP TRIGGER IF EXISTS immutable_grade_scheme_version ON grade_scheme_versions")
         op.execute("DROP FUNCTION IF EXISTS guard_grade_scheme_version()")
@@ -176,9 +178,7 @@ def downgrade() -> None:
     op.drop_table("course_rule_publications")
     op.drop_index("ix_course_resources_course_id", table_name="course_resources")
     op.drop_table("course_resources")
-    if "grade_scheme_version_id" in {
-        column["name"] for column in inspector.get_columns("courses")
-    }:
+    if "grade_scheme_version_id" in {column["name"] for column in inspector.get_columns("courses")}:
         op.drop_column("courses", "grade_scheme_version_id")
     if "uq_grade_scheme_active_per_course" in {
         index["name"] for index in inspector.get_indexes("grade_scheme_versions")

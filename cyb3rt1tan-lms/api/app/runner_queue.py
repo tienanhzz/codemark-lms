@@ -39,7 +39,11 @@ def redis_url(values: dict[str, str] | None = None) -> str:
     parsed = urlsplit(raw)
     if parsed.scheme not in {"redis", "rediss"} or not parsed.hostname:
         raise ValueError("runner_redis_url_invalid")
-    if not parsed.username or parsed.username.lower() in {"default", "redis"} or not parsed.password:
+    if (
+        not parsed.username
+        or parsed.username.lower() in {"default", "redis"}
+        or not parsed.password
+    ):
         raise ValueError("runner_redis_acl_required")
     if values.get("APP_ENV") == "production" and parsed.scheme != "rediss":
         raise ValueError("runner_redis_tls_required")
@@ -47,7 +51,9 @@ def redis_url(values: dict[str, str] | None = None) -> str:
 
 
 def redis_client(values: dict[str, str] | None = None) -> Redis:
-    return Redis.from_url(redis_url(values), decode_responses=True, socket_connect_timeout=2, socket_timeout=3)
+    return Redis.from_url(
+        redis_url(values), decode_responses=True, socket_connect_timeout=2, socket_timeout=3
+    )
 
 
 def retry_delay(attempts: int) -> int:
@@ -121,12 +127,16 @@ def _metadata(entry_id: str, fields: dict[str, str], failure_code: str) -> dict[
     return result
 
 
-def _dead_letter_and_ack(client: Any, entry_id: str, fields: dict[str, str], failure_code: str) -> None:
+def _dead_letter_and_ack(
+    client: Any, entry_id: str, fields: dict[str, str], failure_code: str
+) -> None:
     client.xadd(DEAD_LETTER_STREAM, _metadata(entry_id, fields, failure_code))
     client.xack(JOB_STREAM, WORKER_GROUP, entry_id)
 
 
-def admit_entry(factory: sessionmaker[Session], client: Any, entry_id: str, fields: dict[str, str]) -> bool:
+def admit_entry(
+    factory: sessionmaker[Session], client: Any, entry_id: str, fields: dict[str, str]
+) -> bool:
     try:
         outbox_id = fields["outboxId"]
         payload_json = fields["payload"]
@@ -141,7 +151,11 @@ def admit_entry(factory: sessionmaker[Session], client: Any, entry_id: str, fiel
             raise ValueError("runner_stream_integrity_mismatch")
     except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
         candidate = exc.args[0] if isinstance(exc, ValueError) and exc.args else ""
-        safe_code = candidate if isinstance(candidate, str) and re.fullmatch(r"[a-z0-9_]{1,80}", candidate) else "runner_envelope_invalid"
+        safe_code = (
+            candidate
+            if isinstance(candidate, str) and re.fullmatch(r"[a-z0-9_]{1,80}", candidate)
+            else "runner_envelope_invalid"
+        )
         _dead_letter_and_ack(client, entry_id, fields, safe_code)
         return False
 
@@ -187,22 +201,35 @@ def admit_entry(factory: sessionmaker[Session], client: Any, entry_id: str, fiel
                     return False
         client.xack(JOB_STREAM, WORKER_GROUP, entry_id)
         return True
-def consume_once(factory: sessionmaker[Session], client: Any, consumer: str, count: int = MAX_BATCH) -> int:
+
+
+def consume_once(
+    factory: sessionmaker[Session], client: Any, consumer: str, count: int = MAX_BATCH
+) -> int:
     ensure_group(client)
     processed = 0
     _next, claimed, _deleted = client.xautoclaim(
-        JOB_STREAM, WORKER_GROUP, consumer, min_idle_time=CLAIM_IDLE_MS, start_id="0-0", count=min(count, MAX_BATCH)
+        JOB_STREAM,
+        WORKER_GROUP,
+        consumer,
+        min_idle_time=CLAIM_IDLE_MS,
+        start_id="0-0",
+        count=min(count, MAX_BATCH),
     )
     entries = list(claimed or [])
     for entry_id, fields in entries:
         processed += int(admit_entry(factory, client, str(entry_id), fields))
-    new_entries = client.xreadgroup(
-        WORKER_GROUP,
-        consumer,
-        {JOB_STREAM: ">"},
-        count=min(max(count - len(entries), 0), MAX_BATCH),
-        block=1,
-    ) if count > len(entries) else []
+    new_entries = (
+        client.xreadgroup(
+            WORKER_GROUP,
+            consumer,
+            {JOB_STREAM: ">"},
+            count=min(max(count - len(entries), 0), MAX_BATCH),
+            block=1,
+        )
+        if count > len(entries)
+        else []
+    )
     for _stream, batch in new_entries or []:
         for entry_id, fields in batch:
             processed += int(admit_entry(factory, client, str(entry_id), fields))
@@ -248,15 +275,41 @@ def queue_snapshot(db: Session, client: Any) -> dict[str, int | None]:
     lag = int(group["lag"]) if group and group.get("lag") is not None else None
     consumers = int(group.get("consumers", 0)) if group else 0
     current = datetime.now(UTC)
-    pending_count = int(db.scalar(select(func.count()).select_from(OutboxMessage).where(OutboxMessage.topic == "runner.job_requested", OutboxMessage.status == "pending")) or 0)
-    exhausted_count = int(db.scalar(select(func.count()).select_from(OutboxMessage).where(OutboxMessage.topic == "runner.job_requested", OutboxMessage.status == "exhausted")) or 0)
-    oldest_pending = db.scalar(select(func.min(OutboxMessage.created_at)).where(OutboxMessage.topic == "runner.job_requested", OutboxMessage.status == "pending"))
-    oldest_exhausted = db.scalar(select(func.min(OutboxMessage.created_at)).where(OutboxMessage.topic == "runner.job_requested", OutboxMessage.status == "exhausted"))
+    pending_count = int(
+        db.scalar(
+            select(func.count())
+            .select_from(OutboxMessage)
+            .where(OutboxMessage.topic == "runner.job_requested", OutboxMessage.status == "pending")
+        )
+        or 0
+    )
+    exhausted_count = int(
+        db.scalar(
+            select(func.count())
+            .select_from(OutboxMessage)
+            .where(
+                OutboxMessage.topic == "runner.job_requested", OutboxMessage.status == "exhausted"
+            )
+        )
+        or 0
+    )
+    oldest_pending = db.scalar(
+        select(func.min(OutboxMessage.created_at)).where(
+            OutboxMessage.topic == "runner.job_requested", OutboxMessage.status == "pending"
+        )
+    )
+    oldest_exhausted = db.scalar(
+        select(func.min(OutboxMessage.created_at)).where(
+            OutboxMessage.topic == "runner.job_requested", OutboxMessage.status == "exhausted"
+        )
+    )
+
     def age(value: datetime | None) -> int | None:
         if value is None:
             return None
         instant = value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
         return max(0, int((current - instant).total_seconds()))
+
     return {
         "streamLength": length,
         "pending": pending,

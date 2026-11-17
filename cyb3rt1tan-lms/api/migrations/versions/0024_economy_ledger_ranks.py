@@ -11,13 +11,17 @@ def upgrade() -> None:
     op.create_table(
         "economy_ledger",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False
+        ),
         sa.Column("currency", sa.String(8), nullable=False),
         sa.Column("delta", sa.Integer(), nullable=False),
         sa.Column("source", sa.String(80), nullable=False),
         sa.Column("idempotency_key", sa.String(160), nullable=False),
         sa.Column("reason", sa.String(500), nullable=False, server_default=""),
-        sa.Column("actor_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=True),
+        sa.Column(
+            "actor_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=True
+        ),
         sa.Column("detail", sa.JSON(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.CheckConstraint("currency IN ('exp','coin')", name="ck_economy_ledger_currency"),
@@ -33,7 +37,12 @@ def upgrade() -> None:
         sa.Column("version", sa.Integer(), nullable=False),
         sa.Column("status", sa.String(16), nullable=False),
         sa.Column("effective_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("author_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "author_id",
+            sa.String(36),
+            sa.ForeignKey("users.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.CheckConstraint("track IN ('student','staff')", name="ck_rank_policy_track"),
         sa.CheckConstraint("status IN ('draft','active','retired')", name="ck_rank_policy_status"),
@@ -42,7 +51,12 @@ def upgrade() -> None:
     op.create_table(
         "rank_tiers",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("policy_id", sa.String(36), sa.ForeignKey("rank_policies.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "policy_id",
+            sa.String(36),
+            sa.ForeignKey("rank_policies.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("tier_key", sa.String(64), nullable=False),
         sa.Column("name", sa.String(120), nullable=False),
         sa.Column("threshold_exp", sa.Integer(), nullable=False),

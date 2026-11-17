@@ -21,9 +21,9 @@ class AnnouncementDraft(BaseModel):
 
 
 def _can_manage(item: HomeAnnouncement, user: User | None) -> bool:
-    return bool(user and ("admin" in user.roles or (
-        "teacher" in user.roles and item.author_id == user.id
-    )))
+    return bool(
+        user and ("admin" in user.roles or ("teacher" in user.roles and item.author_id == user.id))
+    )
 
 
 def _view(item: HomeAnnouncement, author: User, user: User | None) -> dict[str, object]:
@@ -82,7 +82,9 @@ def create_announcement(
 ) -> dict[str, object]:
     _publisher(db, request, user)
     item = HomeAnnouncement(
-        title=body.title, body=body.body, author_id=user.id,
+        title=body.title,
+        body=body.body,
+        author_id=user.id,
         author_role="admin" if "admin" in user.roles else "teacher",
     )
     db.add(item)
@@ -92,9 +94,9 @@ def create_announcement(
 
 
 def _owned(db: DB, item_id: uuid.UUID, user: User) -> HomeAnnouncement:
-    item = db.scalar(select(HomeAnnouncement).where(
-        HomeAnnouncement.id == str(item_id)
-    ).with_for_update())
+    item = db.scalar(
+        select(HomeAnnouncement).where(HomeAnnouncement.id == str(item_id)).with_for_update()
+    )
     if item is None:
         raise HTTPException(404, "home_announcement_not_found")
     if not _can_manage(item, user):
@@ -117,9 +119,7 @@ def update_announcement(
 
 
 @router.delete("/announcements/{item_id}", status_code=204)
-def delete_announcement(
-    item_id: uuid.UUID, request: Request, db: DB, user: Principal
-) -> Response:
+def delete_announcement(item_id: uuid.UUID, request: Request, db: DB, user: Principal) -> Response:
     _publisher(db, request, user)
     item = _owned(db, item_id, user)
     audit(db, request, "home_announcement_deleted", user, {"announcementId": item.id})

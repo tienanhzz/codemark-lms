@@ -20,7 +20,10 @@ RESERVED_NAMES = {"runner-control.json", "result.json", "metadata.json"}
 
 @lru_cache(maxsize=1)
 def runner_schema() -> dict[str, Any]:
-    return cast(dict[str, Any], json.loads((SCHEMA_ROOT / "code-runner.schema.json").read_text(encoding="utf-8")))
+    return cast(
+        dict[str, Any],
+        json.loads((SCHEMA_ROOT / "code-runner.schema.json").read_text(encoding="utf-8")),
+    )
 
 
 def validator(definition: str) -> Draft202012Validator:
@@ -33,18 +36,24 @@ def validator(definition: str) -> Draft202012Validator:
 
 
 def canonical_json(value: dict[str, Any]) -> bytes:
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
 
 
 def validate_job(value: object) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise TypeError("runner_job_invalid")
-    errors = sorted(validator("job").iter_errors(value), key=lambda item: ".".join(map(str, item.absolute_path)))
+    errors = sorted(
+        validator("job").iter_errors(value), key=lambda item: ".".join(map(str, item.absolute_path))
+    )
     if errors:
         raise ValueError("runner_job_invalid")
     if len(canonical_json(value)) > MAX_ENVELOPE_BYTES:
         raise ValueError("runner_job_too_large")
-    if not isinstance(value.get("jobId"), str) or not re.fullmatch(r"[A-Za-z0-9:._-]{1,36}", value["jobId"]):
+    if not isinstance(value.get("jobId"), str) or not re.fullmatch(
+        r"[A-Za-z0-9:._-]{1,36}", value["jobId"]
+    ):
         raise ValueError("runner_job_id_invalid")
     if not re.fullmatch(r"[A-Za-z0-9:._-]{1,160}", value["idempotencyKey"]):
         raise ValueError("runner_idempotency_invalid")
@@ -84,9 +93,14 @@ def validate_job(value: object) -> dict[str, Any]:
 def validate_result(value: object) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise TypeError("runner_result_invalid")
-    errors = sorted(validator("result").iter_errors(value), key=lambda item: ".".join(map(str, item.absolute_path)))
+    errors = sorted(
+        validator("result").iter_errors(value),
+        key=lambda item: ".".join(map(str, item.absolute_path)),
+    )
     if errors or len(canonical_json(value)) > 256_000:
         raise ValueError("runner_result_invalid")
-    if not isinstance(value.get("jobId"), str) or not re.fullmatch(r"[A-Za-z0-9:._-]{1,36}", value["jobId"]):
+    if not isinstance(value.get("jobId"), str) or not re.fullmatch(
+        r"[A-Za-z0-9:._-]{1,36}", value["jobId"]
+    ):
         raise ValueError("runner_job_id_invalid")
     return value

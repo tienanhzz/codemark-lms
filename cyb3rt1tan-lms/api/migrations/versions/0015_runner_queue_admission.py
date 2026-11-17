@@ -11,7 +11,12 @@ def upgrade() -> None:
     op.create_table(
         "runner_job_receipts",
         sa.Column("job_id", sa.String(36), primary_key=True),
-        sa.Column("outbox_id", sa.String(36), sa.ForeignKey("outbox_messages.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "outbox_id",
+            sa.String(36),
+            sa.ForeignKey("outbox_messages.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("idempotency_key", sa.String(160), nullable=False),
         sa.Column("payload_digest", sa.String(64), nullable=False),
         sa.Column("admitted_at", sa.DateTime(timezone=True), nullable=False),
@@ -20,7 +25,12 @@ def upgrade() -> None:
     )
     op.create_table(
         "runner_job_results",
-        sa.Column("job_id", sa.String(36), sa.ForeignKey("runner_job_receipts.job_id", ondelete="RESTRICT"), primary_key=True),
+        sa.Column(
+            "job_id",
+            sa.String(36),
+            sa.ForeignKey("runner_job_receipts.job_id", ondelete="RESTRICT"),
+            primary_key=True,
+        ),
         sa.Column("result", sa.JSON(), nullable=False),
         sa.Column("result_digest", sa.String(64), nullable=False),
         sa.Column("recorded_at", sa.DateTime(timezone=True), nullable=False),

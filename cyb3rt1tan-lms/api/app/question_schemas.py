@@ -59,32 +59,81 @@ def schema_errors(
             errors.append({"path": "content.choices", "message": "Choice IDs must be unique."})
         correct = config.get("correctChoiceIds", [])
         if not set(correct).issubset(available):
-            errors.append({"path": "authoringConfig.correctChoiceIds", "message": "Every answer must reference a visible choice."})
+            errors.append(
+                {
+                    "path": "authoringConfig.correctChoiceIds",
+                    "message": "Every answer must reference a visible choice.",
+                }
+            )
         if question_type == "multipleChoice" and isinstance(correct, list) and len(correct) != 1:
-            errors.append({"path": "authoringConfig.correctChoiceIds", "message": "Multiple choice requires exactly one correct answer."})
-    if question_type == "fillInTheBlank" and config is not None and set(content.get("blankIds", [])) != {
-        item.get("blankId") for item in config.get("blanks", []) if isinstance(item, dict)
-    }:
-        errors.append({"path": "authoringConfig.blanks", "message": "Blank IDs must match the visible prompt."})
+            errors.append(
+                {
+                    "path": "authoringConfig.correctChoiceIds",
+                    "message": "Multiple choice requires exactly one correct answer.",
+                }
+            )
+    if (
+        question_type == "fillInTheBlank"
+        and config is not None
+        and set(content.get("blankIds", []))
+        != {item.get("blankId") for item in config.get("blanks", []) if isinstance(item, dict)}
+    ):
+        errors.append(
+            {
+                "path": "authoringConfig.blanks",
+                "message": "Blank IDs must match the visible prompt.",
+            }
+        )
     if question_type == "ordering" and config is not None:
-        item_ids = [item.get("itemId") for item in content.get("items", []) if isinstance(item, dict)]
+        item_ids = [
+            item.get("itemId") for item in content.get("items", []) if isinstance(item, dict)
+        ]
         visible = set(item_ids)
         if len(visible) != len(item_ids):
             errors.append({"path": "content.items", "message": "Item IDs must be unique."})
         correct_items = config.get("correctItemIds")
         if not isinstance(correct_items, list) or set(correct_items) != visible:
-            errors.append({"path": "authoringConfig.correctItemIds", "message": "The answer must order every visible item exactly once."})
+            errors.append(
+                {
+                    "path": "authoringConfig.correctItemIds",
+                    "message": "The answer must order every visible item exactly once.",
+                }
+            )
     if question_type == "matching" and config is not None:
-        left_ids = [item.get("itemId") for item in content.get("leftItems", []) if isinstance(item, dict)]
-        right_ids = [item.get("itemId") for item in content.get("rightItems", []) if isinstance(item, dict)]
+        left_ids = [
+            item.get("itemId") for item in content.get("leftItems", []) if isinstance(item, dict)
+        ]
+        right_ids = [
+            item.get("itemId") for item in content.get("rightItems", []) if isinstance(item, dict)
+        ]
         left, right = set(left_ids), set(right_ids)
         if len(left) != len(left_ids) or len(right) != len(right_ids):
-            errors.append({"path": "content", "message": "Matching item IDs must be unique on each side."})
+            errors.append(
+                {"path": "content", "message": "Matching item IDs must be unique on each side."}
+            )
         pairs = config.get("pairs", [])
-        if any(pair.get("leftItemId") not in left or pair.get("rightItemId") not in right for pair in pairs if isinstance(pair, dict)):
-            errors.append({"path": "authoringConfig.pairs", "message": "Every pair must reference a visible item on each side."})
-        if question_type == "matching" and config.get("scoringMode") == "allOrNothing" and len(pairs) != len(left):
-            errors.append({"path": "authoringConfig.pairs", "message": "All-or-nothing matching must define an answer for every left item."})
+        if any(
+            pair.get("leftItemId") not in left or pair.get("rightItemId") not in right
+            for pair in pairs
+            if isinstance(pair, dict)
+        ):
+            errors.append(
+                {
+                    "path": "authoringConfig.pairs",
+                    "message": "Every pair must reference a visible item on each side.",
+                }
+            )
+        if (
+            question_type == "matching"
+            and config.get("scoringMode") == "allOrNothing"
+            and len(pairs) != len(left)
+        ):
+            errors.append(
+                {
+                    "path": "authoringConfig.pairs",
+                    "message": "All-or-nothing matching must define an answer for every left item.",
+                }
+            )
     if question_type in {"readingSet", "listeningSet"} and config is not None:
         content_ids = content.get("childQuestionVersionIds", [])
         config_ids = [
@@ -93,5 +142,10 @@ def schema_errors(
             if isinstance(item, dict)
         ]
         if content_ids != config_ids:
-            errors.append({"path": "authoringConfig.children", "message": "Child version references must match the visible set."})
+            errors.append(
+                {
+                    "path": "authoringConfig.children",
+                    "message": "Child version references must match the visible set.",
+                }
+            )
     return sorted(errors, key=lambda item: (item["path"], item["message"]))

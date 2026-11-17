@@ -11,7 +11,10 @@ def upgrade() -> None:
     op.create_table(
         "user_exp_multipliers",
         sa.Column(
-            "user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), primary_key=True
+            "user_id",
+            sa.String(36),
+            sa.ForeignKey("users.id", ondelete="RESTRICT"),
+            primary_key=True,
         ),
         sa.Column("multiplier", sa.Integer(), nullable=False, server_default="2"),
         sa.Column("starts_at", sa.DateTime(timezone=True), nullable=False),

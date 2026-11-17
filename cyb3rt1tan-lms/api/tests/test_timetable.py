@@ -11,7 +11,9 @@ from app.models import Course, CourseMembership, CourseStaff, TeachingSession
 RANGE = {"fromAt": "2026-11-15T17:00:00Z", "toAt": "2026-11-22T17:00:00Z"}
 
 
-def add_session(db, course_id, start="2026-11-16T01:00:00+00:00", end="2026-11-16T03:30:00+00:00", **values):
+def add_session(
+    db, course_id, start="2026-11-16T01:00:00+00:00", end="2026-11-16T03:30:00+00:00", **values
+):
     item = TeachingSession(
         course_id=course_id,
         starts_at=datetime.fromisoformat(start),
@@ -44,7 +46,14 @@ def test_timetable_returns_scheduled_visible_sessions_and_utc_instants(clients):
         add_session(db, course["id"], status="cancelled")
         add_session(db, course["id"], "2026-11-22T17:00:00Z", "2026-11-22T18:00:00Z")
         add_session(db, course["id"], "2026-11-15T16:00:00Z", "2026-11-15T17:00:00Z")
-        hidden = Course(code="PRIVATE", title="Private course", term_id=course["termId"], timezone="UTC", owner_id=current.owner_id, status="active")
+        hidden = Course(
+            code="PRIVATE",
+            title="Private course",
+            term_id=course["termId"],
+            timezone="UTC",
+            owner_id=current.owner_id,
+            status="active",
+        )
         db.add(hidden)
         db.flush()
         add_session(db, hidden.id)
@@ -64,15 +73,20 @@ def test_timetable_returns_scheduled_visible_sessions_and_utc_instants(clients):
     }
 
 
-@pytest.mark.parametrize("status,course_status,archived_from,expected", [
-    ("active", "draft", None, False),
-    ("withdrawn", "active", None, False),
-    ("invited", "active", None, False),
-    ("completed", "completed", None, True),
-    ("active", "archived", "draft", False),
-    ("completed", "archived", "active", True),
-])
-def test_timetable_rechecks_membership_and_course_state(clients, status, course_status, archived_from, expected):
+@pytest.mark.parametrize(
+    "status,course_status,archived_from,expected",
+    [
+        ("active", "draft", None, False),
+        ("withdrawn", "active", None, False),
+        ("invited", "active", None, False),
+        ("completed", "completed", None, True),
+        ("active", "archived", "draft", False),
+        ("completed", "archived", "active", True),
+    ],
+)
+def test_timetable_rechecks_membership_and_course_state(
+    clients, status, course_status, archived_from, expected
+):
     admin, student, factory = clients
     _, course, _ = setup_course(admin)
     login(student, "student")
@@ -102,13 +116,16 @@ def test_timetable_staff_access_is_live_and_course_scoped(clients):
     assert len(admin.get("/v1/timetable", params=RANGE).json()["items"]) == 1
 
 
-@pytest.mark.parametrize("start,end", [
-    ("2026-11-16T00:00:00", "2026-11-23T00:00:00Z"),
-    ("2026-11-16T00:00:00Z", "2026-11-23T00:00:00"),
-    ("2026-11-16T00:00:00Z", "2026-11-16T00:00:00Z"),
-    ("2026-11-16T00:00:00Z", "2026-11-15T00:00:00Z"),
-    ("2026-11-16T00:00:00Z", "2026-11-24T00:00:01Z"),
-])
+@pytest.mark.parametrize(
+    "start,end",
+    [
+        ("2026-11-16T00:00:00", "2026-11-23T00:00:00Z"),
+        ("2026-11-16T00:00:00Z", "2026-11-23T00:00:00"),
+        ("2026-11-16T00:00:00Z", "2026-11-16T00:00:00Z"),
+        ("2026-11-16T00:00:00Z", "2026-11-15T00:00:00Z"),
+        ("2026-11-16T00:00:00Z", "2026-11-24T00:00:01Z"),
+    ],
+)
 def test_timetable_rejects_unbounded_or_naive_ranges(clients, start, end):
     admin, _, _ = clients
     login(admin)
@@ -118,6 +135,9 @@ def test_timetable_rejects_unbounded_or_naive_ranges(clients, start, end):
 def test_timetable_accepts_dst_week_with_explicit_offsets(clients):
     admin, _, _ = clients
     login(admin)
-    response = admin.get("/v1/timetable", params={"fromAt": "2026-10-26T00:00:00-04:00", "toAt": "2026-11-02T00:00:00-05:00"})
+    response = admin.get(
+        "/v1/timetable",
+        params={"fromAt": "2026-10-26T00:00:00-04:00", "toAt": "2026-11-02T00:00:00-05:00"},
+    )
     assert response.status_code == 200
     assert response.json() == {"items": []}

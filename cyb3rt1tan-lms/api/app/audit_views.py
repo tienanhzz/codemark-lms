@@ -30,19 +30,35 @@ def ip_digest(value: str) -> str:
     return hmac.new(KEY, normalized.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
-def filtered(db: DB, *, actorId: UUID | None, action: str | None, courseId: UUID | None,
-             query: str | None, ip: str | None, fromAt: datetime | None,
-             toAt: datetime | None, cursor: UUID | None, pageSize: int) -> list[AuditEvent]:
+def filtered(
+    db: DB,
+    *,
+    actorId: UUID | None,
+    action: str | None,
+    courseId: UUID | None,
+    query: str | None,
+    ip: str | None,
+    fromAt: datetime | None,
+    toAt: datetime | None,
+    cursor: UUID | None,
+    pageSize: int,
+) -> list[AuditEvent]:
     statement = select(AuditEvent)
     if actorId:
         statement = statement.where(AuditEvent.actor_id == str(actorId))
     if action:
         statement = statement.where(AuditEvent.action.ilike("%" + action.strip()[:80] + "%"))
     if courseId:
-        statement = statement.where(cast(AuditEvent.detail, String).contains(str(courseId), autoescape=True))
+        statement = statement.where(
+            cast(AuditEvent.detail, String).contains(str(courseId), autoescape=True)
+        )
     if query:
         term = query.strip()[:128]
-        statement = statement.where(cast(AuditEvent.detail, String).contains(term, autoescape=True) | AuditEvent.request_id.contains(term, autoescape=True) | AuditEvent.action.contains(term, autoescape=True))
+        statement = statement.where(
+            cast(AuditEvent.detail, String).contains(term, autoescape=True)
+            | AuditEvent.request_id.contains(term, autoescape=True)
+            | AuditEvent.action.contains(term, autoescape=True)
+        )
     if ip:
         statement = statement.where(AuditEvent.ip_digest == ip_digest(ip))
     if fromAt:
@@ -59,28 +75,62 @@ def filtered(db: DB, *, actorId: UUID | None, action: str | None, courseId: UUID
         point = db.get(AuditEvent, str(cursor))
         if point is None:
             raise HTTPException(422, "invalid_cursor")
-        statement = statement.where(tuple_(AuditEvent.created_at, AuditEvent.id) < (point.created_at, point.id))
-    return list(db.scalars(statement.order_by(AuditEvent.created_at.desc(), AuditEvent.id.desc()).limit(pageSize + 1)))
+        statement = statement.where(
+            tuple_(AuditEvent.created_at, AuditEvent.id) < (point.created_at, point.id)
+        )
+    return list(
+        db.scalars(
+            statement.order_by(AuditEvent.created_at.desc(), AuditEvent.id.desc()).limit(
+                pageSize + 1
+            )
+        )
+    )
 
 
 def _view(item: AuditEvent, matched_ip: bool) -> dict[str, object]:
-    return {"id": item.id, "actorId": item.actor_id, "action": item.action,
-            "createdAt": utc(item.created_at).isoformat(), "requestId": item.request_id,
-            "detail": item.detail, "ipMatched": matched_ip}
+    return {
+        "id": item.id,
+        "actorId": item.actor_id,
+        "action": item.action,
+        "createdAt": utc(item.created_at).isoformat(),
+        "requestId": item.request_id,
+        "detail": item.detail,
+        "ipMatched": matched_ip,
+    }
 
 
 @router.get("")
-def list_events(request: Request, db: DB, user: Admin,
-                actorId: UUID | None = None, action: str | None = Query(default=None, max_length=80),
-                courseId: UUID | None = None, query: str | None = Query(default=None, max_length=128),
-                ip: str | None = Query(default=None, max_length=64), fromAt: datetime | None = None,
-                toAt: datetime | None = None, cursor: UUID | None = None,
-                pageSize: int = Query(default=50, ge=1, le=100)) -> dict[str, object]:
+def list_events(
+    request: Request,
+    db: DB,
+    user: Admin,
+    actorId: UUID | None = None,
+    action: str | None = Query(default=None, max_length=80),
+    courseId: UUID | None = None,
+    query: str | None = Query(default=None, max_length=128),
+    ip: str | None = Query(default=None, max_length=64),
+    fromAt: datetime | None = None,
+    toAt: datetime | None = None,
+    cursor: UUID | None = None,
+    pageSize: int = Query(default=50, ge=1, le=100),
+) -> dict[str, object]:
     lock_admin(db, request, user)
-    rows = filtered(db, actorId=actorId, action=action, courseId=courseId, query=query, ip=ip,
-                    fromAt=fromAt, toAt=toAt, cursor=cursor, pageSize=pageSize)
-    return {"items": [_view(item, bool(ip)) for item in rows[:pageSize]],
-            "nextCursor": rows[pageSize - 1].id if len(rows) > pageSize else None}
+    rows = filtered(
+        db,
+        actorId=actorId,
+        action=action,
+        courseId=courseId,
+        query=query,
+        ip=ip,
+        fromAt=fromAt,
+        toAt=toAt,
+        cursor=cursor,
+        pageSize=pageSize,
+    )
+    return {
+        "items": [_view(item, bool(ip)) for item in rows[:pageSize]],
+        "nextCursor": rows[pageSize - 1].id if len(rows) > pageSize else None,
+    }
 
 
 class AuditExport(BaseModel):
@@ -98,19 +148,54 @@ class AuditExport(BaseModel):
 @router.post("/export")
 def export_events(body: AuditExport, request: Request, db: DB, user: Admin) -> Response:
     lock_admin(db, request, user)
-    rows = filtered(db, actorId=body.actorId, action=body.action, courseId=body.courseId,
-                    query=body.query, ip=body.ip, fromAt=body.fromAt, toAt=body.toAt,
-                    cursor=None, pageSize=10000)
+    rows = filtered(
+        db,
+        actorId=body.actorId,
+        action=body.action,
+        courseId=body.courseId,
+        query=body.query,
+        ip=body.ip,
+        fromAt=body.fromAt,
+        toAt=body.toAt,
+        cursor=None,
+        pageSize=10000,
+    )
     if len(rows) > 10000:
         raise HTTPException(413, "audit_export_too_large")
     buffer = io.StringIO(newline="")
     writer = csv.writer(buffer)
-    writer.writerow(["event_id", "actor_id", "action", "created_at", "request_id", "detail", "ip_matched"])
+    writer.writerow(
+        ["event_id", "actor_id", "action", "created_at", "request_id", "detail", "ip_matched"]
+    )
     for item in rows:
-        writer.writerow([item.id, item.actor_id or "", item.action, utc(item.created_at).isoformat(),
-                         item.request_id, str(item.detail), bool(body.ip)])
-    audit(db, request, "audit_exported", user, {"rowCount": len(rows), "reason": body.reason,
-                                                 "courseId": str(body.courseId) if body.courseId else None})
-    return Response(buffer.getvalue().encode("utf-8-sig"), media_type="text/csv; charset=utf-8",
-                    headers={"Content-Disposition": f'attachment; filename="audit-events-{uuid.uuid4()}.csv"',
-                             "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
+        writer.writerow(
+            [
+                item.id,
+                item.actor_id or "",
+                item.action,
+                utc(item.created_at).isoformat(),
+                item.request_id,
+                str(item.detail),
+                bool(body.ip),
+            ]
+        )
+    audit(
+        db,
+        request,
+        "audit_exported",
+        user,
+        {
+            "rowCount": len(rows),
+            "reason": body.reason,
+            "courseId": str(body.courseId) if body.courseId else None,
+        },
+    )
+    return Response(
+        buffer.getvalue().encode("utf-8-sig"),
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="audit-events-{uuid.uuid4()}.csv"',
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )

@@ -1,0 +1,2 @@
+# Historical MFA test fixture; the literal was replaced in a later commit.
+b76f721f9652989cb3d4ef1986d62769aee784c5:cyb3rt1tan-lms/api/tests/test_mfa_rewrap.py:generic-api-key:66

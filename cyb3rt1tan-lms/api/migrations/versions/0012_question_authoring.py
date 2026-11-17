@@ -11,8 +11,18 @@ def upgrade() -> None:
     op.create_table(
         "questions",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("course_id", sa.String(36), sa.ForeignKey("courses.id", ondelete="RESTRICT"), nullable=False),
-        sa.Column("created_by", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "course_id",
+            sa.String(36),
+            sa.ForeignKey("courses.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
+        sa.Column(
+            "created_by",
+            sa.String(36),
+            sa.ForeignKey("users.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("latest_version", sa.Integer(), nullable=False),
         sa.Column("status", sa.String(20), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
@@ -25,7 +35,12 @@ def upgrade() -> None:
     op.create_table(
         "question_versions",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("question_id", sa.String(36), sa.ForeignKey("questions.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "question_id",
+            sa.String(36),
+            sa.ForeignKey("questions.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("version", sa.Integer(), nullable=False),
         sa.Column("question_type", sa.String(40), nullable=False),
         sa.Column("title", sa.String(240), nullable=False),
@@ -39,7 +54,12 @@ def upgrade() -> None:
         sa.Column("authoring_config", sa.JSON(), nullable=True),
         sa.Column("status", sa.String(20), nullable=False),
         sa.Column("validation", sa.JSON(), nullable=True),
-        sa.Column("created_by", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "created_by",
+            sa.String(36),
+            sa.ForeignKey("users.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("validated_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("published_at", sa.DateTime(timezone=True), nullable=True),
@@ -52,7 +72,10 @@ def upgrade() -> None:
             "difficulty IN ('newbie','noob','wannabe','gatekeeper','legendary')",
             name="ck_question_version_difficulty",
         ),
-        sa.CheckConstraint("status IN ('draft','validated','published','archived')", name="ck_question_version_status"),
+        sa.CheckConstraint(
+            "status IN ('draft','validated','published','archived')",
+            name="ck_question_version_status",
+        ),
         sa.CheckConstraint("version >= 1", name="ck_question_version_number"),
         sa.ForeignKeyConstraint(
             ["category_scope", "category_id"],
@@ -63,15 +86,24 @@ def upgrade() -> None:
     )
     op.create_index("ix_question_versions_question_id", "question_versions", ["question_id"])
     op.create_index(
-        "ix_question_versions_question_status", "question_versions", ["question_id", "status", "version"]
+        "ix_question_versions_question_status",
+        "question_versions",
+        ["question_id", "status", "version"],
     )
     op.create_table(
         "question_version_tags",
-        sa.Column("question_version_id", sa.String(36), sa.ForeignKey("question_versions.id", ondelete="RESTRICT"), primary_key=True),
+        sa.Column(
+            "question_version_id",
+            sa.String(36),
+            sa.ForeignKey("question_versions.id", ondelete="RESTRICT"),
+            primary_key=True,
+        ),
         sa.Column("tag_scope", sa.String(20), primary_key=True),
         sa.Column("tag_id", sa.String(128), primary_key=True),
         sa.ForeignKeyConstraint(
-            ["tag_scope", "tag_id"], ["taxonomy_tags.scope", "taxonomy_tags.id"], ondelete="RESTRICT"
+            ["tag_scope", "tag_id"],
+            ["taxonomy_tags.scope", "taxonomy_tags.id"],
+            ondelete="RESTRICT",
         ),
     )
     op.create_table(
@@ -81,10 +113,17 @@ def upgrade() -> None:
         sa.Column("version", sa.Integer(), nullable=False),
         sa.Column("profile", sa.JSON(), nullable=False),
         sa.Column("status", sa.String(20), nullable=False),
-        sa.Column("created_by", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "created_by",
+            sa.String(36),
+            sa.ForeignKey("users.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.CheckConstraint("version >= 1", name="ck_runtime_profile_version"),
-        sa.CheckConstraint("status IN ('draft','test','active','deprecated')", name="ck_runtime_profile_status"),
+        sa.CheckConstraint(
+            "status IN ('draft','test','active','deprecated')", name="ck_runtime_profile_status"
+        ),
         sa.UniqueConstraint("profile_id", "version", name="uq_runtime_profile_version"),
     )
     if op.get_bind().dialect.name == "postgresql":
@@ -177,7 +216,9 @@ def downgrade() -> None:
             ("immutable_question_version", "question_versions"),
         ):
             op.execute(f"DROP TRIGGER IF EXISTS {trigger} ON {table}")
-        op.execute("DROP TRIGGER IF EXISTS immutable_published_question_tags ON question_version_tags")
+        op.execute(
+            "DROP TRIGGER IF EXISTS immutable_published_question_tags ON question_version_tags"
+        )
         op.execute("DROP FUNCTION IF EXISTS guard_published_question_version_tags()")
         op.execute("DROP FUNCTION IF EXISTS reject_question_version_truncate()")
         op.execute("DROP FUNCTION IF EXISTS guard_runtime_profile_immutable()")

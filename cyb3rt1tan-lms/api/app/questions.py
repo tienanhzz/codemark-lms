@@ -25,9 +25,18 @@ from .question_schemas import runtime_profile_errors, schema_errors
 
 router = APIRouter(prefix="/v1")
 QUESTION_TYPES = {
-    "code", "writing", "sentenceRewriting", "multipleChoice", "multipleSelect",
-    "shortAnswer", "fillInTheBlank", "matching", "ordering", "trueFalseNotGiven",
-    "readingSet", "listeningSet",
+    "code",
+    "writing",
+    "sentenceRewriting",
+    "multipleChoice",
+    "multipleSelect",
+    "shortAnswer",
+    "fillInTheBlank",
+    "matching",
+    "ordering",
+    "trueFalseNotGiven",
+    "readingSet",
+    "listeningSet",
 }
 
 
@@ -107,7 +116,12 @@ def validate_taxonomy(db: Session, body: QuestionDraft) -> None:
 
 
 def create_version(
-    db: Session, request: Request, user: Principal, question: Question, body: QuestionDraft, number: int
+    db: Session,
+    request: Request,
+    user: Principal,
+    question: Question,
+    body: QuestionDraft,
+    number: int,
 ) -> QuestionVersion:
     validate_taxonomy(db, body)
     version = QuestionVersion(
@@ -130,7 +144,9 @@ def create_version(
     db.add(version)
     db.flush()
     for tag_id in body.tagIds:
-        db.add(QuestionVersionTag(question_version_id=version.id, tag_scope="question", tag_id=tag_id))
+        db.add(
+            QuestionVersionTag(question_version_id=version.id, tag_scope="question", tag_id=tag_id)
+        )
     question.latest_version = number
     db.flush()
     audit(
@@ -138,7 +154,12 @@ def create_version(
         request,
         "question_version_created",
         user,
-        {"courseId": question.course_id, "questionId": question.id, "versionId": version.id, "version": number},
+        {
+            "courseId": question.course_id,
+            "questionId": question.id,
+            "versionId": version.id,
+            "version": number,
+        },
     )
     return version
 
@@ -206,22 +227,27 @@ def search_questions(
     staff = "content.author" in permissions(db, course, user)
     published_only = not staff
     tag_ids = tagIds or []
-    latest_query = (
-        select(QuestionVersion.question_id, func.max(QuestionVersion.version).label("version"))
-        .group_by(QuestionVersion.question_id)
-    )
+    latest_query = select(
+        QuestionVersion.question_id, func.max(QuestionVersion.version).label("version")
+    ).group_by(QuestionVersion.question_id)
     if published_only:
         latest_query = latest_query.where(QuestionVersion.status == "published")
     latest = latest_query.subquery()
     statement = (
         select(QuestionVersion)
-        .join(latest, (latest.c.question_id == QuestionVersion.question_id) & (latest.c.version == QuestionVersion.version))
+        .join(
+            latest,
+            (latest.c.question_id == QuestionVersion.question_id)
+            & (latest.c.version == QuestionVersion.version),
+        )
         .join(Question, Question.id == QuestionVersion.question_id)
         .where(Question.course_id == course.id, Question.status == "active")
     )
     if q.strip():
         pattern = f"%{q.strip()}%"
-        statement = statement.where(or_(QuestionVersion.title.ilike(pattern), QuestionVersion.prompt.ilike(pattern)))
+        statement = statement.where(
+            or_(QuestionVersion.title.ilike(pattern), QuestionVersion.prompt.ilike(pattern))
+        )
     if categoryId:
         statement = statement.where(QuestionVersion.category_id == categoryId)
     if questionType:
@@ -258,7 +284,13 @@ def search_questions(
     values = [version_json(db, item, staff) for item in versions[:pageSize]]
     if response is not None:
         response.headers["Cache-Control"] = "no-store"
-    return {"items": values, "page": page, "pageSize": pageSize, "hasMore": has_more, "executionAvailable": False}
+    return {
+        "items": values,
+        "page": page,
+        "pageSize": pageSize,
+        "hasMore": has_more,
+        "executionAvailable": False,
+    }
 
 
 @router.get("/questions/{question_id}/versions/{version_id}")
@@ -302,16 +334,37 @@ def validate_question_version(
         raise HTTPException(409, "question_version_not_draft")
     errors = schema_errors(item.question_type, item.content, item.authoring_config)
     if item.question_type == "code":
-        asset_id = item.authoring_config.get("referenceSolutionAssetId") if item.authoring_config else None
+        asset_id = (
+            item.authoring_config.get("referenceSolutionAssetId") if item.authoring_config else None
+        )
         asset = db.get(QuestionAsset, str(asset_id)) if asset_id else None
-        if asset is None or asset.course_id != question.course_id or asset.asset_kind != "referenceSolution":
-            errors.append({"path": "authoringConfig.referenceSolutionAssetId", "message": "Upload a protected reference solution to this course."})
-        errors.append({"path": "authoringConfig.referenceSolutionAssetId", "message": "Protected reference-solution assets and offline test validation are not configured."})
+        if (
+            asset is None
+            or asset.course_id != question.course_id
+            or asset.asset_kind != "referenceSolution"
+        ):
+            errors.append(
+                {
+                    "path": "authoringConfig.referenceSolutionAssetId",
+                    "message": "Upload a protected reference solution to this course.",
+                }
+            )
+        errors.append(
+            {
+                "path": "authoringConfig.referenceSolutionAssetId",
+                "message": "Protected reference-solution assets and offline test validation are not configured.",
+            }
+        )
     if item.question_type == "listeningSet":
         asset_id = item.content.get("audioAssetId")
         asset = db.get(QuestionAsset, str(asset_id)) if isinstance(asset_id, str) else None
         if asset is None or asset.course_id != question.course_id or asset.asset_kind != "audio":
-            errors.append({"path": "content.audioAssetId", "message": "Upload a protected audio asset to this course."})
+            errors.append(
+                {
+                    "path": "content.audioAssetId",
+                    "message": "Upload a protected audio asset to this course.",
+                }
+            )
     if item.question_type in {"readingSet", "listeningSet"}:
         child_ids = item.content.get("childQuestionVersionIds", [])
         if isinstance(child_ids, list) and child_ids:
@@ -323,15 +376,27 @@ def validate_question_version(
                         QuestionVersion.id.in_(child_ids),
                         QuestionVersion.status == "published",
                         Question.course_id == question.course_id,
-                        QuestionVersion.question_type.in_({
-                            "multipleChoice", "multipleSelect", "shortAnswer", "fillInTheBlank",
-                            "matching", "ordering", "trueFalseNotGiven",
-                        }),
+                        QuestionVersion.question_type.in_(
+                            {
+                                "multipleChoice",
+                                "multipleSelect",
+                                "shortAnswer",
+                                "fillInTheBlank",
+                                "matching",
+                                "ordering",
+                                "trueFalseNotGiven",
+                            }
+                        ),
                     )
                 )
             )
             if len(children) != len(child_ids):
-                errors.append({"path": "content.childQuestionVersionIds", "message": "Every child must be a published objective question in this course."})
+                errors.append(
+                    {
+                        "path": "content.childQuestionVersionIds",
+                        "message": "Every child must be a published objective question in this course.",
+                    }
+                )
     if not errors:
         item.status = "validated"
         item.validation = {"valid": True, "errors": []}
@@ -367,20 +432,40 @@ def publish_question_version(
         raise HTTPException(409, "code_publication_disabled")
     item.status = "published"
     item.published_at = datetime.now(UTC)
-    audit(db, request, "question_version_published", user, {"questionId": question.id, "versionId": item.id})
-    return {"questionId": question.id, "questionVersionId": item.id, "status": item.status, "publishedAt": item.published_at.isoformat(), "executionAvailable": False}
+    audit(
+        db,
+        request,
+        "question_version_published",
+        user,
+        {"questionId": question.id, "versionId": item.id},
+    )
+    return {
+        "questionId": question.id,
+        "questionVersionId": item.id,
+        "status": item.status,
+        "publishedAt": item.published_at.isoformat(),
+        "executionAvailable": False,
+    }
 
 
 @router.get("/admin/runtime-profiles")
 def list_runtime_profiles(db: DB, user: Admin) -> dict[str, object]:
     items = list(
-        db.scalars(select(RuntimeProfileVersion).order_by(RuntimeProfileVersion.profile_id, RuntimeProfileVersion.version.desc()))
+        db.scalars(
+            select(RuntimeProfileVersion).order_by(
+                RuntimeProfileVersion.profile_id, RuntimeProfileVersion.version.desc()
+            )
+        )
     )
     return {"items": [runtime_profile_json(item) for item in items], "executionAvailable": False}
 
 
 def runtime_profile_json(item: RuntimeProfileVersion) -> dict[str, object]:
-    return {"profile": item.profile, "createdAt": item.created_at.isoformat(), "executionAvailable": False}
+    return {
+        "profile": item.profile,
+        "createdAt": item.created_at.isoformat(),
+        "executionAvailable": False,
+    }
 
 
 @router.post("/admin/runtime-profiles", status_code=201)
@@ -408,5 +493,11 @@ def create_runtime_profile(
     )
     db.add(item)
     db.flush()
-    audit(db, request, "runtime_profile_draft_created", user, {"profileId": body.profileId, "version": version_number})
+    audit(
+        db,
+        request,
+        "runtime_profile_draft_created",
+        user,
+        {"profileId": body.profileId, "version": version_number},
+    )
     return runtime_profile_json(item)

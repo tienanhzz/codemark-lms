@@ -22,7 +22,12 @@ PASSWORD = "A test password for fixtures only!"
 
 def login(client: TestClient, username: str = "admin") -> dict[str, str]:
     response = client.post(
-        "/v1/auth/login", headers=ORIGIN, json={"username": "9999000001" if username == "student" else username, "password": PASSWORD}
+        "/v1/auth/login",
+        headers=ORIGIN,
+        json={
+            "username": "9999000001" if username == "student" else username,
+            "password": PASSWORD,
+        },
     )
     assert response.status_code == 200, response.text
     return {**ORIGIN, "X-CSRF-Token": client.cookies["lms_csrf"]}

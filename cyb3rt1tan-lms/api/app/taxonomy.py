@@ -60,7 +60,10 @@ def nodes_json(
     if include_counts and scope == "question":
         category_counts = dict(
             db.execute(
-                select(QuestionVersion.category_id, func.count(func.distinct(QuestionVersion.question_id)))
+                select(
+                    QuestionVersion.category_id,
+                    func.count(func.distinct(QuestionVersion.question_id)),
+                )
                 .where(QuestionVersion.category_scope == "question")
                 .group_by(QuestionVersion.category_id)
             ).all()
@@ -108,9 +111,7 @@ def nodes_json(
         "tags": tag_values,
         "redirects": [
             {"kind": row.node_kind, "sourceId": row.source_id, "targetId": row.target_id}
-            for row in db.scalars(
-                select(TaxonomyRedirect).where(TaxonomyRedirect.scope == scope)
-            )
+            for row in db.scalars(select(TaxonomyRedirect).where(TaxonomyRedirect.scope == scope))
         ],
     }
 
@@ -135,7 +136,9 @@ def seed_taxonomies(body: TaxonomySeed, request: Request, db: DB, user: Admin) -
     record = catalog(db)
     if record.version != body.expectedCatalogVersion:
         raise HTTPException(409, "taxonomy_catalog_version_conflict")
-    if db.scalar(select(TaxonomyCategory.id).limit(1)) or db.scalar(select(TaxonomyTag.id).limit(1)):
+    if db.scalar(select(TaxonomyCategory.id).limit(1)) or db.scalar(
+        select(TaxonomyTag.id).limit(1)
+    ):
         raise HTTPException(409, "taxonomy_catalog_not_empty")
     category_by_id = {item.id: item for item in body.categories}
     tag_by_id = {item.id: item for item in body.tags}
@@ -146,7 +149,11 @@ def seed_taxonomies(body: TaxonomySeed, request: Request, db: DB, user: Admin) -
         pending = dict(items)
         result: list[SeedNode] = []
         while pending:
-            ready = [item for item in pending.values() if item.parentId is None or item.parentId in {row.id for row in result}]
+            ready = [
+                item
+                for item in pending.values()
+                if item.parentId is None or item.parentId in {row.id for row in result}
+            ]
             if not ready:
                 raise HTTPException(422, "taxonomy_seed_invalid_hierarchy")
             for item in sorted(ready, key=lambda row: (row.sortOrder, row.id)):
@@ -158,17 +165,53 @@ def seed_taxonomies(body: TaxonomySeed, request: Request, db: DB, user: Admin) -
     tag_order = ordered(tag_by_id)
     for scope in ("content", "question"):
         for item in category_order:
-            db.add(TaxonomyCategory(scope=scope, id=item.id, names=item.name, parent_id=item.parentId, status="active", sort_order=item.sortOrder))
+            db.add(
+                TaxonomyCategory(
+                    scope=scope,
+                    id=item.id,
+                    names=item.name,
+                    parent_id=item.parentId,
+                    status="active",
+                    sort_order=item.sortOrder,
+                )
+            )
     for item in tag_order:
         for applies_to, scope in (("lesson", "content"), ("question", "question")):
             if applies_to in item.appliesTo:
-                if item.parentId and not any(row.id == item.parentId and applies_to in row.appliesTo for row in tag_order):
+                if item.parentId and not any(
+                    row.id == item.parentId and applies_to in row.appliesTo for row in tag_order
+                ):
                     raise HTTPException(422, "taxonomy_seed_invalid_hierarchy")
-                db.add(TaxonomyTag(scope=scope, id=item.id, names=item.name, parent_id=item.parentId, status="active", sort_order=item.sortOrder, selectable=item.selectable, applicability=[]))
+                db.add(
+                    TaxonomyTag(
+                        scope=scope,
+                        id=item.id,
+                        names=item.name,
+                        parent_id=item.parentId,
+                        status="active",
+                        sort_order=item.sortOrder,
+                        selectable=item.selectable,
+                        applicability=[],
+                    )
+                )
     record.version += 1
     db.flush()
-    audit(db, request, "taxonomy_seed_imported", user, {"categories": len(category_order), "tags": len(tag_order), "catalogVersion": record.version})
-    return {"catalogVersion": record.version, "categories": len(category_order), "tags": len(tag_order)}
+    audit(
+        db,
+        request,
+        "taxonomy_seed_imported",
+        user,
+        {
+            "categories": len(category_order),
+            "tags": len(tag_order),
+            "catalogVersion": record.version,
+        },
+    )
+    return {
+        "catalogVersion": record.version,
+        "categories": len(category_order),
+        "tags": len(tag_order),
+    }
 
 
 def check_parent(
@@ -323,7 +366,11 @@ def merge_node(
         raise HTTPException(404, "taxonomy_node_not_found")
     if source.status != "active" or target.status != "active":
         raise HTTPException(409, "taxonomy_merge_requires_active_nodes")
-    child = db.scalar(select(model.id).where(model.scope == scope, model.parent_id == source_id, model.status == "active"))
+    child = db.scalar(
+        select(model.id).where(
+            model.scope == scope, model.parent_id == source_id, model.status == "active"
+        )
+    )
     if child:
         raise HTTPException(409, "taxonomy_has_active_children")
     if db.get(TaxonomyRedirect, (scope, kind, source_id)):
@@ -332,11 +379,25 @@ def merge_node(
         target.applicability = sorted(set(target.applicability) | set(source.applicability))
         target.selectable = target.selectable or source.selectable
     source.status = "retired"
-    db.add(TaxonomyRedirect(scope=scope, node_kind=kind, source_id=source_id, target_id=target_id, created_by=user.id))
+    db.add(
+        TaxonomyRedirect(
+            scope=scope,
+            node_kind=kind,
+            source_id=source_id,
+            target_id=target_id,
+            created_by=user.id,
+        )
+    )
     record = catalog(db)
     record.version += 1
     db.flush()
-    audit(db, request, f"{scope}_{kind}_merged", user, {"sourceId": source_id, "targetId": target_id, "catalogVersion": record.version})
+    audit(
+        db,
+        request,
+        f"{scope}_{kind}_merged",
+        user,
+        {"sourceId": source_id, "targetId": target_id, "catalogVersion": record.version},
+    )
     return {"sourceId": source_id, "targetId": target_id, "catalogVersion": record.version}
 
 
@@ -397,20 +458,32 @@ def update_question_tag(
 
 
 @router.post("/admin/taxonomy/categories/{node_id}/merge")
-def merge_content_category(node_id: str, body: TaxonomyMerge, request: Request, db: DB, user: Admin) -> dict[str, object]:
-    return merge_node(db, request, user, "content", node_id, body.targetId, TaxonomyCategory, "category")
+def merge_content_category(
+    node_id: str, body: TaxonomyMerge, request: Request, db: DB, user: Admin
+) -> dict[str, object]:
+    return merge_node(
+        db, request, user, "content", node_id, body.targetId, TaxonomyCategory, "category"
+    )
 
 
 @router.post("/admin/taxonomy/tags/{node_id}/merge")
-def merge_content_tag(node_id: str, body: TaxonomyMerge, request: Request, db: DB, user: Admin) -> dict[str, object]:
+def merge_content_tag(
+    node_id: str, body: TaxonomyMerge, request: Request, db: DB, user: Admin
+) -> dict[str, object]:
     return merge_node(db, request, user, "content", node_id, body.targetId, TaxonomyTag, "tag")
 
 
 @router.post("/admin/question-taxonomy/categories/{node_id}/merge")
-def merge_question_category(node_id: str, body: TaxonomyMerge, request: Request, db: DB, user: Admin) -> dict[str, object]:
-    return merge_node(db, request, user, "question", node_id, body.targetId, TaxonomyCategory, "category")
+def merge_question_category(
+    node_id: str, body: TaxonomyMerge, request: Request, db: DB, user: Admin
+) -> dict[str, object]:
+    return merge_node(
+        db, request, user, "question", node_id, body.targetId, TaxonomyCategory, "category"
+    )
 
 
 @router.post("/admin/question-taxonomy/tags/{node_id}/merge")
-def merge_question_tag(node_id: str, body: TaxonomyMerge, request: Request, db: DB, user: Admin) -> dict[str, object]:
+def merge_question_tag(
+    node_id: str, body: TaxonomyMerge, request: Request, db: DB, user: Admin
+) -> dict[str, object]:
     return merge_node(db, request, user, "question", node_id, body.targetId, TaxonomyTag, "tag")

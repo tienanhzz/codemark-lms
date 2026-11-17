@@ -35,7 +35,9 @@ async def bounded_body(request: Request) -> bytes:
 
 
 def normalized_image(content: bytes, content_type: str) -> tuple[bytes, str]:
-    expected_format = {"image/png": "PNG", "image/jpeg": "JPEG", "image/webp": "WEBP"}.get(content_type)
+    expected_format = {"image/png": "PNG", "image/jpeg": "JPEG", "image/webp": "WEBP"}.get(
+        content_type
+    )
     if expected_format is None:
         raise HTTPException(415, "question_asset_mime_mismatch")
     try:
@@ -45,7 +47,11 @@ def normalized_image(content: bytes, content_type: str) -> tuple[bytes, str]:
             image.verify()
         with Image.open(io.BytesIO(content)) as image:
             normalized = ImageOps.exif_transpose(image)
-            if normalized.width < 1 or normalized.height < 1 or normalized.width * normalized.height > 16_000_000:
+            if (
+                normalized.width < 1
+                or normalized.height < 1
+                or normalized.width * normalized.height > 16_000_000
+            ):
                 raise HTTPException(413, "question_image_dimensions_exceeded")
             normalized.load()
             normalized = normalized.convert("RGBA" if "A" in normalized.getbands() else "RGB")
@@ -66,7 +72,10 @@ def validate_audio(content: bytes, content_type: str) -> None:
         or (content_type == "audio/mp4" and content[4:8] == b"ftyp")
         or (
             content_type == "audio/mpeg"
-            and (content.startswith(b"ID3") or (len(content) > 1 and content[0] == 0xFF and content[1] & 0xE0 == 0xE0))
+            and (
+                content.startswith(b"ID3")
+                or (len(content) > 1 and content[0] == 0xFF and content[1] & 0xE0 == 0xE0)
+            )
         )
     )
     if not valid:
@@ -118,9 +127,21 @@ async def upload_question_asset(
     )
     db.add(item)
     db.flush()
-    audit(db, request, "question_asset_uploaded", user, {"courseId": course.id, "assetId": item.id, "kind": kind, "size": item.size})
+    audit(
+        db,
+        request,
+        "question_asset_uploaded",
+        user,
+        {"courseId": course.id, "assetId": item.id, "kind": kind, "size": item.size},
+    )
     response.headers["Cache-Control"] = "no-store"
-    return {"assetId": item.id, "kind": item.asset_kind, "mediaType": item.media_type, "size": item.size, "digest": item.digest}
+    return {
+        "assetId": item.id,
+        "kind": item.asset_kind,
+        "mediaType": item.media_type,
+        "size": item.size,
+        "digest": item.digest,
+    }
 
 
 def contains_id(value: object, asset_id: str) -> bool:

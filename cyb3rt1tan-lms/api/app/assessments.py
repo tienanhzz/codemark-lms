@@ -49,7 +49,9 @@ def _json(assessment: Assessment, version: AssessmentVersion | None) -> dict[str
         "kind": assessment.kind,
         "status": assessment.status,
         "version": assessment.current_version,
-        "draft": None if version is None else {
+        "draft": None
+        if version is None
+        else {
             "id": version.id,
             "title": version.title,
             "instructions": version.instructions,
@@ -136,7 +138,9 @@ def _question_points(question: QuestionVersion) -> float:
     return 1.0
 
 
-def _make_version(db: Session, assessment: Assessment, body: AssessmentDraft, actor_id: str) -> AssessmentVersion:
+def _make_version(
+    db: Session, assessment: Assessment, body: AssessmentDraft, actor_id: str
+) -> AssessmentVersion:
     _zone(body.timezone)
     if (body.opensAt is None) != (body.closesAt is None):
         raise HTTPException(422, "schedule_requires_both_bounds")
@@ -163,7 +167,11 @@ def _make_version(db: Session, assessment: Assessment, body: AssessmentDraft, ac
         question = by_id[question_id]
         parent = db.get(Assessment, assessment.id)
         course_id = parent.course_id if parent else assessment.course_id
-        if question.status != "published" or required_use not in question.usage_types or question.question_type == "code":
+        if (
+            question.status != "published"
+            or required_use not in question.usage_types
+            or question.question_type == "code"
+        ):
             raise HTTPException(422, "question_not_eligible_for_assessment")
         question_parent = db.get(Question, question.question_id)
         if question_parent is None or question_parent.course_id != course_id:
@@ -181,10 +189,18 @@ def _make_version(db: Session, assessment: Assessment, body: AssessmentDraft, ac
         }
         if question.question_type in {"readingSet", "listeningSet"}:
             child_ids = question.content.get("childQuestionVersionIds", [])
-            child_config = question.authoring_config.get("children", []) if question.authoring_config else []
-            if not isinstance(child_ids, list) or not isinstance(child_config, list) or len(child_ids) != len(child_config):
+            child_config = (
+                question.authoring_config.get("children", []) if question.authoring_config else []
+            )
+            if (
+                not isinstance(child_ids, list)
+                or not isinstance(child_config, list)
+                or len(child_ids) != len(child_config)
+            ):
                 raise HTTPException(422, "assessment_set_children_invalid")
-            child_versions = list(db.scalars(select(QuestionVersion).where(QuestionVersion.id.in_(child_ids))))
+            child_versions = list(
+                db.scalars(select(QuestionVersion).where(QuestionVersion.id.in_(child_ids)))
+            )
             children_by_id = {child.id: child for child in child_versions}
             if len(children_by_id) != len(child_ids):
                 raise HTTPException(422, "assessment_set_child_not_found")
@@ -200,17 +216,21 @@ def _make_version(db: Session, assessment: Assessment, body: AssessmentDraft, ac
                     or child_question.course_id != course_id
                 ):
                     raise HTTPException(422, "assessment_set_child_not_eligible")
-                child_points = child_settings.get("points") if isinstance(child_settings, dict) else None
+                child_points = (
+                    child_settings.get("points") if isinstance(child_settings, dict) else None
+                )
                 if not isinstance(child_points, (int, float)) or child_points <= 0:
                     raise HTTPException(422, "assessment_set_child_points_invalid")
-                children.append({
-                    "questionVersionId": child.id,
-                    "questionType": child.question_type,
-                    "title": child.title,
-                    "prompt": child.prompt,
-                    "content": child.content,
-                    "points": float(child_points),
-                })
+                children.append(
+                    {
+                        "questionVersionId": child.id,
+                        "questionType": child.question_type,
+                        "title": child.title,
+                        "prompt": child.prompt,
+                        "content": child.content,
+                        "points": float(child_points),
+                    }
+                )
             snapshot["childQuestions"] = children
         items.append(snapshot)
     return AssessmentVersion(
@@ -233,45 +253,88 @@ def _make_version(db: Session, assessment: Assessment, body: AssessmentDraft, ac
 @router.get("/courses/{course_id}/assessments")
 def list_assessments(course_id: uuid.UUID, db: DB, user: Principal) -> dict[str, object]:
     course = course_for(db, course_id, user)
-    items = list(db.scalars(select(Assessment).where(Assessment.course_id == course.id).order_by(Assessment.created_at.desc())))
+    items = list(
+        db.scalars(
+            select(Assessment)
+            .where(Assessment.course_id == course.id)
+            .order_by(Assessment.created_at.desc())
+        )
+    )
     result = []
     for item in items:
         if "assessment.manage" in permissions(db, course, user):
-            version = db.scalar(select(AssessmentVersion).where(AssessmentVersion.assessment_id == item.id, AssessmentVersion.version == item.current_version))
+            version = db.scalar(
+                select(AssessmentVersion).where(
+                    AssessmentVersion.assessment_id == item.id,
+                    AssessmentVersion.version == item.current_version,
+                )
+            )
             result.append(_json(item, version))
             continue
         if item.status != "published":
             continue
-        version = db.scalar(select(AssessmentVersion).where(AssessmentVersion.assessment_id == item.id, AssessmentVersion.status == "published").order_by(AssessmentVersion.version.desc()).limit(1))
+        version = db.scalar(
+            select(AssessmentVersion)
+            .where(
+                AssessmentVersion.assessment_id == item.id, AssessmentVersion.status == "published"
+            )
+            .order_by(AssessmentVersion.version.desc())
+            .limit(1)
+        )
         if version is None:
             continue
-        recipient_id = db.scalar(select(AssessmentRecipient.id).where(
-            AssessmentRecipient.assessment_id == item.id,
-            AssessmentRecipient.version_id == version.id,
-            AssessmentRecipient.user_id == user.id,
-        ))
+        recipient_id = db.scalar(
+            select(AssessmentRecipient.id).where(
+                AssessmentRecipient.assessment_id == item.id,
+                AssessmentRecipient.version_id == version.id,
+                AssessmentRecipient.user_id == user.id,
+            )
+        )
         if recipient_id is not None:
             result.append(_published_list_json(item, version))
     return {"items": result}
 
 
 @router.post("/courses/{course_id}/assessments", status_code=201)
-def create_assessment(course_id: uuid.UUID, body: AssessmentDraft, request: Request, response: Response, db: DB, user: Principal) -> dict[str, object]:
+def create_assessment(
+    course_id: uuid.UUID,
+    body: AssessmentDraft,
+    request: Request,
+    response: Response,
+    db: DB,
+    user: Principal,
+) -> dict[str, object]:
     lock_actor(db, request, user)
     course = course_for(db, course_id, user, "assessment.manage", write=True)
-    item = Assessment(course_id=course.id, kind=body.kind, status="draft", current_version=1, created_by=user.id)
+    item = Assessment(
+        course_id=course.id, kind=body.kind, status="draft", current_version=1, created_by=user.id
+    )
     db.add(item)
     db.flush()
     version = _make_version(db, item, body, user.id)
     db.add(version)
     db.flush()
     response.headers["ETag"] = '"1"'
-    audit(db, request, "assessment_draft_created", user, {"assessmentId": item.id, "kind": item.kind, "version": 1})
+    audit(
+        db,
+        request,
+        "assessment_draft_created",
+        user,
+        {"assessmentId": item.id, "kind": item.kind, "version": 1},
+    )
     return _json(item, version)
 
 
 @router.put("/courses/{course_id}/assessments/{assessment_id}")
-def revise_assessment(course_id: uuid.UUID, assessment_id: uuid.UUID, body: AssessmentDraft, request: Request, response: Response, db: DB, user: Principal) -> dict[str, object]:
+def revise_assessment(
+    course_id: uuid.UUID,
+    assessment_id: uuid.UUID,
+    body: AssessmentDraft,
+    request: Request,
+    response: Response,
+    db: DB,
+    user: Principal,
+) -> dict[str, object]:
     lock_actor(db, request, user)
     course = course_for(db, course_id, user, "assessment.manage", write=True)
     item = db.get(Assessment, str(assessment_id), populate_existing=True)
@@ -281,7 +344,12 @@ def revise_assessment(course_id: uuid.UUID, assessment_id: uuid.UUID, body: Asse
         raise HTTPException(409, "assessment_kind_immutable")
     if request.headers.get("if-match") != f'"{item.current_version}"':
         raise HTTPException(409, "stale_assessment_version")
-    current = db.scalar(select(AssessmentVersion).where(AssessmentVersion.assessment_id == item.id, AssessmentVersion.version == item.current_version))
+    current = db.scalar(
+        select(AssessmentVersion).where(
+            AssessmentVersion.assessment_id == item.id,
+            AssessmentVersion.version == item.current_version,
+        )
+    )
     if current is None:
         raise HTTPException(409, "assessment_version_missing")
     next_version = _make_version(db, item, body, user.id)
@@ -304,46 +372,78 @@ def revise_assessment(course_id: uuid.UUID, assessment_id: uuid.UUID, body: Asse
         raise HTTPException(409, "assessment_version_not_editable")
     db.flush()
     response.headers["ETag"] = f'"{item.current_version}"'
-    audit(db, request, "assessment_draft_revised", user, {"assessmentId": item.id, "version": item.current_version})
+    audit(
+        db,
+        request,
+        "assessment_draft_revised",
+        user,
+        {"assessmentId": item.id, "version": item.current_version},
+    )
     return _json(item, next_version)
 
 
 @router.post("/courses/{course_id}/assessments/{assessment_id}/publish", status_code=202)
-def publish_assessment(course_id: uuid.UUID, assessment_id: uuid.UUID, request: Request, response: Response, db: DB, user: Principal) -> dict[str, object]:
+def publish_assessment(
+    course_id: uuid.UUID,
+    assessment_id: uuid.UUID,
+    request: Request,
+    response: Response,
+    db: DB,
+    user: Principal,
+) -> dict[str, object]:
     lock_actor(db, request, user)
     course = course_for(db, course_id, user, "assessment.manage", write=True)
     item = db.get(Assessment, str(assessment_id), populate_existing=True)
     if item is None or item.course_id != course.id:
         raise HTTPException(404, "assessment_not_found")
-    version = db.scalar(select(AssessmentVersion).where(AssessmentVersion.assessment_id == item.id, AssessmentVersion.version == item.current_version))
+    version = db.scalar(
+        select(AssessmentVersion).where(
+            AssessmentVersion.assessment_id == item.id,
+            AssessmentVersion.version == item.current_version,
+        )
+    )
     if version is None or version.status != "draft" or not version.question_items:
         raise HTTPException(409, "valid_assessment_draft_required")
     version.status = "published"
     item.status = "published"
-    for membership in db.scalars(select(CourseMembership).where(
-        CourseMembership.course_id == course.id,
-        CourseMembership.status == "active",
-    )):
+    for membership in db.scalars(
+        select(CourseMembership).where(
+            CourseMembership.course_id == course.id,
+            CourseMembership.status == "active",
+        )
+    ):
         target = db.get(User, membership.user_id)
         if target is None or target.status != "active" or "student" not in target.roles:
             continue
-        recipient = db.scalar(select(AssessmentRecipient).where(
-            AssessmentRecipient.version_id == version.id,
-            AssessmentRecipient.user_id == target.id,
-        ))
+        recipient = db.scalar(
+            select(AssessmentRecipient).where(
+                AssessmentRecipient.version_id == version.id,
+                AssessmentRecipient.user_id == target.id,
+            )
+        )
         if recipient is None:
-            db.add(AssessmentRecipient(
-                assessment_id=item.id,
-                version_id=version.id,
-                user_id=target.id,
-                status="pending",
-            ))
-    audit(db, request, "assessment_published", user, {"assessmentId": item.id, "version": version.version})
+            db.add(
+                AssessmentRecipient(
+                    assessment_id=item.id,
+                    version_id=version.id,
+                    user_id=target.id,
+                    status="pending",
+                )
+            )
+    audit(
+        db,
+        request,
+        "assessment_published",
+        user,
+        {"assessmentId": item.id, "version": version.version},
+    )
     response.headers["ETag"] = f'"{item.current_version}"'
     return _json(item, version)
 
 
-def _attempt_json(attempt: AssessmentAttempt, assessment: Assessment, version: AssessmentVersion) -> dict[str, object]:
+def _attempt_json(
+    attempt: AssessmentAttempt, assessment: Assessment, version: AssessmentVersion
+) -> dict[str, object]:
     return {
         "attemptId": attempt.id,
         "attemptNumber": attempt.attempt_number,
@@ -369,11 +469,13 @@ def _automatic_scores(
         if isinstance(children, list):
             parent_answer = answers.get(question_id)
             nested_answers = parent_answer if isinstance(parent_answer, dict) else {}
-            result.update(_automatic_scores(
-                db,
-                [child for child in children if isinstance(child, dict)],
-                nested_answers,
-            ))
+            result.update(
+                _automatic_scores(
+                    db,
+                    [child for child in children if isinstance(child, dict)],
+                    nested_answers,
+                )
+            )
             continue
         if item.get("questionType") == "writing":
             continue
@@ -421,34 +523,62 @@ def start_attempt(
     item = db.get(Assessment, str(assessment_id))
     if item is None or item.course_id != course.id or item.status != "published":
         raise HTTPException(404, "assessment_not_found")
-    version = db.scalar(select(AssessmentVersion).where(
-        AssessmentVersion.assessment_id == item.id,
-        AssessmentVersion.status == "published",
-    ).order_by(AssessmentVersion.version.desc()).limit(1))
+    version = db.scalar(
+        select(AssessmentVersion)
+        .where(
+            AssessmentVersion.assessment_id == item.id,
+            AssessmentVersion.status == "published",
+        )
+        .order_by(AssessmentVersion.version.desc())
+        .limit(1)
+    )
     if version is None:
         raise HTTPException(404, "assessment_not_found")
-    recipient = db.scalar(select(AssessmentRecipient).where(
-        AssessmentRecipient.version_id == version.id,
-        AssessmentRecipient.user_id == user.id,
-    ).with_for_update())
+    recipient = db.scalar(
+        select(AssessmentRecipient)
+        .where(
+            AssessmentRecipient.version_id == version.id,
+            AssessmentRecipient.user_id == user.id,
+        )
+        .with_for_update()
+    )
     if recipient is None:
         raise HTTPException(404, "assessment_not_found")
     current_time = now()
     if version.opens_at is not None and utc(version.opens_at) > current_time:
         raise HTTPException(409, "assessment_not_open")
-    if item.kind == "exam" and version.closes_at is not None and utc(version.closes_at) <= current_time:
+    if (
+        item.kind == "exam"
+        and version.closes_at is not None
+        and utc(version.closes_at) <= current_time
+    ):
         raise HTTPException(409, "assessment_closed")
-    attempts = list(db.scalars(select(AssessmentAttempt).where(
-        AssessmentAttempt.recipient_id == recipient.id,
-    ).order_by(AssessmentAttempt.attempt_number.desc()).with_for_update()))
+    attempts = list(
+        db.scalars(
+            select(AssessmentAttempt)
+            .where(
+                AssessmentAttempt.recipient_id == recipient.id,
+            )
+            .order_by(AssessmentAttempt.attempt_number.desc())
+            .with_for_update()
+        )
+    )
     expired_attempt: AssessmentAttempt | None = None
     for prior in attempts:
         if _submit_expired(prior, recipient):
             expired_attempt = prior
             prior.automatic_scores = _automatic_scores(db, version.question_items, prior.answers)
-            audit(db, request, "assessment_attempt_auto_submitted", user, {
-                "assessmentId": item.id, "attemptId": prior.id, "reason": "deadline_elapsed",
-            })
+            audit(
+                db,
+                request,
+                "assessment_attempt_auto_submitted",
+                user,
+                {
+                    "assessmentId": item.id,
+                    "attemptId": prior.id,
+                    "reason": "deadline_elapsed",
+                },
+            )
         if prior.status == "inProgress":
             response.headers["ETag"] = f'"{prior.revision}"'
             return _attempt_json(prior, item, version)
@@ -458,10 +588,16 @@ def start_attempt(
             return _attempt_json(expired_attempt, item, version)
         raise HTTPException(409, "assessment_attempt_limit_reached")
     started = now()
-    deadlines = [value for value in (
-        version.closes_at if item.kind == "exam" else None,
-        started + timedelta(minutes=version.duration_minutes) if version.duration_minutes else None,
-    ) if value is not None]
+    deadlines = [
+        value
+        for value in (
+            version.closes_at if item.kind == "exam" else None,
+            started + timedelta(minutes=version.duration_minutes)
+            if version.duration_minutes
+            else None,
+        )
+        if value is not None
+    ]
     attempt = AssessmentAttempt(
         recipient_id=recipient.id,
         attempt_number=len(attempts) + 1,
@@ -474,9 +610,17 @@ def start_attempt(
     recipient.status = "inProgress"
     db.add(attempt)
     db.flush()
-    audit(db, request, "assessment_attempt_started", user, {
-        "assessmentId": item.id, "attemptId": attempt.id, "attemptNumber": attempt.attempt_number,
-    })
+    audit(
+        db,
+        request,
+        "assessment_attempt_started",
+        user,
+        {
+            "assessmentId": item.id,
+            "attemptId": attempt.id,
+            "attemptNumber": attempt.attempt_number,
+        },
+    )
     response.status_code = 201
     response.headers["ETag"] = '"1"'
     return _attempt_json(attempt, item, version)
@@ -495,17 +639,35 @@ def save_attempt_answers(
 ) -> dict[str, object]:
     lock_actor(db, request, user)
     course = course_for(db, course_id, user)
-    attempt = db.scalar(select(AssessmentAttempt).where(AssessmentAttempt.id == str(attempt_id)).with_for_update())
+    attempt = db.scalar(
+        select(AssessmentAttempt).where(AssessmentAttempt.id == str(attempt_id)).with_for_update()
+    )
     recipient = db.get(AssessmentRecipient, attempt.recipient_id) if attempt else None
     item = db.get(Assessment, recipient.assessment_id) if recipient else None
     version = db.get(AssessmentVersion, recipient.version_id) if recipient else None
-    if attempt is None or recipient is None or item is None or version is None or item.id != str(assessment_id) or item.course_id != course.id or recipient.user_id != user.id:
+    if (
+        attempt is None
+        or recipient is None
+        or item is None
+        or version is None
+        or item.id != str(assessment_id)
+        or item.course_id != course.id
+        or recipient.user_id != user.id
+    ):
         raise HTTPException(404, "attempt_not_found")
     if _submit_expired(attempt, recipient):
         attempt.automatic_scores = _automatic_scores(db, version.question_items, attempt.answers)
-        audit(db, request, "assessment_attempt_auto_submitted", user, {
-            "assessmentId": item.id, "attemptId": attempt.id, "reason": "deadline_elapsed",
-        })
+        audit(
+            db,
+            request,
+            "assessment_attempt_auto_submitted",
+            user,
+            {
+                "assessmentId": item.id,
+                "attemptId": attempt.id,
+                "reason": "deadline_elapsed",
+            },
+        )
         response.headers["ETag"] = f'"{attempt.revision}"'
         return _attempt_json(attempt, item, version)
     if attempt.status != "inProgress":
@@ -516,8 +678,13 @@ def save_attempt_answers(
     if not set(body.answers).issubset(question_ids):
         raise HTTPException(422, "answer_question_not_in_attempt")
     try:
-        encoded = json.dumps(body.answers, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-        answer_sizes = [len(json.dumps(value, ensure_ascii=False).encode("utf-8")) for value in body.answers.values()]
+        encoded = json.dumps(body.answers, ensure_ascii=False, separators=(",", ":")).encode(
+            "utf-8"
+        )
+        answer_sizes = [
+            len(json.dumps(value, ensure_ascii=False).encode("utf-8"))
+            for value in body.answers.values()
+        ]
     except (TypeError, ValueError):
         raise HTTPException(422, "invalid_answer_payload") from None
     if len(encoded) > 100_000 or any(size > 16_000 for size in answer_sizes):
@@ -540,11 +707,21 @@ def submit_attempt(
 ) -> dict[str, object]:
     lock_actor(db, request, user)
     course = course_for(db, course_id, user)
-    attempt = db.scalar(select(AssessmentAttempt).where(AssessmentAttempt.id == str(attempt_id)).with_for_update())
+    attempt = db.scalar(
+        select(AssessmentAttempt).where(AssessmentAttempt.id == str(attempt_id)).with_for_update()
+    )
     recipient = db.get(AssessmentRecipient, attempt.recipient_id) if attempt else None
     item = db.get(Assessment, recipient.assessment_id) if recipient else None
     version = db.get(AssessmentVersion, recipient.version_id) if recipient else None
-    if attempt is None or recipient is None or item is None or version is None or item.id != str(assessment_id) or item.course_id != course.id or recipient.user_id != user.id:
+    if (
+        attempt is None
+        or recipient is None
+        or item is None
+        or version is None
+        or item.id != str(assessment_id)
+        or item.course_id != course.id
+        or recipient.user_id != user.id
+    ):
         raise HTTPException(404, "attempt_not_found")
     if attempt.status == "inProgress":
         expired = _submit_expired(attempt, recipient)
@@ -579,7 +756,13 @@ def _grade_context(
     recipient = db.get(AssessmentRecipient, attempt.recipient_id) if attempt else None
     assessment = db.get(Assessment, recipient.assessment_id) if recipient else None
     version = db.get(AssessmentVersion, recipient.version_id) if recipient else None
-    if attempt is None or recipient is None or assessment is None or version is None or assessment.course_id != course.id:
+    if (
+        attempt is None
+        or recipient is None
+        or assessment is None
+        or version is None
+        or assessment.course_id != course.id
+    ):
         raise HTTPException(404, "assessment_attempt_not_found")
     return course, attempt, recipient, assessment, version
 
@@ -593,7 +776,9 @@ def _leaf_questions(
         if isinstance(children, list):
             parent_answer = answers.get(question_id)
             nested = parent_answer if isinstance(parent_answer, dict) else {}
-            yield from _leaf_questions([child for child in children if isinstance(child, dict)], nested)
+            yield from _leaf_questions(
+                [child for child in children if isinstance(child, dict)], nested
+            )
         else:
             yield item, answers.get(question_id)
 
@@ -616,43 +801,64 @@ def grading_queue(
     )
     if status == "submitted":
         statement = statement.where(AssessmentAttempt.status.in_(["submitted", "forceSubmitted"]))
-    rows = list(db.execute(statement.order_by(AssessmentAttempt.submitted_at.desc(), AssessmentAttempt.id).offset((page - 1) * pageSize).limit(pageSize + 1)))
+    rows = list(
+        db.execute(
+            statement.order_by(AssessmentAttempt.submitted_at.desc(), AssessmentAttempt.id)
+            .offset((page - 1) * pageSize)
+            .limit(pageSize + 1)
+        )
+    )
     has_more = len(rows) > pageSize
     result = []
     for attempt, recipient, assessment in rows[:pageSize]:
         learner = db.get(User, recipient.user_id)
-        release = db.scalar(select(AssessmentGradeRelease).where(
-            AssessmentGradeRelease.attempt_id == attempt.id,
-        ).order_by(AssessmentGradeRelease.revision.desc()).limit(1))
-        result.append({
-            "attemptId": attempt.id,
-            "assessmentId": assessment.id,
-            "assessmentKind": assessment.kind,
-            "status": attempt.status,
-            "attemptNumber": attempt.attempt_number,
-            "submittedAt": attempt.submitted_at.isoformat() if attempt.submitted_at else None,
-            "learner": {"id": learner.id, "officialName": learner.official_name} if learner else None,
-            "gradeReleased": release is not None,
-        })
+        release = db.scalar(
+            select(AssessmentGradeRelease)
+            .where(
+                AssessmentGradeRelease.attempt_id == attempt.id,
+            )
+            .order_by(AssessmentGradeRelease.revision.desc())
+            .limit(1)
+        )
+        result.append(
+            {
+                "attemptId": attempt.id,
+                "assessmentId": assessment.id,
+                "assessmentKind": assessment.kind,
+                "status": attempt.status,
+                "attemptNumber": attempt.attempt_number,
+                "submittedAt": attempt.submitted_at.isoformat() if attempt.submitted_at else None,
+                "learner": {"id": learner.id, "officialName": learner.official_name}
+                if learner
+                else None,
+                "gradeReleased": release is not None,
+            }
+        )
     return {"items": result, "hasMore": has_more}
 
 
 @router.get("/courses/{course_id}/grading/attempts/{attempt_id}")
-def grading_detail(course_id: uuid.UUID, attempt_id: uuid.UUID, db: DB, user: Principal) -> dict[str, object]:
+def grading_detail(
+    course_id: uuid.UUID, attempt_id: uuid.UUID, db: DB, user: Principal
+) -> dict[str, object]:
     _, attempt, recipient, assessment, version = _grade_context(db, course_id, attempt_id, user)
     grades = {}
     for item, _answer in _leaf_questions(version.question_items, attempt.answers):
         question_id = str(item.get("questionVersionId", ""))
-        latest_revision = db.scalar(select(func.max(AssessmentGradeRevision.revision)).where(
-            AssessmentGradeRevision.attempt_id == attempt.id,
-            AssessmentGradeRevision.question_version_id == question_id,
-        ))
-        if latest_revision is not None:
-            grades[question_id] = db.scalar(select(AssessmentGradeRevision).where(
+        latest_revision = db.scalar(
+            select(func.max(AssessmentGradeRevision.revision)).where(
                 AssessmentGradeRevision.attempt_id == attempt.id,
                 AssessmentGradeRevision.question_version_id == question_id,
-                AssessmentGradeRevision.revision == latest_revision,
-            ))
+            )
+        )
+        if latest_revision is not None:
+            grades[question_id] = db.scalar(
+                select(AssessmentGradeRevision).where(
+                    AssessmentGradeRevision.attempt_id == attempt.id,
+                    AssessmentGradeRevision.question_version_id == question_id,
+                    AssessmentGradeRevision.revision == latest_revision,
+                )
+            )
     answer_items = []
     for item, answer in _leaf_questions(version.question_items, attempt.answers):
         question_id = str(item.get("questionVersionId", ""))
@@ -661,19 +867,23 @@ def grading_detail(course_id: uuid.UUID, attempt_id: uuid.UUID, db: DB, user: Pr
         rubric = config.get("rubric") if isinstance(config, dict) else None
         grade = grades.get(question_id)
         auto = attempt.automatic_scores.get(question_id)
-        answer_items.append({
-            **item,
-            "answer": answer,
-            "rubric": rubric if isinstance(rubric, dict) else None,
-            "automaticGrade": auto,
-            "manualGrade": None if grade is None else {
-                "revision": grade.revision,
-                "pointsAwarded": grade.points_awarded,
-                "criterionScores": grade.criterion_scores,
-                "feedback": grade.feedback,
-                "createdAt": grade.created_at.isoformat(),
-            },
-        })
+        answer_items.append(
+            {
+                **item,
+                "answer": answer,
+                "rubric": rubric if isinstance(rubric, dict) else None,
+                "automaticGrade": auto,
+                "manualGrade": None
+                if grade is None
+                else {
+                    "revision": grade.revision,
+                    "pointsAwarded": grade.points_awarded,
+                    "criterionScores": grade.criterion_scores,
+                    "feedback": grade.feedback,
+                    "createdAt": grade.created_at.isoformat(),
+                },
+            }
+        )
     return {
         "attemptId": attempt.id,
         "assessmentId": assessment.id,
@@ -701,10 +911,14 @@ def grade_question(
     _, attempt, _recipient, assessment, version = _grade_context(db, course_id, attempt_id, user)
     if attempt.status not in {"submitted", "forceSubmitted"}:
         raise HTTPException(409, "attempt_not_submitted")
-    item = next((
-        question for question, _answer in _leaf_questions(version.question_items, attempt.answers)
-        if question.get("questionVersionId") == str(question_version_id)
-    ), None)
+    item = next(
+        (
+            question
+            for question, _answer in _leaf_questions(version.question_items, attempt.answers)
+            if question.get("questionVersionId") == str(question_version_id)
+        ),
+        None,
+    )
     if item is None:
         raise HTTPException(404, "question_not_in_attempt")
     if item.get("questionType") != "writing":
@@ -720,19 +934,31 @@ def grade_question(
     criteria = rubric.get("criteria", []) if isinstance(rubric, dict) else []
     criterion_scores = body.criterionScores
     if criteria:
-        by_id = {criterion.get("criterionId"): criterion for criterion in criteria if isinstance(criterion, dict)}
+        by_id = {
+            criterion.get("criterionId"): criterion
+            for criterion in criteria
+            if isinstance(criterion, dict)
+        }
         if set(criterion_scores) != set(by_id):
             raise HTTPException(422, "all_rubric_criteria_required")
-        if any(score < 0 or score > by_id[key].get("points", 0) for key, score in criterion_scores.items()):
+        if any(
+            score < 0 or score > by_id[key].get("points", 0)
+            for key, score in criterion_scores.items()
+        ):
             raise HTTPException(422, "rubric_score_out_of_range")
         if abs(sum(criterion_scores.values()) - body.pointsAwarded) > 1e-7:
             raise HTTPException(422, "rubric_total_mismatch")
     elif criterion_scores:
         raise HTTPException(422, "rubric_not_configured")
-    revision = (db.scalar(select(func.max(AssessmentGradeRevision.revision)).where(
-        AssessmentGradeRevision.attempt_id == attempt.id,
-        AssessmentGradeRevision.question_version_id == str(question_version_id),
-    )) or 0) + 1
+    revision = (
+        db.scalar(
+            select(func.max(AssessmentGradeRevision.revision)).where(
+                AssessmentGradeRevision.attempt_id == attempt.id,
+                AssessmentGradeRevision.question_version_id == str(question_version_id),
+            )
+        )
+        or 0
+    ) + 1
     grade = AssessmentGradeRevision(
         attempt_id=attempt.id,
         question_version_id=str(question_version_id),
@@ -744,14 +970,25 @@ def grade_question(
     )
     db.add(grade)
     db.flush()
-    audit(db, request, "assessment_question_graded", user, {
-        "assessmentId": assessment.id,
-        "attemptId": attempt.id,
+    audit(
+        db,
+        request,
+        "assessment_question_graded",
+        user,
+        {
+            "assessmentId": assessment.id,
+            "attemptId": attempt.id,
+            "questionVersionId": str(question_version_id),
+            "revision": revision,
+            "pointsAwarded": body.pointsAwarded,
+        },
+    )
+    return {
         "questionVersionId": str(question_version_id),
         "revision": revision,
         "pointsAwarded": body.pointsAwarded,
-    })
-    return {"questionVersionId": str(question_version_id), "revision": revision, "pointsAwarded": body.pointsAwarded, "criterionScores": criterion_scores}
+        "criterionScores": criterion_scores,
+    }
 
 
 @router.post("/courses/{course_id}/grading/attempts/{attempt_id}/release", status_code=201)
@@ -771,17 +1008,21 @@ def release_grade(
     grades: dict[str, AssessmentGradeRevision] = {}
     for item in manual_items:
         question_id = str(item.get("questionVersionId", ""))
-        latest_revision = db.scalar(select(func.max(AssessmentGradeRevision.revision)).where(
-            AssessmentGradeRevision.attempt_id == attempt.id,
-            AssessmentGradeRevision.question_version_id == question_id,
-        ))
+        latest_revision = db.scalar(
+            select(func.max(AssessmentGradeRevision.revision)).where(
+                AssessmentGradeRevision.attempt_id == attempt.id,
+                AssessmentGradeRevision.question_version_id == question_id,
+            )
+        )
         if latest_revision is None:
             raise HTTPException(409, "manual_grading_incomplete")
-        grade = db.scalar(select(AssessmentGradeRevision).where(
-            AssessmentGradeRevision.attempt_id == attempt.id,
-            AssessmentGradeRevision.question_version_id == question_id,
-            AssessmentGradeRevision.revision == latest_revision,
-        ))
+        grade = db.scalar(
+            select(AssessmentGradeRevision).where(
+                AssessmentGradeRevision.attempt_id == attempt.id,
+                AssessmentGradeRevision.question_version_id == question_id,
+                AssessmentGradeRevision.revision == latest_revision,
+            )
+        )
         if grade is None:
             raise HTTPException(409, "manual_grading_incomplete")
         grades[question_id] = grade
@@ -796,18 +1037,35 @@ def release_grade(
         if item.get("questionType") == "writing":
             grade = grades[question_id]
             score = grade.points_awarded
-            breakdown.append({"questionVersionId": question_id, "score": score, "maxPoints": max_points, "feedback": grade.feedback, "criterionScores": grade.criterion_scores})
+            breakdown.append(
+                {
+                    "questionVersionId": question_id,
+                    "score": score,
+                    "maxPoints": max_points,
+                    "feedback": grade.feedback,
+                    "criterionScores": grade.criterion_scores,
+                }
+            )
         else:
             automatic = attempt.automatic_scores.get(question_id)
             score_value = automatic.get("score", 0) if isinstance(automatic, dict) else 0
             score = float(score_value) if isinstance(score_value, (int, float)) else 0.0
-            breakdown.append({"questionVersionId": question_id, "score": score, "maxPoints": max_points, "feedback": ""})
+            breakdown.append(
+                {
+                    "questionVersionId": question_id,
+                    "score": score,
+                    "maxPoints": max_points,
+                    "feedback": "",
+                }
+            )
         gross += score
     if maximum <= 0:
         raise HTTPException(409, "assessment_max_points_invalid")
     penalty = 0.0
     if assessment.kind == "assignment" and version.closes_at and attempt.submitted_at:
-        late_minutes = max(0, math.ceil((utc(attempt.submitted_at) - utc(version.closes_at)).total_seconds() / 60))
+        late_minutes = max(
+            0, math.ceil((utc(attempt.submitted_at) - utc(version.closes_at)).total_seconds() / 60)
+        )
         tier_rows = [
             (threshold, row)
             for row in version.late_penalty
@@ -818,7 +1076,14 @@ def release_grade(
             if isinstance(percent, (int, float)) and late_minutes >= threshold:
                 penalty = float(percent)
     released_score = round(max(0.0, gross * (1 - penalty / 100)), 4)
-    revision = (db.scalar(select(func.max(AssessmentGradeRelease.revision)).where(AssessmentGradeRelease.attempt_id == attempt.id)) or 0) + 1
+    revision = (
+        db.scalar(
+            select(func.max(AssessmentGradeRelease.revision)).where(
+                AssessmentGradeRelease.attempt_id == attempt.id
+            )
+        )
+        or 0
+    ) + 1
     release = AssessmentGradeRelease(
         attempt_id=attempt.id,
         revision=revision,
@@ -831,15 +1096,28 @@ def release_grade(
     )
     db.add(release)
     db.flush()
-    audit(db, request, "assessment_grade_released", user, {
-        "assessmentId": assessment.id,
+    audit(
+        db,
+        request,
+        "assessment_grade_released",
+        user,
+        {
+            "assessmentId": assessment.id,
+            "attemptId": attempt.id,
+            "revision": revision,
+            "score": released_score,
+            "maxPoints": maximum,
+            "penaltyPercent": penalty,
+        },
+    )
+    return {
         "attemptId": attempt.id,
         "revision": revision,
-        "score": released_score,
-        "maxPoints": maximum,
+        "grossScore": gross,
         "penaltyPercent": penalty,
-    })
-    return {"attemptId": attempt.id, "revision": revision, "grossScore": gross, "penaltyPercent": penalty, "releasedScore": released_score, "maxPoints": maximum}
+        "releasedScore": released_score,
+        "maxPoints": maximum,
+    }
 
 
 @router.get("/courses/{course_id}/released-grades")
@@ -848,7 +1126,13 @@ def released_grades(course_id: uuid.UUID, db: DB, user: Principal) -> dict[str, 
     if "student" not in user.roles:
         raise HTTPException(403, "student_role_required")
     rows = db.execute(
-        select(AssessmentGradeRelease, AssessmentAttempt, AssessmentRecipient, Assessment, AssessmentVersion)
+        select(
+            AssessmentGradeRelease,
+            AssessmentAttempt,
+            AssessmentRecipient,
+            Assessment,
+            AssessmentVersion,
+        )
         .join(AssessmentAttempt, AssessmentAttempt.id == AssessmentGradeRelease.attempt_id)
         .join(AssessmentRecipient, AssessmentRecipient.id == AssessmentAttempt.recipient_id)
         .join(Assessment, Assessment.id == AssessmentRecipient.assessment_id)
@@ -856,21 +1140,35 @@ def released_grades(course_id: uuid.UUID, db: DB, user: Principal) -> dict[str, 
         .where(AssessmentRecipient.user_id == user.id, Assessment.course_id == course.id)
         .order_by(AssessmentGradeRelease.released_at.desc())
     )
-    latest: dict[str, tuple[AssessmentGradeRelease, AssessmentAttempt, AssessmentRecipient, Assessment, AssessmentVersion]] = {}
+    latest: dict[
+        str,
+        tuple[
+            AssessmentGradeRelease,
+            AssessmentAttempt,
+            AssessmentRecipient,
+            Assessment,
+            AssessmentVersion,
+        ],
+    ] = {}
     for row in rows:
         release, attempt, recipient, assessment, version = row
         if attempt.id not in latest:
             latest[attempt.id] = (release, attempt, recipient, assessment, version)
-    return {"items": [{
-        "attemptId": attempt.id,
-        "assessmentId": assessment.id,
-        "title": version.title,
-        "kind": assessment.kind,
-        "revision": release.revision,
-        "score": release.released_score,
-        "grossScore": release.gross_score,
-        "maxPoints": release.max_points,
-        "penaltyPercent": release.penalty_percent,
-        "breakdown": release.breakdown,
-        "releasedAt": release.released_at.isoformat(),
-    } for release, attempt, _recipient, assessment, version in latest.values()]}
+    return {
+        "items": [
+            {
+                "attemptId": attempt.id,
+                "assessmentId": assessment.id,
+                "title": version.title,
+                "kind": assessment.kind,
+                "revision": release.revision,
+                "score": release.released_score,
+                "grossScore": release.gross_score,
+                "maxPoints": release.max_points,
+                "penaltyPercent": release.penalty_percent,
+                "breakdown": release.breakdown,
+                "releasedAt": release.released_at.isoformat(),
+            }
+            for release, attempt, _recipient, assessment, version in latest.values()
+        ]
+    }

@@ -273,11 +273,20 @@ def test_admin_clan_war_result_awards_once_and_updates_record(clients):
         "/v1/clans", headers=student_headers, json={"name": "War Bravo", "inventoryId": b_inv}
     )
     assert a.status_code == b.status_code == 201
-    reward_item = admin.post("/v1/admin/shop/items", headers=admin_headers, json={
-        "itemKey": "war-participant-prize", "name": "Competition prize", "priceCoin": 0,
-        "stock": 2, "purchaseLimit": 10, "eligibleRoles": [], "effectType": "cosmetic",
-        "tradeable": False,
-    })
+    reward_item = admin.post(
+        "/v1/admin/shop/items",
+        headers=admin_headers,
+        json={
+            "itemKey": "war-participant-prize",
+            "name": "Competition prize",
+            "priceCoin": 0,
+            "stock": 2,
+            "purchaseLimit": 10,
+            "eligibleRoles": [],
+            "effectType": "cosmetic",
+            "tradeable": False,
+        },
+    )
     assert reward_item.status_code == 201, reward_item.text
     war = admin.post(
         "/v1/admin/clan-wars",
@@ -297,9 +306,14 @@ def test_admin_clan_war_result_awards_once_and_updates_record(clients):
     )
     assert war.status_code == 201, war.text
     result_url = f"/v1/admin/clan-wars/{war.json()['id']}/results"
-    invalid_participant = admin.post(result_url, headers=admin_headers, json={
-        "outcome": "clan_a", "participantIds": ["00000000-0000-4000-8000-000000009999"],
-    })
+    invalid_participant = admin.post(
+        result_url,
+        headers=admin_headers,
+        json={
+            "outcome": "clan_a",
+            "participantIds": ["00000000-0000-4000-8000-000000009999"],
+        },
+    )
     assert invalid_participant.status_code == 422
     result_body = {"outcome": "clan_a", "participantIds": [admin_id, student_id]}
     saved = admin.post(result_url, headers=admin_headers, json=result_body)
@@ -316,12 +330,20 @@ def test_admin_clan_war_result_awards_once_and_updates_record(clients):
     assert admin.get("/v1/me/wallet", headers=admin_headers).json()["coin"] == 10
     assert student.get("/v1/me/wallet", headers=student_headers).json()["coin"] == 10
     with factory() as db:
-        assert db.scalar(select(InventoryItem).where(
-            InventoryItem.user_id == admin_id, InventoryItem.item_id == reward_item.json()["id"],
-            InventoryItem.status == "available"))
-        assert db.scalar(select(InventoryItem).where(
-            InventoryItem.user_id == student_id, InventoryItem.item_id == reward_item.json()["id"],
-            InventoryItem.status == "available"))
+        assert db.scalar(
+            select(InventoryItem).where(
+                InventoryItem.user_id == admin_id,
+                InventoryItem.item_id == reward_item.json()["id"],
+                InventoryItem.status == "available",
+            )
+        )
+        assert db.scalar(
+            select(InventoryItem).where(
+                InventoryItem.user_id == student_id,
+                InventoryItem.item_id == reward_item.json()["id"],
+                InventoryItem.status == "available",
+            )
+        )
 
 
 def test_course_staff_clan_war_proposal_requires_admin_decision(clients):

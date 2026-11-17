@@ -14,10 +14,18 @@ from .course_access import course_for, lock_actor
 from .models import CourseMembership, PracticeAttempt, Question, QuestionVersion, User
 
 router = APIRouter(prefix="/v1")
-PRACTICE_TYPES = frozenset({
-    "multipleChoice", "multipleSelect", "shortAnswer", "sentenceRewriting",
-    "fillInTheBlank", "matching", "ordering", "trueFalseNotGiven",
-})
+PRACTICE_TYPES = frozenset(
+    {
+        "multipleChoice",
+        "multipleSelect",
+        "shortAnswer",
+        "sentenceRewriting",
+        "fillInTheBlank",
+        "matching",
+        "ordering",
+        "trueFalseNotGiven",
+    }
+)
 
 
 class PracticeSubmission(BaseModel):
@@ -60,23 +68,36 @@ def _validate_answer(question: QuestionVersion, answer: object) -> None:
         return
     if question_type == "multipleSelect":
         allowed = {item.get("choiceId") for item in _object_list(content.get("choices"))}
-        if not isinstance(answer, list) or any(not isinstance(item, str) or item not in allowed for item in answer) or len(answer) != len(set(answer)):
+        if (
+            not isinstance(answer, list)
+            or any(not isinstance(item, str) or item not in allowed for item in answer)
+            or len(answer) != len(set(answer))
+        ):
             raise HTTPException(422, "practice_answer_invalid")
         return
     if question_type == "fillInTheBlank":
         blanks = _string_list(content.get("blankIds"))
-        if not isinstance(answer, dict) or any(key not in blanks or not isinstance(value, str) for key, value in answer.items()):
+        if not isinstance(answer, dict) or any(
+            key not in blanks or not isinstance(value, str) for key, value in answer.items()
+        ):
             raise HTTPException(422, "practice_answer_invalid")
         return
     if question_type == "matching":
         left = {item.get("itemId") for item in _object_list(content.get("leftItems"))}
         right = {item.get("itemId") for item in _object_list(content.get("rightItems"))}
-        if not isinstance(answer, dict) or any(key not in left or value not in right for key, value in answer.items()):
+        if not isinstance(answer, dict) or any(
+            key not in left or value not in right for key, value in answer.items()
+        ):
             raise HTTPException(422, "practice_answer_invalid")
         return
     if question_type == "ordering":
         allowed = {item.get("itemId") for item in _object_list(content.get("items"))}
-        if not isinstance(answer, list) or any(not isinstance(item, str) for item in answer) or set(answer) != allowed or len(answer) != len(allowed):
+        if (
+            not isinstance(answer, list)
+            or any(not isinstance(item, str) for item in answer)
+            or set(answer) != allowed
+            or len(answer) != len(allowed)
+        ):
             raise HTTPException(422, "practice_answer_invalid")
         return
     raise HTTPException(422, "practice_question_type_not_supported")
@@ -86,7 +107,11 @@ def _score(question: QuestionVersion, answer: object) -> tuple[float, float]:
     config = question.authoring_config or {}
     question_type = question.question_type
     if question_type in {"multipleChoice", "trueFalseNotGiven"}:
-        expected = config.get("correctChoiceIds") if question_type == "multipleChoice" else config.get("correctValue")
+        expected = (
+            config.get("correctChoiceIds")
+            if question_type == "multipleChoice"
+            else config.get("correctValue")
+        )
         if isinstance(expected, list):
             correct = answer in expected
         else:
@@ -108,7 +133,9 @@ def _score(question: QuestionVersion, answer: object) -> tuple[float, float]:
         expected = config.get("acceptedAnswers", [])
         normalization = config.get("normalization", [])
         options = normalization if isinstance(normalization, list) else []
-        correct = isinstance(expected, list) and any(_normalize(answer, options) == _normalize(value, options) for value in expected)
+        correct = isinstance(expected, list) and any(
+            _normalize(answer, options) == _normalize(value, options) for value in expected
+        )
         return (1.0 if correct else 0.0, 1.0)
     if question_type == "fillInTheBlank":
         blanks = config.get("blanks", [])
@@ -125,7 +152,9 @@ def _score(question: QuestionVersion, answer: object) -> tuple[float, float]:
             modes = norm if isinstance(norm, list) else []
             maximum += weight
             value = answer.get(str(blank.get("blankId", "")), "")
-            if isinstance(accepted, list) and any(_normalize(value, modes) == _normalize(item, modes) for item in accepted):
+            if isinstance(accepted, list) and any(
+                _normalize(value, modes) == _normalize(item, modes) for item in accepted
+            ):
                 earned += weight
         return earned, maximum or 1.0
     if question_type == "matching":
@@ -133,13 +162,20 @@ def _score(question: QuestionVersion, answer: object) -> tuple[float, float]:
         if not isinstance(pairs, list) or not isinstance(answer, dict):
             return 0.0, 1.0
         maximum = sum(float(row.get("points", 0)) for row in pairs if isinstance(row, dict))
-        earned = sum(float(row.get("points", 0)) for row in pairs if isinstance(row, dict) and answer.get(str(row.get("leftItemId"))) == row.get("rightItemId"))
+        earned = sum(
+            float(row.get("points", 0))
+            for row in pairs
+            if isinstance(row, dict)
+            and answer.get(str(row.get("leftItemId"))) == row.get("rightItemId")
+        )
         return earned, maximum or 1.0
     if question_type == "ordering":
         expected = config.get("correctItemIds", [])
         if not isinstance(expected, list) or not isinstance(answer, list):
             return 0.0, 1.0
-        correct_positions = sum(index < len(answer) and answer[index] == item for index, item in enumerate(expected))
+        correct_positions = sum(
+            index < len(answer) and answer[index] == item for index, item in enumerate(expected)
+        )
         if config.get("scoringMode") == "allOrNothing":
             return (1.0 if answer == expected else 0.0, 1.0)
         return float(correct_positions), float(max(1, len(expected)))
@@ -171,35 +207,44 @@ def practice_questions(
         .group_by(QuestionVersion.question_id)
         .subquery()
     )
-    items = list(db.scalars(
-        select(QuestionVersion)
-        .join(latest_published, (latest_published.c.question_id == QuestionVersion.question_id) & (latest_published.c.version == QuestionVersion.version))
-        .join(Question, Question.id == QuestionVersion.question_id)
-        .where(
-            Question.course_id == course.id,
-            Question.status == "active",
-            QuestionVersion.status == "published",
-            QuestionVersion.usage_types.cast(Text).ilike('%"practice"%'),
-            QuestionVersion.question_type.in_(PRACTICE_TYPES),
+    items = list(
+        db.scalars(
+            select(QuestionVersion)
+            .join(
+                latest_published,
+                (latest_published.c.question_id == QuestionVersion.question_id)
+                & (latest_published.c.version == QuestionVersion.version),
+            )
+            .join(Question, Question.id == QuestionVersion.question_id)
+            .where(
+                Question.course_id == course.id,
+                Question.status == "active",
+                QuestionVersion.status == "published",
+                QuestionVersion.usage_types.cast(Text).ilike('%"practice"%'),
+                QuestionVersion.question_type.in_(PRACTICE_TYPES),
+            )
+            .order_by(QuestionVersion.published_at.desc(), QuestionVersion.id)
+            .offset((page - 1) * pageSize)
+            .limit(pageSize + 1)
         )
-        .order_by(QuestionVersion.published_at.desc(), QuestionVersion.id)
-        .offset((page - 1) * pageSize)
-        .limit(pageSize + 1)
-    ))
+    )
     has_more = len(items) > pageSize
     response.headers["Cache-Control"] = "no-store"
     return {
-        "items": [{
-            "questionId": item.question_id,
-            "questionVersionId": item.id,
-            "questionType": item.question_type,
-            "title": item.title,
-            "prompt": item.prompt,
-            "categoryId": item.category_id,
-            "difficulty": item.difficulty,
-            "content": item.content,
-            "status": item.status,
-        } for item in items[:pageSize]],
+        "items": [
+            {
+                "questionId": item.question_id,
+                "questionVersionId": item.id,
+                "questionType": item.question_type,
+                "title": item.title,
+                "prompt": item.prompt,
+                "categoryId": item.category_id,
+                "difficulty": item.difficulty,
+                "content": item.content,
+                "status": item.status,
+            }
+            for item in items[:pageSize]
+        ],
         "hasMore": has_more,
         "executionAvailable": False,
     }
@@ -247,13 +292,19 @@ def submit_practice(
     )
     db.add(attempt)
     db.flush()
-    audit(db, request, "practice_attempt_submitted", user, {
-        "courseId": course.id,
-        "attemptId": attempt.id,
-        "questionVersionId": question.id,
-        "score": attempt.score,
-        "maxPoints": attempt.max_points,
-    })
+    audit(
+        db,
+        request,
+        "practice_attempt_submitted",
+        user,
+        {
+            "courseId": course.id,
+            "attemptId": attempt.id,
+            "questionVersionId": question.id,
+            "score": attempt.score,
+            "maxPoints": attempt.max_points,
+        },
+    )
     from .missions import record_domain_event
 
     record_domain_event(db, request, user, "practice.attempt", attempt.id)
@@ -279,18 +330,26 @@ def practice_history(
 ) -> dict[str, object]:
     course = course_for(db, course_id, user)
     _learner(db, course_id, user)
-    attempts = list(db.scalars(
-        select(PracticeAttempt)
-        .where(PracticeAttempt.course_id == course.id, PracticeAttempt.user_id == user.id)
-        .order_by(PracticeAttempt.created_at.desc(), PracticeAttempt.id)
-        .offset((page - 1) * pageSize)
-        .limit(pageSize + 1)
-    ))
+    attempts = list(
+        db.scalars(
+            select(PracticeAttempt)
+            .where(PracticeAttempt.course_id == course.id, PracticeAttempt.user_id == user.id)
+            .order_by(PracticeAttempt.created_at.desc(), PracticeAttempt.id)
+            .offset((page - 1) * pageSize)
+            .limit(pageSize + 1)
+        )
+    )
     has_more = len(attempts) > pageSize
-    return {"items": [{
-        "attemptId": item.id,
-        "questionVersionId": item.question_version_id,
-        "score": item.score,
-        "maxPoints": item.max_points,
-        "createdAt": item.created_at.isoformat(),
-    } for item in attempts[:pageSize]], "hasMore": has_more}
+    return {
+        "items": [
+            {
+                "attemptId": item.id,
+                "questionVersionId": item.question_version_id,
+                "score": item.score,
+                "maxPoints": item.max_points,
+                "createdAt": item.created_at.isoformat(),
+            }
+            for item in attempts[:pageSize]
+        ],
+        "hasMore": has_more,
+    }
