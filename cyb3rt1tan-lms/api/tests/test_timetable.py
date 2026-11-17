@@ -91,7 +91,7 @@ def test_timetable_staff_access_is_live_and_course_scoped(clients):
     admin, staff, factory = clients
     _, course, _ = setup_course(admin)
     teacher_id = staff_user(factory, "teacher", "teacher")
-    login(staff, "teacher@example.test")
+    login(staff, "teacher")
     with factory.begin() as db:
         db.add(CourseStaff(course_id=course["id"], user_id=teacher_id, role="teacher", active=True))
         add_session(db, course["id"])

@@ -335,14 +335,14 @@ from .course_planning import router as planning_router
 from .courses import router as course_router
 from .csv_imports import router as csv_router
 from .economy import router as economy_router
-from .learning_overview import router as learning_overview_router
+from .home import router as home_router
 from .leaderboard import router as leaderboard_router
+from .learning_overview import router as learning_overview_router
 from .lesson_progress import router as lesson_progress_router
 from .marketplace import router as marketplace_router
 from .marketplace_disputes import router as marketplace_disputes_router
 from .mfa_routes import router as mfa_router
 from .missions import router as missions_router
-from .home import router as home_router
 from .notifications import router as notifications_router
 from .operations import router as operations_router
 from .practice import router as practice_router

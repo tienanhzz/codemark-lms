@@ -216,11 +216,7 @@ def login_account(db: Session, identifier: str) -> User | None:
     if by_code is not None and "student" in by_code.roles:
         candidates[by_code.id] = by_code
     by_name = db.scalar(select(User).where(User.username == normalized))
-    if (
-        by_name is not None
-        and "student" not in by_name.roles
-        and ("teacher" not in by_name.roles or "admin" in by_name.roles)
-    ):
+    if by_name is not None and "student" not in by_name.roles:
         candidates[by_name.id] = by_name
     for by_email in db.scalars(select(User).where(func.lower(User.email) == normalized)):
         if "teacher" in by_email.roles and "student" not in by_email.roles:

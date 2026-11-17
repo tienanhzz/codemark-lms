@@ -86,6 +86,12 @@ def test_teacher_email_and_ambiguous_identifiers(clients):
         ).status_code
         == 200
     )
+    assert (
+        admin.post(
+            "/v1/auth/login", headers=ORIGIN, json={"username": "teacher", "password": PASSWORD}
+        ).status_code
+        == 200
+    )
     with factory.begin() as db:
         root = db.scalar(select(User).where(User.username == "admin"))
         db.add(
@@ -108,12 +114,11 @@ def test_teacher_email_and_ambiguous_identifiers(clients):
 @pytest.mark.parametrize(
     "status,password,identifier",
     [
-        ("active", PASSWORD, "teacher"),
         ("active", "wrong-password", "teacher@gmail.com"),
         ("suspended", PASSWORD, "teacher@gmail.com"),
     ],
 )
-def test_teacher_rejects_username_wrong_password_and_suspended_account(
+def test_teacher_rejects_wrong_password_and_suspended_account(
     clients, status, password, identifier
 ):
     admin, _, factory = clients
