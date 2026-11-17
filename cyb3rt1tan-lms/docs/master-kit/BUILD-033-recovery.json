@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "scope": "isolated-local-release-drill",
+  "status": "passed",
+  "recordedAt": "2026-11-16T11:53:48.032024+00:00",
+  "baselineCommit": "051d239610bab0d7ef69bcada6a7cf16915d7e05",
+  "workingTreeDirty": true,
+  "sourceFingerprintSha256": "15d95d029f0fc7f4f4f55eaabef492401b0655f2519e72ce88394aa3c4da8190",
+  "productionAccepted": false,
+  "sourceDatabaseReadOnly": true,
+  "snapshotConsistent": true,
+  "tablesVerified": 99,
+  "rowsVerified": 64,
+  "encryptedArchiveSha256": "787d901b0477458d543b90e228513f4b9817884ee40d7bbb9b2f7dd511b953f0",
+  "wrongKeyRejected": true,
+  "tamperingRejected": true,
+  "independentRestoresVerified": 2,
+  "mfaRotation": {
+    "recordsVerified": 2,
+    "rewrapped": 2,
+    "dryRunImmutable": true,
+    "repeatApplyNoop": true,
+    "missingKeyRejected": true,
+    "keyRecoveryVerified": true
+  },
+  "seconds": 2.97,
+  "temporaryDatabasesRemoved": true
+}

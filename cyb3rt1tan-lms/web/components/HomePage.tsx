@@ -127,7 +127,7 @@ const copy = {
   },
 };
 
-export function HomePage({ locale, roles = [] }: { locale: 'en' | 'vi'; roles?: string[] }) {
+export function HomePage({ locale, roles = [], showCarousel = true }: { locale: 'en' | 'vi'; roles?: string[]; showCarousel?: boolean }) {
   const c = copy[locale];
   return (
     <div className="home-page">
@@ -137,7 +137,7 @@ export function HomePage({ locale, roles = [] }: { locale: 'en' | 'vi'; roles?: 
           {c.latest} <span aria-hidden="true">↓</span>
         </a>
       </div>
-      <HomeCarousel locale={locale} />
+      {showCarousel && <HomeCarousel locale={locale} />}
       <nav
         className="home-quicklinks"
         aria-label={locale === 'vi' ? 'Truy cập nhanh' : 'Quick links'}

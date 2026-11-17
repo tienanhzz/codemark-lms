@@ -11,8 +11,18 @@ def upgrade() -> None:
     op.create_table(
         "question_assets",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("course_id", sa.String(36), sa.ForeignKey("courses.id", ondelete="RESTRICT"), nullable=False),
-        sa.Column("created_by", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "course_id",
+            sa.String(36),
+            sa.ForeignKey("courses.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
+        sa.Column(
+            "created_by",
+            sa.String(36),
+            sa.ForeignKey("users.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("asset_kind", sa.String(30), nullable=False),
         sa.Column("media_type", sa.String(100), nullable=False),
         sa.Column("content", sa.LargeBinary(), nullable=False),

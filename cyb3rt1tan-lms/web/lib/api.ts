@@ -14,6 +14,25 @@ export const defaultPreferences: UserPreferences = {
   captionsEnabled: false,
 };
 
+const guestLocaleKey = 'codemark:guest-locale';
+
+export function readGuestLocale(): UserPreferences['locale'] | null {
+  try {
+    const locale = window.localStorage.getItem(guestLocaleKey);
+    return locale === 'en' || locale === 'vi' ? locale : null;
+  } catch {
+    return null;
+  }
+}
+
+export function rememberGuestLocale(locale: UserPreferences['locale']): void {
+  try {
+    window.localStorage.setItem(guestLocaleKey, locale);
+  } catch {
+    // Language switching remains usable when browser storage is unavailable.
+  }
+}
+
 export async function api<T>(
   path: string,
   method = 'GET',

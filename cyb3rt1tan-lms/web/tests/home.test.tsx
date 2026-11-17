@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { HomePage } from '../components/HomePage';
+import { HomeCarousel } from '../components/HomeCarousel';
 
 const transport = vi.hoisted(() => ({ api: vi.fn() }));
 vi.mock('../lib/api', () => ({ api: transport.api }));
@@ -19,7 +20,13 @@ beforeEach(() => {
       disconnect() {}
     },
   );
+  delete document.documentElement.dataset.motion;
   transport.api.mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 10 });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+  delete document.documentElement.dataset.motion;
 });
 
 it('shows public posts as plain text and gives guests navigation without publication controls', async () => {
@@ -96,32 +103,64 @@ it('lets teachers publish news and reloads the public bulletin', async () => {
   });
 });
 
-it('uses exactly three illustrated web-learning banners', async () => {
+it('renders animated technology artwork instead of static banner images', async () => {
   const { container } = render(<HomePage locale="en" />);
   await screen.findByText('No public announcements yet.');
-  expect(container.querySelectorAll('.home-carousel-slide img')).toHaveLength(3);
-  expect(screen.getAllByRole('button', { name: /View scene/ })).toHaveLength(3);
+  expect(container.querySelectorAll('.home-carousel-slide svg[role="img"]')).toHaveLength(8);
+  expect(container.querySelectorAll('.home-carousel-slide img')).toHaveLength(0);
+  expect(screen.getByRole('img', { name: 'AI neural network among the planets' })).toBeTruthy();
+  expect(container.querySelector('.is-active .learning-motion-satellite')).toBeTruthy();
+  expect(container.querySelector('.is-active .learning-motion-network')).toBeTruthy();
+  expect(container.querySelector('.home-carousel')?.querySelectorAll('button')).toHaveLength(0);
 });
 
-it('supports manual scene changes and respects reduced motion', async () => {
+it('automatically loops banners every ten seconds while the pointer remains over the image', () => {
+  vi.useFakeTimers();
+  const { container } = render(<HomeCarousel locale="en" />);
+  const carousel = container.querySelector('.home-carousel')!;
+  const active = () => container.querySelector('.is-active')?.getAttribute('aria-label');
+  expect(active()).toContain('Scene 1 / 8');
+  fireEvent.mouseEnter(carousel);
+  act(() => vi.advanceTimersByTime(9999));
+  expect(active()).toContain('Scene 1 / 8');
+  act(() => vi.advanceTimersByTime(1));
+  expect(active()).toContain('Scene 2 / 8');
+  act(() => vi.advanceTimersByTime(10000));
+  expect(active()).toContain('Scene 3 / 8');
+  act(() => vi.advanceTimersByTime(10000));
+  expect(active()).toContain('Scene 4 / 8');
+  for (let scene = 5; scene <= 8; scene++) {
+    act(() => vi.advanceTimersByTime(10000));
+    expect(active()).toContain(`Scene ${scene} / 8`);
+  }
+  act(() => vi.advanceTimersByTime(10000));
+  expect(active()).toContain('Scene 1 / 8');
+  expect(carousel.querySelectorAll('button')).toHaveLength(0);
+});
+
+it('keeps the requested homepage autoplay even when the device reduces motion', () => {
+  vi.useFakeTimers();
   vi.stubGlobal('matchMedia', () => ({
     matches: true,
     addEventListener() {},
     removeEventListener() {},
   }));
-  render(<HomePage locale="en" />);
-  const user = userEvent.setup();
-  await screen.findByText('No public announcements yet.');
-  const play = screen.getByRole('button', {
-    name: 'Motion disabled by your device settings',
-  }) as HTMLButtonElement;
-  expect(play.disabled).toBe(true);
-  await user.click(screen.getByRole('button', { name: 'Next scene' }));
-  await waitFor(() =>
-    expect(screen.getByRole('button', { name: /View scene 2:/ }).getAttribute('aria-current')).toBe(
-      'true',
-    ),
-  );
+  const { container } = render(<HomeCarousel locale="en" />);
+  act(() => vi.advanceTimersByTime(10000));
+  expect(container.querySelector('.home-carousel')?.getAttribute('data-paused')).toBe('false');
+  expect(container.querySelector('.is-active')?.getAttribute('aria-label')).toContain('Scene 2 / 8');
+  expect(container.querySelectorAll('button')).toHaveLength(0);
+});
+
+it('keeps homepage autoplay without changing the account motion preference', () => {
+  vi.useFakeTimers();
+  document.documentElement.dataset.motion = 'false';
+  const { container } = render(<HomeCarousel locale="en" />);
+  act(() => vi.advanceTimersByTime(10000));
+  expect(container.querySelector('.is-active')?.getAttribute('aria-label')).toContain('Scene 2 / 8');
+  act(() => vi.advanceTimersByTime(10000));
+  expect(container.querySelector('.is-active')?.getAttribute('aria-label')).toContain('Scene 3 / 8');
+  expect(document.documentElement.dataset.motion).toBe('false');
 });
 
 it('provides a retry when the public bulletin cannot load', async () => {
@@ -133,14 +172,12 @@ it('provides a retry when the public bulletin cannot load', async () => {
   await screen.findByText('No public announcements yet.');
 });
 
-it('keeps manual navigation available when motion preference APIs are unavailable', async () => {
+it('continues autoplay when motion preference APIs are unavailable', () => {
+  vi.useFakeTimers();
   vi.stubGlobal('matchMedia', undefined);
-  render(<HomePage locale="en" />);
-  await screen.findByText('No public announcements yet.');
-  await userEvent.setup().click(screen.getByRole('button', { name: 'Next scene' }));
-  expect(screen.getByRole('button', { name: /View scene 2:/ }).getAttribute('aria-current')).toBe(
-    'true',
-  );
+  const { container } = render(<HomeCarousel locale="en" />);
+  act(() => vi.advanceTimersByTime(10000));
+  expect(container.querySelector('.is-active')?.getAttribute('aria-label')).toContain('Scene 2 / 8');
 });
 
 const highlight = {

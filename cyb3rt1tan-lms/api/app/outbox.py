@@ -27,7 +27,9 @@ def enqueue(
             raise ValueError("Outbox payload contains unapproved fields.")
         if payload != {"eventId": event.id, "action": event.action, "requestId": event.request_id}:
             raise ValueError("Outbox metadata must match its audit event.")
-        if not isinstance(payload["action"], str) or not re.fullmatch(r"[a-z][a-z0-9_.-]{0,79}", payload["action"]):
+        if not isinstance(payload["action"], str) or not re.fullmatch(
+            r"[a-z][a-z0-9_.-]{0,79}", payload["action"]
+        ):
             raise ValueError("Invalid outbox action.")
         try:
             uuid.UUID(str(payload["eventId"]))
@@ -90,7 +92,11 @@ def enqueue_runner_job(
         actor_id=actor_id,
         action="runner.job_requested",
         request_id=request_id,
-        detail={"jobId": job["jobId"], "profileId": job["profileId"], "profileVersion": job["profileVersion"]},
+        detail={
+            "jobId": job["jobId"],
+            "profileId": job["profileId"],
+            "profileVersion": job["profileVersion"],
+        },
     )
     db.add(event)
     db.flush()

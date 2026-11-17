@@ -243,8 +243,8 @@ def test_owner_transfer_revokes_previous_owner_and_protects_new_owner(clients):
             == 201
         )
     with TestClient(app) as old, TestClient(app) as new:
-        login(old, "teacher1")
-        new_headers = login(new, "teacher2")
+        login(old, "teacher1@example.test")
+        new_headers = login(new, "teacher2@example.test")
         assert old.get(endpoint).status_code == 404
         assert new.get(endpoint).json()["ownerId"] == second
         assert (

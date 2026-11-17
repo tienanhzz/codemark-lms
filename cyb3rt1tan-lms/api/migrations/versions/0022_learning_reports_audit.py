@@ -13,7 +13,12 @@ def upgrade() -> None:
     op.create_table(
         "report_jobs",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("actor_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "actor_id",
+            sa.String(36),
+            sa.ForeignKey("users.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("kind", sa.String(40), nullable=False),
         sa.Column("format", sa.String(10), nullable=False),
         sa.Column("filters", sa.JSON(), nullable=False),

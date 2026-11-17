@@ -1,12 +1,17 @@
 'use client';
 
 import { useId } from 'react';
+import { AdditionalTechnologyScene } from './AdditionalTechnologyScenes';
 
 export const SCENE_NAMES = [
   'Mạng nơ-ron AI giữa các hành tinh',
   'Bộ xử lý lượng tử và các trường năng lượng',
   'Trái Đất số và mạng lưới vệ tinh',
   'Đài quan sát thiên hà và màn hình hologram',
+  'Lập trình web và mã nguồn trực quan',
+  'Thư viện số và thành tích học tập',
+  'Trợ lý học tập AI và cộng tác',
+  'Điện toán đám mây và bảo mật dữ liệu',
 ];
 
 export const SCENE_NAMES_EN = [
@@ -14,6 +19,10 @@ export const SCENE_NAMES_EN = [
   'Quantum processor and energy fields',
   'Digital Earth and satellite network',
   'Galactic observatory and holographic screens',
+  'Web development and live code',
+  'Digital library and learning achievements',
+  'AI learning assistant and collaboration',
+  'Cloud computing and secure data',
 ];
 
 export function TechnologyScene({ variant, locale }: { variant: number; locale: 'en' | 'vi' }) {
@@ -794,6 +803,7 @@ export function TechnologyScene({ variant, locale }: { variant: number; locale: 
           />
         </>
       )}
+      <AdditionalTechnologyScene variant={variant} paint={paint} />
     </svg>
   );
 }

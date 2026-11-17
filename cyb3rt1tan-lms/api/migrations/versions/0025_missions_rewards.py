@@ -24,20 +24,31 @@ def upgrade() -> None:
         sa.Column("starts_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("ends_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("status", sa.String(16), nullable=False),
-        sa.Column("author_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "author_id",
+            sa.String(36),
+            sa.ForeignKey("users.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.CheckConstraint("cadence IN ('daily','weekly','once')", name="ck_mission_cadence"),
         sa.CheckConstraint("status IN ('active','retired')", name="ck_mission_status"),
         sa.CheckConstraint("target_count > 0", name="ck_mission_target"),
         sa.CheckConstraint("reward_exp >= 0 AND reward_coin >= 0", name="ck_mission_reward"),
-        sa.CheckConstraint("ends_at IS NULL OR starts_at IS NULL OR ends_at > starts_at", name="ck_mission_window"),
+        sa.CheckConstraint(
+            "ends_at IS NULL OR starts_at IS NULL OR ends_at > starts_at", name="ck_mission_window"
+        ),
         sa.UniqueConstraint("mission_id", "version", name="uq_mission_definition_version"),
     )
-    op.create_index("ix_mission_definitions_event_status", "mission_definitions", ["event_key", "status"])
+    op.create_index(
+        "ix_mission_definitions_event_status", "mission_definitions", ["event_key", "status"]
+    )
     op.create_table(
         "mission_progress",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False
+        ),
         sa.Column("mission_id", sa.String(64), nullable=False),
         sa.Column("mission_version", sa.Integer(), nullable=False),
         sa.Column("cycle_key", sa.String(80), nullable=False),
@@ -45,26 +56,46 @@ def upgrade() -> None:
         sa.Column("status", sa.String(16), nullable=False),
         sa.Column("completed_at", sa.DateTime(timezone=True), nullable=True),
         sa.CheckConstraint("progress >= 0", name="ck_mission_progress_nonnegative"),
-        sa.CheckConstraint("status IN ('active','complete','claimed')", name="ck_mission_progress_status"),
-        sa.UniqueConstraint("user_id", "mission_id", "mission_version", "cycle_key", name="uq_mission_progress_cycle"),
+        sa.CheckConstraint(
+            "status IN ('active','complete','claimed')", name="ck_mission_progress_status"
+        ),
+        sa.UniqueConstraint(
+            "user_id",
+            "mission_id",
+            "mission_version",
+            "cycle_key",
+            name="uq_mission_progress_cycle",
+        ),
     )
     op.create_index("ix_mission_progress_user_cycle", "mission_progress", ["user_id", "cycle_key"])
     op.create_table(
         "mission_event_receipts",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False
+        ),
         sa.Column("mission_id", sa.String(64), nullable=False),
         sa.Column("mission_version", sa.Integer(), nullable=False),
         sa.Column("cycle_key", sa.String(80), nullable=False),
         sa.Column("source_event_id", sa.String(64), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
-        sa.UniqueConstraint("user_id", "mission_id", "mission_version", "source_event_id", name="uq_mission_event_receipt"),
+        sa.UniqueConstraint(
+            "user_id",
+            "mission_id",
+            "mission_version",
+            "source_event_id",
+            name="uq_mission_event_receipt",
+        ),
     )
-    op.create_index("ix_mission_event_receipts_cycle", "mission_event_receipts", ["mission_id", "cycle_key"])
+    op.create_index(
+        "ix_mission_event_receipts_cycle", "mission_event_receipts", ["mission_id", "cycle_key"]
+    )
     op.create_table(
         "reward_events",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False
+        ),
         sa.Column("mission_id", sa.String(64), nullable=False),
         sa.Column("mission_version", sa.Integer(), nullable=False),
         sa.Column("cycle_key", sa.String(80), nullable=False),

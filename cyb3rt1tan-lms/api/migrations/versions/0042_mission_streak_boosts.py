@@ -11,7 +11,9 @@ def upgrade() -> None:
     op.create_table(
         "mission_streak_boosts",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="RESTRICT"), nullable=False
+        ),
         sa.Column("mission_id", sa.String(64), nullable=False),
         sa.Column("mission_version", sa.Integer(), nullable=False),
         sa.Column("cycle_key", sa.String(80), nullable=False),
@@ -22,7 +24,9 @@ def upgrade() -> None:
         sa.Column("expired_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.CheckConstraint("base_progress >= 0", name="ck_mission_streak_boost_base"),
-        sa.CheckConstraint("granted_progress BETWEEN 0 AND 3", name="ck_mission_streak_boost_grant"),
+        sa.CheckConstraint(
+            "granted_progress BETWEEN 0 AND 3", name="ck_mission_streak_boost_grant"
+        ),
         sa.CheckConstraint("expires_at > created_at", name="ck_mission_streak_boost_expiry"),
         sa.CheckConstraint(
             "consumed_at IS NULL OR expired_at IS NULL",

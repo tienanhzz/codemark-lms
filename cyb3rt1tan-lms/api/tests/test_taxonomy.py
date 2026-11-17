@@ -12,9 +12,17 @@ ORIGIN = {"Origin": "http://127.0.0.1:3100"}
 
 
 def _login(client: TestClient, username: str) -> dict[str, str]:
-    assert client.post(
-        "/v1/auth/login", headers=ORIGIN, json={"username": "9999000001" if username == "student" else username, "password": PASSWORD}
-    ).status_code == 200
+    assert (
+        client.post(
+            "/v1/auth/login",
+            headers=ORIGIN,
+            json={
+                "username": "9999000001" if username == "student" else username,
+                "password": PASSWORD,
+            },
+        ).status_code
+        == 200
+    )
     return {**ORIGIN, "X-CSRF-Token": client.cookies["lms_csrf"]}
 
 
@@ -27,11 +35,14 @@ def test_taxonomy_catalogs_are_separate_admin_managed_trees_and_audited(clients)
     assert initial["catalogVersion"] == 1
     assert initial["categories"] == [] and initial["tags"] == []
     assert student.get("/v1/question-taxonomy?includeRetired=true").status_code == 403
-    assert student.post(
-        "/v1/admin/question-taxonomy/categories",
-        headers=student_headers,
-        json={"id": "algorithms", "names": {"en": "Algorithms", "vi": "Thuật toán"}},
-    ).status_code == 403
+    assert (
+        student.post(
+            "/v1/admin/question-taxonomy/categories",
+            headers=student_headers,
+            json={"id": "algorithms", "names": {"en": "Algorithms", "vi": "Thuật toán"}},
+        ).status_code
+        == 403
+    )
 
     category = admin.post(
         "/v1/admin/question-taxonomy/categories",
@@ -60,21 +71,30 @@ def test_taxonomy_catalogs_are_separate_admin_managed_trees_and_audited(clients)
     )
     assert tag.status_code == 201, tag.text
 
-    assert admin.patch(
-        "/v1/admin/question-taxonomy/categories/algorithms",
-        headers=headers,
-        json={"parentId": "sorting"},
-    ).status_code == 422
-    assert admin.patch(
-        "/v1/admin/question-taxonomy/categories/algorithms",
-        headers=headers,
-        json={"status": "retired"},
-    ).status_code == 409
-    assert admin.patch(
-        "/v1/admin/question-taxonomy/tags/stable-sort",
-        headers=headers,
-        json={"selectable": False},
-    ).status_code == 200
+    assert (
+        admin.patch(
+            "/v1/admin/question-taxonomy/categories/algorithms",
+            headers=headers,
+            json={"parentId": "sorting"},
+        ).status_code
+        == 422
+    )
+    assert (
+        admin.patch(
+            "/v1/admin/question-taxonomy/categories/algorithms",
+            headers=headers,
+            json={"status": "retired"},
+        ).status_code
+        == 409
+    )
+    assert (
+        admin.patch(
+            "/v1/admin/question-taxonomy/tags/stable-sort",
+            headers=headers,
+            json={"selectable": False},
+        ).status_code
+        == 200
+    )
 
     question = admin.get("/v1/question-taxonomy").json()
     content = admin.get("/v1/taxonomy").json()
@@ -115,11 +135,14 @@ def test_taxonomy_merge_keeps_source_id_and_creates_audited_redirect(clients):
     assert source["status"] == "retired"
     assert set(target["applicability"]) == {"multipleChoice", "writing"}
     assert catalog["redirects"] == [{"kind": "tag", "sourceId": "legacy", "targetId": "core"}]
-    assert admin.post(
-        "/v1/admin/question-taxonomy/tags/core/merge",
-        headers=headers,
-        json={"targetId": "legacy"},
-    ).status_code == 409
+    assert (
+        admin.post(
+            "/v1/admin/question-taxonomy/tags/core/merge",
+            headers=headers,
+            json={"targetId": "legacy"},
+        ).status_code
+        == 409
+    )
 
 
 def test_one_time_taxonomy_seed_requires_expected_version_and_empty_catalog(clients):
@@ -132,7 +155,12 @@ def test_one_time_taxonomy_seed_requires_expected_version_and_empty_catalog(clie
             {"id": "logic", "name": {"en": "Logic"}, "parentId": "foundations", "status": "active"},
         ],
         "tags": [
-            {"id": "basics", "name": {"en": "Basics"}, "appliesTo": ["lesson", "question"], "status": "active"},
+            {
+                "id": "basics",
+                "name": {"en": "Basics"},
+                "appliesTo": ["lesson", "question"],
+                "status": "active",
+            },
         ],
     }
     seeded = admin.post("/v1/admin/taxonomy/seed", headers=headers, json=payload)
@@ -149,7 +177,9 @@ def test_one_time_taxonomy_seed_requires_expected_version_and_empty_catalog(clie
 def test_canonical_master_kit_taxonomy_imports_to_both_trees(clients):
     admin, _, _ = clients
     headers = _login(admin, "admin")
-    source = Path(__file__).resolve().parents[2] / "web" / "public" / "learning-taxonomy.example.json"
+    source = (
+        Path(__file__).resolve().parents[2] / "web" / "public" / "learning-taxonomy.example.json"
+    )
     payload = json.loads(source.read_text(encoding="utf-8"))
     payload.pop("catalogVersion", None)
     payload["expectedCatalogVersion"] = 1

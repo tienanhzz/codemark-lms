@@ -2,8 +2,8 @@
 .public-header { max-width:1200px; margin:auto; display:flex; justify-content:space-between; align-items:center; padding:24px; gap:20px; border-bottom:1px solid var(--line); }
 .public-header > div { display:flex; gap:12px; align-items:center; }
 .public-home > main { max-width:1200px; margin:auto; padding:32px 24px; }
-.legacy-login { --surface:#fff; --background:#f1f5f9; --text:#203047; --muted:#627184; --line:#dce4ec; --accent:#176f91; display:flex; justify-content:center; align-items:center; min-height:100dvh; background:#f1f5f9; padding:84px 20px 60px; color:var(--text); }
-.legacy-login .login-form-area { position:relative; width:100%; max-width:440px; padding:0; display:block; background:transparent; }
+.login-page.legacy-login { --surface:#fff; --background:#f1f5f9; --text:#203047; --muted:#627184; --line:#dce4ec; --accent:#176f91; display:flex; justify-content:center; align-items:center; min-height:100vh; min-height:100dvh; background:#f1f5f9; padding:76px 20px; color:var(--text); }
+.legacy-login .login-form-area { position:relative; width:100%; max-width:440px; min-height:0; padding:0; display:block; background:transparent; }
 .legacy-login .legacy-back { position:absolute; top:-44px; left:0; font-size:12px; color:#526475; padding:8px 0; }
 .legacy-login .language-toggle { top:-44px; right:0; font-size:12px; }
 .legacy-login .login-form { width:100%; max-width:none; background:#fff; border:1px solid #dce4ec; border-radius:16px; padding:32px; box-shadow:0 8px 24px #2338520a; }
@@ -14,5 +14,5 @@
 .legacy-support { margin-top:16px; font-size:12px; color:#526475; }
 .legacy-support summary { cursor:pointer; color:#176f91; font-weight:600; }
 .legacy-support p { margin-top:10px; line-height:1.7; }
-.legacy-login .login-footer { position:static; display:block; text-align:center; margin-top:24px; }
+.legacy-login .login-footer { position:absolute; top:100%; bottom:auto; left:0; width:100%; display:block; text-align:center; margin-top:24px; }
 @media(max-width:520px) { .public-header { padding:18px 16px; flex-wrap:wrap; } .public-header .brand { font-size:20px; } .public-home > main { padding:24px 16px; } .legacy-login .login-form { padding:26px 22px; } }

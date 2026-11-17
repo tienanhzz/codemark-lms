@@ -49,8 +49,18 @@ def test_question_versions_validate_publish_and_hide_private_keys(clients):
     assert tag.status_code == 201
     student_id = student.get("/v1/me").json()["id"]
     endpoint = f"/v1/courses/{course['id']}"
-    assert admin.post(endpoint + "/enrollments", headers=headers, json={"userId": student_id}).status_code == 201
-    assert admin.post(endpoint + "/activate", headers=headers, json={"reason": "Question visibility"}).status_code == 200
+    assert (
+        admin.post(
+            endpoint + "/enrollments", headers=headers, json={"userId": student_id}
+        ).status_code
+        == 201
+    )
+    assert (
+        admin.post(
+            endpoint + "/activate", headers=headers, json={"reason": "Question visibility"}
+        ).status_code
+        == 200
+    )
 
     draft = admin.post(endpoint + "/questions", headers=headers, json=_question_body("basics"))
     assert draft.status_code == 201, draft.text
@@ -59,9 +69,13 @@ def test_question_versions_validate_publish_and_hide_private_keys(clients):
     assert draft.json()["status"] == "draft"
     assert student.get(f"/v1/questions/{question_id}/versions/{version_id}").status_code == 404
 
-    validate = admin.post(f"/v1/questions/{question_id}/versions/{version_id}/validate", headers=headers)
+    validate = admin.post(
+        f"/v1/questions/{question_id}/versions/{version_id}/validate", headers=headers
+    )
     assert validate.status_code == 200 and validate.json()["valid"], validate.text
-    published = admin.post(f"/v1/questions/{question_id}/versions/{version_id}/publish", headers=headers)
+    published = admin.post(
+        f"/v1/questions/{question_id}/versions/{version_id}/publish", headers=headers
+    )
     assert published.status_code == 202, published.text
 
     student_search = student.get(endpoint + "/questions")
@@ -74,7 +88,10 @@ def test_question_versions_validate_publish_and_hide_private_keys(clients):
     assert private.json()["authoringConfig"]["correctChoiceIds"] == ["a"]
 
     next_draft = _question_body("basics", "Newer draft")
-    next_draft["authoringConfig"] = {"configType": "multipleChoice", "correctChoiceIds": ["missing"]}
+    next_draft["authoringConfig"] = {
+        "configType": "multipleChoice",
+        "correctChoiceIds": ["missing"],
+    }
     second = admin.post(f"/v1/questions/{question_id}/versions", headers=headers, json=next_draft)
     assert second.status_code == 201 and second.json()["versionNumber"] == 2
     invalid = admin.post(
@@ -94,11 +111,14 @@ def test_question_versions_validate_publish_and_hide_private_keys(clients):
 def test_code_question_is_never_published_and_runtime_profiles_are_draft_only(clients):
     admin, _, _ = clients
     headers, course, _ = setup_course(admin)
-    assert admin.post(
-        "/v1/admin/question-taxonomy/categories",
-        headers=headers,
-        json={"id": "code-basics", "names": {"en": "Code basics"}},
-    ).status_code == 201
+    assert (
+        admin.post(
+            "/v1/admin/question-taxonomy/categories",
+            headers=headers,
+            json={"id": "code-basics", "names": {"en": "Code basics"}},
+        ).status_code
+        == 201
+    )
     body = {
         "questionType": "code",
         "title": "Write a program",
@@ -108,13 +128,32 @@ def test_code_question_is_never_published_and_runtime_profiles_are_draft_only(cl
         "usageTypes": ["practice"],
         "tagIds": [],
         "content": {
-            "contentType": "code", "submissionModes": ["editor"],
-            "wrapperKind": "program", "runtimeProfileId": "python-313",
+            "contentType": "code",
+            "submissionModes": ["editor"],
+            "wrapperKind": "program",
+            "runtimeProfileId": "python-313",
         },
         "authoringConfig": {
-            "configType": "code", "referenceSolutionAssetId": "ref-solution",
-            "testCases": [{"testCaseId": "case-1", "position": 1, "representation": "inputOutput", "input": "1", "expectedOutput": "1", "display": "hide", "points": 1}],
-            "scoring": {"mode": "allOrNothing", "maximumPoints": 1, "showCheckButton": False, "wrongCheckPenalty": 0, "scoreFloor": 0},
+            "configType": "code",
+            "referenceSolutionAssetId": "ref-solution",
+            "testCases": [
+                {
+                    "testCaseId": "case-1",
+                    "position": 1,
+                    "representation": "inputOutput",
+                    "input": "1",
+                    "expectedOutput": "1",
+                    "display": "hide",
+                    "points": 1,
+                }
+            ],
+            "scoring": {
+                "mode": "allOrNothing",
+                "maximumPoints": 1,
+                "showCheckButton": False,
+                "wrongCheckPenalty": 0,
+                "scoreFloor": 0,
+            },
         },
     }
     draft = admin.post(f"/v1/courses/{course['id']}/questions", headers=headers, json=body)
@@ -122,13 +161,31 @@ def test_code_question_is_never_published_and_runtime_profiles_are_draft_only(cl
     qid, vid = draft.json()["questionId"], draft.json()["questionVersionId"]
     checked = admin.post(f"/v1/questions/{qid}/versions/{vid}/validate", headers=headers)
     assert not checked.json()["valid"]
-    assert admin.post(f"/v1/questions/{qid}/versions/{vid}/publish", headers=headers).status_code == 409
+    assert (
+        admin.post(f"/v1/questions/{qid}/versions/{vid}/publish", headers=headers).status_code
+        == 409
+    )
 
     profile = {
-        "profileId": "python-313", "language": "python", "languageVersion": "3.13",
-        "imageDigest": "sha256:" + "a" * 64, "allowedLibraries": [],
-        "resourceCaps": {"wallTimeMs": 1000, "cpuTimeMs": 1000, "memoryBytes": 1048576, "maxSourceBytes": 65536},
-        "sandbox": {"network": "disabled", "nonRootUser": True, "readOnlyRootFilesystem": True, "dropAllCapabilities": True, "ephemeralWorkspace": True, "secretMounts": False},
+        "profileId": "python-313",
+        "language": "python",
+        "languageVersion": "3.13",
+        "imageDigest": "sha256:" + "a" * 64,
+        "allowedLibraries": [],
+        "resourceCaps": {
+            "wallTimeMs": 1000,
+            "cpuTimeMs": 1000,
+            "memoryBytes": 1048576,
+            "maxSourceBytes": 65536,
+        },
+        "sandbox": {
+            "network": "disabled",
+            "nonRootUser": True,
+            "readOnlyRootFilesystem": True,
+            "dropAllCapabilities": True,
+            "ephemeralWorkspace": True,
+            "secretMounts": False,
+        },
     }
     first = admin.post("/v1/admin/runtime-profiles", headers=headers, json=profile)
     second = admin.post("/v1/admin/runtime-profiles", headers=headers, json=profile)
@@ -136,7 +193,9 @@ def test_code_question_is_never_published_and_runtime_profiles_are_draft_only(cl
     assert first.json()["profile"]["version"] == 1 and second.json()["profile"]["version"] == 2
     listing = admin.get("/v1/admin/runtime-profiles").json()
     assert listing["executionAvailable"] is False and len(listing["items"]) == 2
-    assert admin.get("/v1/admin/runtime-profiles").json()["items"][0]["profile"]["status"] == "draft"
+    assert (
+        admin.get("/v1/admin/runtime-profiles").json()["items"][0]["profile"]["status"] == "draft"
+    )
 
 
 def test_question_assets_are_bounded_immutable_and_course_scoped(clients):
@@ -153,7 +212,9 @@ def test_question_assets_are_bounded_immutable_and_course_scoped(clients):
     item = upload.json()
     assert item["kind"] == "audio" and item["size"] == len(b"OggS-test-audio")
     assert admin.get(f"/v1/question-assets/{item['assetId']}").content == b"OggS-test-audio"
-    assert admin.get(f"/v1/question-assets/{item['assetId']}").headers["cache-control"] == "no-store"
+    assert (
+        admin.get(f"/v1/question-assets/{item['assetId']}").headers["cache-control"] == "no-store"
+    )
     assert student.get(f"/v1/question-assets/{item['assetId']}").status_code == 404
 
     invalid = admin.post(
@@ -192,24 +253,68 @@ def test_question_assets_are_bounded_immutable_and_course_scoped(clients):
     assert tag.status_code == 201
     student_id = student.get("/v1/me").json()["id"]
     course_endpoint = f"/v1/courses/{course['id']}"
-    assert admin.post(course_endpoint + "/enrollments", headers=headers, json={"userId": student_id}).status_code == 201
-    assert admin.post(course_endpoint + "/activate", headers=headers, json={"reason": "Published listening set"}).status_code == 200
-    child = admin.post(course_endpoint + "/questions", headers=headers, json=_question_body("basics"))
+    assert (
+        admin.post(
+            course_endpoint + "/enrollments", headers=headers, json={"userId": student_id}
+        ).status_code
+        == 201
+    )
+    assert (
+        admin.post(
+            course_endpoint + "/activate",
+            headers=headers,
+            json={"reason": "Published listening set"},
+        ).status_code
+        == 200
+    )
+    child = admin.post(
+        course_endpoint + "/questions", headers=headers, json=_question_body("basics")
+    )
     assert child.status_code == 201, child.text
     child_id, child_version = child.json()["questionId"], child.json()["questionVersionId"]
-    assert admin.post(f"/v1/questions/{child_id}/versions/{child_version}/validate", headers=headers).json()["valid"]
-    assert admin.post(f"/v1/questions/{child_id}/versions/{child_version}/publish", headers=headers).status_code == 202
+    assert admin.post(
+        f"/v1/questions/{child_id}/versions/{child_version}/validate", headers=headers
+    ).json()["valid"]
+    assert (
+        admin.post(
+            f"/v1/questions/{child_id}/versions/{child_version}/publish", headers=headers
+        ).status_code
+        == 202
+    )
     listening = {
-        "questionType": "listeningSet", "title": "Listen and answer", "prompt": "Listen carefully.",
-        "categoryId": "basics", "difficulty": "newbie", "language": "en", "usageTypes": ["practice"], "tagIds": [],
-        "content": {"contentType": "listeningSet", "audioAssetId": item["assetId"], "childQuestionVersionIds": [child_version], "playLimit": 2},
-        "authoringConfig": {"configType": "listeningSet", "children": [{"questionVersionId": child_version, "questionType": "multipleChoice", "points": 1}]},
+        "questionType": "listeningSet",
+        "title": "Listen and answer",
+        "prompt": "Listen carefully.",
+        "categoryId": "basics",
+        "difficulty": "newbie",
+        "language": "en",
+        "usageTypes": ["practice"],
+        "tagIds": [],
+        "content": {
+            "contentType": "listeningSet",
+            "audioAssetId": item["assetId"],
+            "childQuestionVersionIds": [child_version],
+            "playLimit": 2,
+        },
+        "authoringConfig": {
+            "configType": "listeningSet",
+            "children": [
+                {"questionVersionId": child_version, "questionType": "multipleChoice", "points": 1}
+            ],
+        },
     }
     draft = admin.post(course_endpoint + "/questions", headers=headers, json=listening)
     listen_id, listen_version = draft.json()["questionId"], draft.json()["questionVersionId"]
-    checked = admin.post(f"/v1/questions/{listen_id}/versions/{listen_version}/validate", headers=headers)
+    checked = admin.post(
+        f"/v1/questions/{listen_id}/versions/{listen_version}/validate", headers=headers
+    )
     assert checked.json()["valid"], checked.text
-    assert admin.post(f"/v1/questions/{listen_id}/versions/{listen_version}/publish", headers=headers).status_code == 202
+    assert (
+        admin.post(
+            f"/v1/questions/{listen_id}/versions/{listen_version}/publish", headers=headers
+        ).status_code
+        == 202
+    )
     assert student.get(f"/v1/question-assets/{item['assetId']}").content == b"OggS-test-audio"
 
 

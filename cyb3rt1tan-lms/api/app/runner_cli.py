@@ -16,7 +16,9 @@ def main() -> int:
     commands = parser.add_subparsers(dest="command", required=True)
     dispatch = commands.add_parser("dispatch", help="Publish committed runner outbox jobs")
     dispatch.add_argument("--once", action="store_true")
-    consume = commands.add_parser("consume", help="Admit stream jobs to PostgreSQL; never execute source")
+    consume = commands.add_parser(
+        "consume", help="Admit stream jobs to PostgreSQL; never execute source"
+    )
     consume.add_argument("--once", action="store_true")
     args = parser.parse_args()
     try:

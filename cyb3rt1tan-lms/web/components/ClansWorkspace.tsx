@@ -226,11 +226,11 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
           <p>
             {t(
               'Build a community, manage membership and climb the Clan EXP leaderboard.',
-              'XÃƒÂ¢y dÃ¡Â»Â±ng cÃ¡Â»â„¢ng Ã„â€˜Ã¡Â»â€œng, quÃ¡ÂºÂ£n lÃƒÂ½ thÃƒÂ nh viÃƒÂªn vÃƒÂ  leo bÃ¡ÂºÂ£ng xÃ¡ÂºÂ¿p hÃ¡ÂºÂ¡ng Clan EXP.',
+              'Xây dựng cộng đồng, quản lý thành viên và leo bảng xếp hạng Clan EXP.',
             )}
           </p>
           <small>
-            {clans.length} {t('active clans', 'clan Ã„â€˜ang hoÃ¡ÂºÂ¡t Ã„â€˜Ã¡Â»â„¢ng')}
+            {clans.length} {t('active clans', 'clan đang hoạt động')}
           </small>
         </div>
       </div>
@@ -250,19 +250,19 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
           void act(async () => {
             const draft = await api<{ id: string }>('/admin/clan-policies', 'POST', { levels });
             await api(`/admin/clan-policies/${draft.id}/activation`, 'POST');
-          }, t('Clan level policy activated.', 'Ã„ÂÃƒÂ£ ÃƒÂ¡p dÃ¡Â»Â¥ng chÃƒÂ­nh sÃƒÂ¡ch cÃ¡ÂºÂ¥p clan.'));
+          }, t('Clan level policy activated.', 'Đã áp dụng chính sách cấp clan.'));
         }}>
-          <h3>{t('Admin: Clan level policy', 'Admin: ChÃƒÂ­nh sÃƒÂ¡ch cÃ¡ÂºÂ¥p Clan')}</h3>
-          <p>{t('Thresholds, member caps and icon/color are versioned and apply to every clan.', 'NgÃ†Â°Ã¡Â»Â¡ng EXP, giÃ¡Â»â€ºi hÃ¡ÂºÂ¡n thÃƒÂ nh viÃƒÂªn, biÃ¡Â»Æ’u tÃ†Â°Ã¡Â»Â£ng vÃƒÂ  mÃƒÂ u Ã„â€˜Ã†Â°Ã¡Â»Â£c quÃ¡ÂºÂ£n lÃƒÂ½ theo phiÃƒÂªn bÃ¡ÂºÂ£n cho mÃ¡Â»Âi clan.')}</p>
+          <h3>{t('Admin: Clan level policy', 'Admin: Chính sách cấp Clan')}</h3>
+          <p>{t('Thresholds, member caps and icon/color are versioned and apply to every clan.', 'Ngưỡng EXP, giới hạn thành viên, biểu tượng và màu được quản lý theo phiên bản cho mọi clan.')}</p>
           {levels.map((rule, index) => <div className="assessment-fields" key={rule.level}>
-            <label className="course-field"><span>{t('Level', 'CÃ¡ÂºÂ¥p')}</span><input type="number" min={1} max={100} required value={rule.level} onChange={(event) => setLevels((current) => current.map((item, position) => position === index ? { ...item, level: Number(event.target.value) } : item))} /></label>
-            <label className="course-field"><span>{t('Clan EXP threshold', 'NgÃ†Â°Ã¡Â»Â¡ng Clan EXP')}</span><input type="number" min={0} required value={rule.thresholdExp} onChange={(event) => setLevels((current) => current.map((item, position) => position === index ? { ...item, thresholdExp: Number(event.target.value) } : item))} /></label>
-            <label className="course-field"><span>{t('Member cap', 'GiÃ¡Â»â€ºi hÃ¡ÂºÂ¡n thÃƒÂ nh viÃƒÂªn')}</span><input type="number" min={1} max={1000} required value={rule.memberCap} onChange={(event) => setLevels((current) => current.map((item, position) => position === index ? { ...item, memberCap: Number(event.target.value) } : item))} /></label>
-            <label className="course-field"><span>{t('Icon class', 'MÃƒÂ£ biÃ¡Â»Æ’u tÃ†Â°Ã¡Â»Â£ng')}</span><input required pattern="fa-[a-z0-9-]+" value={rule.icon} onChange={(event) => setLevels((current) => current.map((item, position) => position === index ? { ...item, icon: event.target.value } : item))} /></label>
-            <label className="course-field"><span>{t('Color', 'MÃƒÂ u')}</span><input type="color" value={rule.color} onChange={(event) => setLevels((current) => current.map((item, position) => position === index ? { ...item, color: event.target.value } : item))} /></label>
-            {index > 0 && <button type="button" className="button secondary" onClick={() => setLevels((current) => current.filter((_, position) => position !== index))}>{t('Remove level', 'XÃƒÂ³a cÃ¡ÂºÂ¥p')}</button>}
+            <label className="course-field"><span>{t('Level', 'Cấp')}</span><input type="number" min={1} max={100} required value={rule.level} onChange={(event) => setLevels((current) => current.map((item, position) => position === index ? { ...item, level: Number(event.target.value) } : item))} /></label>
+            <label className="course-field"><span>{t('Clan EXP threshold', 'Ngưỡng Clan EXP')}</span><input type="number" min={0} required value={rule.thresholdExp} onChange={(event) => setLevels((current) => current.map((item, position) => position === index ? { ...item, thresholdExp: Number(event.target.value) } : item))} /></label>
+            <label className="course-field"><span>{t('Member cap', 'Giới hạn thành viên')}</span><input type="number" min={1} max={1000} required value={rule.memberCap} onChange={(event) => setLevels((current) => current.map((item, position) => position === index ? { ...item, memberCap: Number(event.target.value) } : item))} /></label>
+            <label className="course-field"><span>{t('Icon class', 'Mã biểu tượng')}</span><input required pattern="fa-[a-z0-9-]+" value={rule.icon} onChange={(event) => setLevels((current) => current.map((item, position) => position === index ? { ...item, icon: event.target.value } : item))} /></label>
+            <label className="course-field"><span>{t('Color', 'Màu')}</span><input type="color" value={rule.color} onChange={(event) => setLevels((current) => current.map((item, position) => position === index ? { ...item, color: event.target.value } : item))} /></label>
+            {index > 0 && <button type="button" className="button secondary" onClick={() => setLevels((current) => current.filter((_, position) => position !== index))}>{t('Remove level', 'Xóa cấp')}</button>}
           </div>)}
-          <div className="assessment-action-row"><button type="button" className="button secondary" disabled={levels.length >= 100} onClick={() => setLevels((current) => [...current, { level: current.length + 1, thresholdExp: (current.at(-1)?.thresholdExp || 0) + 500, memberCap: (current.at(-1)?.memberCap || 20) + 5, icon: 'fa-shield', color: '#176b87' }])}>{t('Add level', 'ThÃƒÂªm cÃ¡ÂºÂ¥p')}</button><button className="button primary" disabled={busy}>{t('Save and activate policy', 'LÃ†Â°u vÃƒÂ  ÃƒÂ¡p dÃ¡Â»Â¥ng')}</button></div>
+          <div className="assessment-action-row"><button type="button" className="button secondary" disabled={levels.length >= 100} onClick={() => setLevels((current) => [...current, { level: current.length + 1, thresholdExp: (current.at(-1)?.thresholdExp || 0) + 500, memberCap: (current.at(-1)?.memberCap || 20) + 5, icon: 'fa-shield', color: '#176b87' }])}>{t('Add level', 'Thêm cấp')}</button><button className="button primary" disabled={busy}>{t('Save and activate policy', 'Lưu và áp dụng')}</button></div>
         </form>
       )}
       {!detail?.isMember && (
@@ -275,20 +275,20 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
               () => api('/clans', 'POST', { name: createName, inventoryId: createCard }),
               t(
                 'Clan created; the creation card was consumed.',
-                'Ã„ÂÃƒÂ£ tÃ¡ÂºÂ¡o clan vÃƒÂ  dÃƒÂ¹ng thÃ¡ÂºÂ» tÃ¡ÂºÂ¡o clan.',
+                'Đã tạo clan và dùng thẻ tạo clan.',
               ),
             );
           }}
         >
-          <h3>{t('Create your clan', 'TÃ¡ÂºÂ¡o clan cÃ¡Â»Â§a bÃ¡ÂºÂ¡n')}</h3>
+          <h3>{t('Create your clan', 'Tạo clan của bạn')}</h3>
           <p>
             {t(
               'Creation requires an available Create Clan card.',
-              'CÃ¡ÂºÂ§n cÃƒÂ³ thÃ¡ÂºÂ» TÃ¡ÂºÂ¡o Clan cÃƒÂ²n khÃ¡ÂºÂ£ dÃ¡Â»Â¥ng.',
+              'Cần có thẻ Tạo Clan còn khả dụng.',
             )}
           </p>
           <label className="course-field">
-            <span>{t('Clan name', 'TÃƒÂªn clan')}</span>
+            <span>{t('Clan name', 'Tên clan')}</span>
             <input
               required
               minLength={3}
@@ -300,13 +300,13 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
           {createCards.length ? (
             <>
               <label className="course-field">
-                <span>{t('Creation card', 'ThÃ¡ÂºÂ» tÃ¡ÂºÂ¡o clan')}</span>
+                <span>{t('Creation card', 'Thẻ tạo clan')}</span>
                 <select
                   required
                   value={createCard}
                   onChange={(event) => setCreateCard(event.target.value)}
                 >
-                  <option value="">{t('Choose a card', 'ChÃ¡Â»Ân thÃ¡ÂºÂ»')}</option>
+                  <option value="">{t('Choose a card', 'Chọn thẻ')}</option>
                   {createCards.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.item.name}
@@ -315,41 +315,41 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                 </select>
               </label>
               <button className="button primary" disabled={busy || !createCard}>
-                {t('Create clan', 'TÃ¡ÂºÂ¡o clan')}
+                {t('Create clan', 'Tạo clan')}
               </button>
             </>
           ) : (
             <a className="button secondary" href="/shop">
-              {t('Find a Create Clan card in the shop', 'TÃƒÂ¬m thÃ¡ÂºÂ» TÃ¡ÂºÂ¡o Clan trong cÃ¡Â»Â­a hÃƒÂ ng')}
+              {t('Find a Create Clan card in the shop', 'Tìm thẻ Tạo Clan trong cửa hàng')}
             </a>
           )}
         </form>
       )}
       <div className="assessment-fields">
         <section>
-          <h3>{t('Clan leaderboard', 'BÃ¡ÂºÂ£ng xÃ¡ÂºÂ¿p hÃ¡ÂºÂ¡ng Clan')}</h3>
+          <h3>{t('Clan leaderboard', 'Bảng xếp hạng Clan')}</h3>
           <div className="mission-card-grid">
             {leaderboard.length ? (
               leaderboard.map((clan, index) => (
                 <article className="mission-card" key={clan.id}>
                   <div className="assessment-attempt-heading">
                     <span className="eyebrow">
-                      #{index + 1} Ã‚Â· {t('Level', 'CÃ¡ÂºÂ¥p')} {clan.level}
+                      #{index + 1} · {t('Level', 'Cấp')} {clan.level}
                     </span>
                     <i className={`fa-solid ${clan.icon}`} style={{ color: clan.color }} aria-hidden="true" />
                   </div>
                   <h3>{clan.name}</h3>
                   <p>
-                    {clan.clanExp.toLocaleString(locale)} Clan EXP Ã‚Â· {clan.memberCount}/
-                    {clan.memberCap} {t('members', 'thÃƒÂ nh viÃƒÂªn')}
-                    {' Ã‚Â· '}{clan.warRecord?.wins || 0}-{clan.warRecord?.losses || 0}-{clan.warRecord?.draws || 0} {t('W-L-D', 'ThÃ¡ÂºÂ¯ng-Thua-HÃƒÂ²a')}
+                    {clan.clanExp.toLocaleString(locale)} Clan EXP · {clan.memberCount}/
+                    {clan.memberCap} {t('members', 'thành viên')}
+                    {' · '}{clan.warRecord?.wins || 0}-{clan.warRecord?.losses || 0}-{clan.warRecord?.draws || 0} {t('W-L-D', 'Thắng-Thua-Hòa')}
                   </p>
                   <button
                     type="button"
                     className="button secondary"
                     onClick={() => void load(clan.id)}
                   >
-                    {t('Open clan', 'MÃ¡Â»Å¸ clan')}
+                    {t('Open clan', 'Mở clan')}
                   </button>
                   {!clan.isMember && !clan.myRequest && (
                     <button
@@ -359,7 +359,7 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                       onClick={() =>
                         void act(
                           () => api(`/clans/${clan.id}/join-requests`, 'POST'),
-                          t('Join request submitted.', 'Ã„ÂÃƒÂ£ gÃ¡Â»Â­i yÃƒÂªu cÃ¡ÂºÂ§u tham gia.'),
+                          t('Join request submitted.', 'Đã gửi yêu cầu tham gia.'),
                         )
                       }
                     >
@@ -369,18 +369,18 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                 </article>
               ))
             ) : (
-              <p className="course-empty">{t('No clans yet.', 'ChÃ†Â°a cÃƒÂ³ clan nÃƒÂ o.')}</p>
+              <p className="course-empty">{t('No clans yet.', 'Chưa có clan nào.')}</p>
             )}
           </div>
         </section>
         <section className="mission-card clan-detail">
-          <h3>{t('Clan missions', 'NhiÃ¡Â»â€¡m vÃ¡Â»Â¥ Clan')}</h3>
-          <p>{t('Trusted course activity by active members contributes to shared Clan goals.', 'HoÃ¡ÂºÂ¡t Ã„â€˜Ã¡Â»â„¢ng hÃ¡Â»Âc tÃ¡ÂºÂ­p hÃ¡Â»Â£p lÃ¡Â»â€¡ cÃ¡Â»Â§a thÃƒÂ nh viÃƒÂªn Ã„â€˜ÃƒÂ³ng gÃƒÂ³p vÃƒÂ o mÃ¡Â»Â¥c tiÃƒÂªu chung cÃ¡Â»Â§a Clan.')}</p>
+          <h3>{t('Clan missions', 'Nhiệm vụ Clan')}</h3>
+          <p>{t('Trusted course activity by active members contributes to shared Clan goals.', 'Hoạt động học tập hợp lệ của thành viên đóng góp vào mục tiêu chung của Clan.')}</p>
           {clanMissions.length ? <div className="mission-card-grid">{clanMissions.map((mission) => <article className="mission-card" key={`${mission.missionId}-${mission.version}`}>
-            <span className="eyebrow">{mission.cycle} Ã‚Â· {mission.status}</span><h4>{mission.title}</h4>
+            <span className="eyebrow">{mission.cycle} · {mission.status}</span><h4>{mission.title}</h4>
             <progress max={mission.targetCount} value={mission.progress} aria-label={`${mission.title}: ${mission.progress}/${mission.targetCount}`} />
-            <p>{mission.progress}/{mission.targetCount} Ã‚Â· {mission.reward.clanExp.toLocaleString(locale)} Clan EXP Ã‚Â· {mission.reward.exp.toLocaleString(locale)} EXP Ã‚Â· {mission.reward.coin.toLocaleString(locale)} Coin</p>
-          </article>)}</div> : <p className="course-empty">{t('No active Clan missions for this clan.', 'Clan chÃ†Â°a cÃƒÂ³ nhiÃ¡Â»â€¡m vÃ¡Â»Â¥ hoÃ¡ÂºÂ¡t Ã„â€˜Ã¡Â»â„¢ng.')}</p>}
+            <p>{mission.progress}/{mission.targetCount} · {mission.reward.clanExp.toLocaleString(locale)} Clan EXP · {mission.reward.exp.toLocaleString(locale)} EXP · {mission.reward.coin.toLocaleString(locale)} Coin</p>
+          </article>)}</div> : <p className="course-empty">{t('No active Clan missions for this clan.', 'Clan chưa có nhiệm vụ hoạt động.')}</p>}
           {isAdmin && <form className="attendance-create" onSubmit={(event) => {
             event.preventDefault();
             void act(async () => {
@@ -390,45 +390,45 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                 rewardExp: missionPersonalExp, rewardCoin: missionCoin,
               });
               await api(`/admin/clan-missions/${encodeURIComponent(draft.missionId)}/versions/${draft.version}/activation`, 'POST');
-            }, t('Clan mission activated.', 'Ã„ÂÃƒÂ£ kÃƒÂ­ch hoÃ¡ÂºÂ¡t nhiÃ¡Â»â€¡m vÃ¡Â»Â¥ Clan.'));
+            }, t('Clan mission activated.', 'Đã kích hoạt nhiệm vụ Clan.'));
           }}>
-            <h4>{t('Admin: configure Clan mission', 'Admin: cÃ¡ÂºÂ¥u hÃƒÂ¬nh nhiÃ¡Â»â€¡m vÃ¡Â»Â¥ Clan')}</h4>
+            <h4>{t('Admin: configure Clan mission', 'Admin: cấu hình nhiệm vụ Clan')}</h4>
             <div className="assessment-fields">
-              <label className="course-field"><span>{t('Mission key', 'MÃƒÂ£ nhiÃ¡Â»â€¡m vÃ¡Â»Â¥')}</span><input required pattern="[A-Za-z0-9._-]+" value={missionId} onChange={(e) => setMissionId(e.target.value)} /></label>
-              <label className="course-field"><span>{t('Title', 'TÃƒÂªn nhiÃ¡Â»â€¡m vÃ¡Â»Â¥')}</span><input required maxLength={160} value={missionTitle} onChange={(e) => setMissionTitle(e.target.value)} /></label>
-              <label className="course-field"><span>{t('Trusted activity', 'HoÃ¡ÂºÂ¡t Ã„â€˜Ã¡Â»â„¢ng hÃ¡Â»Â£p lÃ¡Â»â€¡')}</span><select value={missionEvent} onChange={(e) => setMissionEvent(e.target.value)}><option value="practice.attempt">{t('Practice attempt', 'LÃ†Â°Ã¡Â»Â£t luyÃ¡Â»â€¡n tÃ¡ÂºÂ­p')}</option><option value="practice.correct">{t('Correct practice answer', 'CÃƒÂ¢u luyÃ¡Â»â€¡n tÃ¡ÂºÂ­p Ã„â€˜ÃƒÂºng')}</option><option value="attendance.present">{t('Attendance check-in', 'Ã„ÂiÃ¡Â»Æ’m danh cÃƒÂ³ mÃ¡ÂºÂ·t')}</option><option value="lesson.completed">{t('Lesson completed', 'HoÃƒÂ n thÃƒÂ nh bÃƒÂ i hÃ¡Â»Âc')}</option><option value="assessment.submitted">{t('Assessment submitted', 'NÃ¡Â»â„¢p bÃƒÂ i Ã„â€˜ÃƒÂ¡nh giÃƒÂ¡')}</option></select></label>
-              <label className="course-field"><span>{t('Target count', 'SÃ¡Â»â€˜ lÃ†Â°Ã¡Â»Â£ng mÃ¡Â»Â¥c tiÃƒÂªu')}</span><input type="number" min={1} max={1000000} required value={missionTarget} onChange={(e) => setMissionTarget(Number(e.target.value))} /></label>
-              <label className="course-field"><span>{t('Cadence', 'Chu kÃ¡Â»Â³')}</span><select value={missionCadence} onChange={(e) => setMissionCadence(e.target.value as typeof missionCadence)}><option value="daily">{t('Daily', 'HÃƒÂ ng ngÃƒÂ y')}</option><option value="weekly">{t('Weekly', 'HÃƒÂ ng tuÃ¡ÂºÂ§n')}</option><option value="once">{t('One time', 'MÃ¡Â»â„¢t lÃ¡ÂºÂ§n')}</option></select></label>
-              <label className="course-field"><span>{t('Clan EXP reward', 'ThÃ†Â°Ã¡Â»Å¸ng Clan EXP')}</span><input type="number" min={0} value={missionClanExp} onChange={(e) => setMissionClanExp(Number(e.target.value))} /></label>
-              <label className="course-field"><span>{t('Contributor EXP reward', 'ThÃ†Â°Ã¡Â»Å¸ng EXP ngÃ†Â°Ã¡Â»Âi hoÃƒÂ n thÃƒÂ nh')}</span><input type="number" min={0} value={missionPersonalExp} onChange={(e) => setMissionPersonalExp(Number(e.target.value))} /></label>
-              <label className="course-field"><span>{t('Contributor Coin reward', 'ThÃ†Â°Ã¡Â»Å¸ng Coin ngÃ†Â°Ã¡Â»Âi hoÃƒÂ n thÃƒÂ nh')}</span><input type="number" min={0} value={missionCoin} onChange={(e) => setMissionCoin(Number(e.target.value))} /></label>
+              <label className="course-field"><span>{t('Mission key', 'Mã nhiệm vụ')}</span><input required pattern="[A-Za-z0-9._-]+" value={missionId} onChange={(e) => setMissionId(e.target.value)} /></label>
+              <label className="course-field"><span>{t('Title', 'Tên nhiệm vụ')}</span><input required maxLength={160} value={missionTitle} onChange={(e) => setMissionTitle(e.target.value)} /></label>
+              <label className="course-field"><span>{t('Trusted activity', 'Hoạt động hợp lệ')}</span><select value={missionEvent} onChange={(e) => setMissionEvent(e.target.value)}><option value="practice.attempt">{t('Practice attempt', 'Lượt luyện tập')}</option><option value="practice.correct">{t('Correct practice answer', 'Câu luyện tập đúng')}</option><option value="attendance.present">{t('Attendance check-in', 'Điểm danh có mặt')}</option><option value="lesson.completed">{t('Lesson completed', 'Hoàn thành bài học')}</option><option value="assessment.submitted">{t('Assessment submitted', 'Nộp bài đánh giá')}</option></select></label>
+              <label className="course-field"><span>{t('Target count', 'Số lượng mục tiêu')}</span><input type="number" min={1} max={1000000} required value={missionTarget} onChange={(e) => setMissionTarget(Number(e.target.value))} /></label>
+              <label className="course-field"><span>{t('Cadence', 'Chu kỳ')}</span><select value={missionCadence} onChange={(e) => setMissionCadence(e.target.value as typeof missionCadence)}><option value="daily">{t('Daily', 'Hàng ngày')}</option><option value="weekly">{t('Weekly', 'Hàng tuần')}</option><option value="once">{t('One time', 'Một lần')}</option></select></label>
+              <label className="course-field"><span>{t('Clan EXP reward', 'Thưởng Clan EXP')}</span><input type="number" min={0} value={missionClanExp} onChange={(e) => setMissionClanExp(Number(e.target.value))} /></label>
+              <label className="course-field"><span>{t('Contributor EXP reward', 'Thưởng EXP người hoàn thành')}</span><input type="number" min={0} value={missionPersonalExp} onChange={(e) => setMissionPersonalExp(Number(e.target.value))} /></label>
+              <label className="course-field"><span>{t('Contributor Coin reward', 'Thưởng Coin người hoàn thành')}</span><input type="number" min={0} value={missionCoin} onChange={(e) => setMissionCoin(Number(e.target.value))} /></label>
             </div>
-            <button className="button primary" disabled={busy}>{t('Create and activate version', 'TÃ¡ÂºÂ¡o vÃƒÂ  kÃƒÂ­ch hoÃ¡ÂºÂ¡t phiÃƒÂªn bÃ¡ÂºÂ£n')}</button>
-            {missionPolicies.length > 0 && <ul>{missionPolicies.map((item) => <li key={item.id}>{item.title} Ã‚Â· v{item.version} Ã‚Â· {item.status}</li>)}</ul>}
+            <button className="button primary" disabled={busy}>{t('Create and activate version', 'Tạo và kích hoạt phiên bản')}</button>
+            {missionPolicies.length > 0 && <ul>{missionPolicies.map((item) => <li key={item.id}>{item.title} · v{item.version} · {item.status}</li>)}</ul>}
           </form>}
         </section>
         <section className="mission-card clan-detail">
-          <h3>{t('Clan Wars', 'ChiÃ¡ÂºÂ¿n Clan')}</h3>
-          <p>{t('Admin scheduled matches award Clan EXP once when results are finalized.', 'Admin lÃƒÂªn lÃ¡Â»â€¹ch trÃ¡ÂºÂ­n Ã„â€˜Ã¡ÂºÂ¥u; Clan EXP Ã„â€˜Ã†Â°Ã¡Â»Â£c cÃ¡Â»â„¢ng mÃ¡Â»â„¢t lÃ¡ÂºÂ§n khi chÃ¡Â»â€˜t kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£.')}</p>
+          <h3>{t('Clan Wars', 'Chiến Clan')}</h3>
+          <p>{t('Admin scheduled matches award Clan EXP once when results are finalized.', 'Admin lên lịch trận đấu; Clan EXP được cộng một lần khi chốt kết quả.')}</p>
           {isAdmin && <form className="attendance-create" onSubmit={(event) => {
             event.preventDefault();
-            void act(() => api('/admin/clan-wars', 'POST', { title: warTitle, clanAId: warA, clanBId: warB, startsAt: new Date(warStart).toISOString(), expReward: warReward, competitionType: warType, rewardExp: warType === 'war' ? 0 : warParticipantExp, rewardCoin: warType === 'war' ? 0 : warParticipantCoin, rewardItemId: warType === 'war' || !warRewardItemId ? null : warRewardItemId, rewardItemQuantity: warType === 'war' || !warRewardItemId ? 0 : warRewardItemQuantity }), t('Clan competition scheduled.', 'Ã„ÂÃƒÂ£ lÃƒÂªn lÃ¡Â»â€¹ch cuÃ¡Â»â„¢c thi Clan.'));
+            void act(() => api('/admin/clan-wars', 'POST', { title: warTitle, clanAId: warA, clanBId: warB, startsAt: new Date(warStart).toISOString(), expReward: warReward, competitionType: warType, rewardExp: warType === 'war' ? 0 : warParticipantExp, rewardCoin: warType === 'war' ? 0 : warParticipantCoin, rewardItemId: warType === 'war' || !warRewardItemId ? null : warRewardItemId, rewardItemQuantity: warType === 'war' || !warRewardItemId ? 0 : warRewardItemQuantity }), t('Clan competition scheduled.', 'Đã lên lịch cuộc thi Clan.'));
           }}>
-            <label className="course-field"><span>{t('Match title', 'TÃƒÂªn trÃ¡ÂºÂ­n Ã„â€˜Ã¡ÂºÂ¥u')}</span><input required minLength={3} maxLength={160} value={warTitle} onChange={(e) => setWarTitle(e.target.value)} /></label>
+            <label className="course-field"><span>{t('Match title', 'Tên trận đấu')}</span><input required minLength={3} maxLength={160} value={warTitle} onChange={(e) => setWarTitle(e.target.value)} /></label>
             <div className="assessment-fields">
-              <label className="course-field"><span>{t('Clan A', 'Clan A')}</span><select required value={warA} onChange={(e) => setWarA(e.target.value)}><option value="">Ã¢â‚¬â€</option>{clans.map((clan) => <option key={clan.id} value={clan.id}>{clan.name}</option>)}</select></label>
-              <label className="course-field"><span>{t('Clan B', 'Clan B')}</span><select required value={warB} onChange={(e) => setWarB(e.target.value)}><option value="">Ã¢â‚¬â€</option>{clans.map((clan) => <option key={clan.id} value={clan.id}>{clan.name}</option>)}</select></label>
-              <label className="course-field"><span>{t('Start time', 'ThÃ¡Â»Âi gian bÃ¡ÂºÂ¯t Ã„â€˜Ã¡ÂºÂ§u')}</span><input type="datetime-local" required value={warStart} onChange={(e) => setWarStart(e.target.value)} /></label>
-              <label className="course-field"><span>{t('Winner Clan EXP', 'Clan EXP cho Ã„â€˜Ã¡Â»â„¢i thÃ¡ÂºÂ¯ng')}</span><input type="number" min={0} max={2000000000} value={warReward} onChange={(e) => setWarReward(Number(e.target.value))} /></label>
-              <label className="course-field"><span>{t('Competition type', 'LoÃ¡ÂºÂ¡i cuÃ¡Â»â„¢c thi')}</span><select value={warType} onChange={(e) => setWarType(e.target.value as typeof warType)}><option value="war">Clan War</option><option value="code">Code competition</option><option value="writing">Writing competition</option></select></label>
+              <label className="course-field"><span>{t('Clan A', 'Clan A')}</span><select required value={warA} onChange={(e) => setWarA(e.target.value)}><option value="">—</option>{clans.map((clan) => <option key={clan.id} value={clan.id}>{clan.name}</option>)}</select></label>
+              <label className="course-field"><span>{t('Clan B', 'Clan B')}</span><select required value={warB} onChange={(e) => setWarB(e.target.value)}><option value="">—</option>{clans.map((clan) => <option key={clan.id} value={clan.id}>{clan.name}</option>)}</select></label>
+              <label className="course-field"><span>{t('Start time', 'Thời gian bắt đầu')}</span><input type="datetime-local" required value={warStart} onChange={(e) => setWarStart(e.target.value)} /></label>
+              <label className="course-field"><span>{t('Winner Clan EXP', 'Clan EXP cho đội thắng')}</span><input type="number" min={0} max={2000000000} value={warReward} onChange={(e) => setWarReward(Number(e.target.value))} /></label>
+              <label className="course-field"><span>{t('Competition type', 'Loại cuộc thi')}</span><select value={warType} onChange={(e) => setWarType(e.target.value as typeof warType)}><option value="war">Clan War</option><option value="code">Code competition</option><option value="writing">Writing competition</option></select></label>
               {warType !== 'war' && <>
-                <label className="course-field"><span>{t('Participant EXP each', 'EXP mÃ¡Â»â€”i ngÃ†Â°Ã¡Â»Âi tham gia')}</span><input type="number" min={0} max={2000000000} value={warParticipantExp} onChange={(e) => setWarParticipantExp(Number(e.target.value))} /></label>
-                <label className="course-field"><span>{t('Participant Coin each', 'Coin mÃ¡Â»â€”i ngÃ†Â°Ã¡Â»Âi tham gia')}</span><input type="number" min={0} max={2000000000} value={warParticipantCoin} onChange={(e) => setWarParticipantCoin(Number(e.target.value))} /></label>
-                <label className="course-field"><span>{t('Supported shop item prize', 'VÃ¡ÂºÂ­t phÃ¡ÂºÂ©m shop lÃƒÂ m giÃ¡ÂºÂ£i')}</span><select value={warRewardItemId} onChange={(e) => setWarRewardItemId(e.target.value)}><option value="">{t('No item prize', 'KhÃƒÂ´ng cÃƒÂ³ vÃ¡ÂºÂ­t phÃ¡ÂºÂ©m')}</option>{rewardCatalog.map((item) => <option key={item.id} value={item.id}>{item.name} Ã‚Â· {item.effectType} Ã‚Â· {item.stock}</option>)}</select></label>
-                {warRewardItemId && <label className="course-field"><span>{t('Items per participant', 'VÃ¡ÂºÂ­t phÃ¡ÂºÂ©m mÃ¡Â»â€”i ngÃ†Â°Ã¡Â»Âi')}</span><input type="number" min={1} max={10} value={warRewardItemQuantity || 1} onChange={(e) => setWarRewardItemQuantity(Number(e.target.value))} /></label>}
+                <label className="course-field"><span>{t('Participant EXP each', 'EXP mỗi người tham gia')}</span><input type="number" min={0} max={2000000000} value={warParticipantExp} onChange={(e) => setWarParticipantExp(Number(e.target.value))} /></label>
+                <label className="course-field"><span>{t('Participant Coin each', 'Coin mỗi người tham gia')}</span><input type="number" min={0} max={2000000000} value={warParticipantCoin} onChange={(e) => setWarParticipantCoin(Number(e.target.value))} /></label>
+                <label className="course-field"><span>{t('Supported shop item prize', 'Vật phẩm shop làm giải')}</span><select value={warRewardItemId} onChange={(e) => setWarRewardItemId(e.target.value)}><option value="">{t('No item prize', 'Không có vật phẩm')}</option>{rewardCatalog.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.effectType} · {item.stock}</option>)}</select></label>
+                {warRewardItemId && <label className="course-field"><span>{t('Items per participant', 'Vật phẩm mỗi người')}</span><input type="number" min={1} max={10} value={warRewardItemQuantity || 1} onChange={(e) => setWarRewardItemQuantity(Number(e.target.value))} /></label>}
               </>}
             </div>
-            <button className="button primary" disabled={busy || !warA || warA === warB || (warRewardItemId !== '' && warRewardItemQuantity < 1)}>{t('Schedule event', 'LÃƒÂªn lÃ¡Â»â€¹ch sÃ¡Â»Â± kiÃ¡Â»â€¡n')}</button>
+            <button className="button primary" disabled={busy || !warA || warA === warB || (warRewardItemId !== '' && warRewardItemQuantity < 1)}>{t('Schedule event', 'Lên lịch sự kiện')}</button>
           </form>}
           {!isAdmin && proposalCourses.length > 0 && <form className="attendance-create" onSubmit={(event) => {
             event.preventDefault();
@@ -437,41 +437,41 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
               clanAId: proposalClanA, clanBId: proposalClanB,
               startsAt: new Date(proposalStart).toISOString(),
               competitionType: proposalType,
-            }), t('Proposal submitted for Admin review.', 'Ã„ÂÃƒÂ£ gÃ¡Â»Â­i Ã„â€˜Ã¡Â»Â xuÃ¡ÂºÂ¥t Ã„â€˜Ã¡Â»Æ’ Admin duyÃ¡Â»â€¡t.'));
+            }), t('Proposal submitted for Admin review.', 'Đã gửi đề xuất để Admin duyệt.'));
           }}>
-            <h4>{t('Propose a Clan War', 'Ã„ÂÃ¡Â»Â xuÃ¡ÂºÂ¥t chiÃ¡ÂºÂ¿n Clan')}</h4>
-            <p>{t('Course staff can propose a match. Admin sets any Clan EXP reward during review.', 'NhÃƒÂ¢n sÃ¡Â»Â± khÃƒÂ³a hÃ¡Â»Âc cÃƒÂ³ thÃ¡Â»Æ’ Ã„â€˜Ã¡Â»Â xuÃ¡ÂºÂ¥t trÃ¡ÂºÂ­n Ã„â€˜Ã¡ÂºÂ¥u. Admin quyÃ¡ÂºÂ¿t Ã„â€˜Ã¡Â»â€¹nh thÃ†Â°Ã¡Â»Å¸ng Clan EXP khi duyÃ¡Â»â€¡t.')}</p>
-            <label className="course-field"><span>{t('Course', 'KhÃƒÂ³a hÃ¡Â»Âc')}</span><select required value={proposalCourseId} onChange={(e) => setProposalCourseId(e.target.value)}><option value="">Ã¢â‚¬â€</option>{proposalCourses.map((course) => <option key={course.id} value={course.id}>{course.title}</option>)}</select></label>
-            <label className="course-field"><span>{t('Proposal title', 'TÃƒÂªn Ã„â€˜Ã¡Â»Â xuÃ¡ÂºÂ¥t')}</span><input required minLength={3} maxLength={160} value={proposalTitle} onChange={(e) => setProposalTitle(e.target.value)} /></label>
-            <label className="course-field"><span>{t('Description', 'MÃƒÂ´ tÃ¡ÂºÂ£')}</span><textarea maxLength={1000} value={proposalDescription} onChange={(e) => setProposalDescription(e.target.value)} /></label>
-            <label className="course-field"><span>{t('Event type', 'LoÃ¡ÂºÂ¡i sÃ¡Â»Â± kiÃ¡Â»â€¡n')}</span><select value={proposalType} onChange={(e) => setProposalType(e.target.value as typeof proposalType)}><option value="war">Clan War</option><option value="code">Code competition</option><option value="writing">Writing competition</option></select></label>
+            <h4>{t('Propose a Clan War', 'Đề xuất chiến Clan')}</h4>
+            <p>{t('Course staff can propose a match. Admin sets any Clan EXP reward during review.', 'Nhân sự khóa học có thể đề xuất trận đấu. Admin quyết định thưởng Clan EXP khi duyệt.')}</p>
+            <label className="course-field"><span>{t('Course', 'Khóa học')}</span><select required value={proposalCourseId} onChange={(e) => setProposalCourseId(e.target.value)}><option value="">—</option>{proposalCourses.map((course) => <option key={course.id} value={course.id}>{course.title}</option>)}</select></label>
+            <label className="course-field"><span>{t('Proposal title', 'Tên đề xuất')}</span><input required minLength={3} maxLength={160} value={proposalTitle} onChange={(e) => setProposalTitle(e.target.value)} /></label>
+            <label className="course-field"><span>{t('Description', 'Mô tả')}</span><textarea maxLength={1000} value={proposalDescription} onChange={(e) => setProposalDescription(e.target.value)} /></label>
+            <label className="course-field"><span>{t('Event type', 'Loại sự kiện')}</span><select value={proposalType} onChange={(e) => setProposalType(e.target.value as typeof proposalType)}><option value="war">Clan War</option><option value="code">Code competition</option><option value="writing">Writing competition</option></select></label>
             <div className="assessment-fields">
-              <label className="course-field"><span>{t('Clan A', 'Clan A')}</span><select required value={proposalClanA} onChange={(e) => setProposalClanA(e.target.value)}><option value="">Ã¢â‚¬â€</option>{clans.map((clan) => <option key={clan.id} value={clan.id}>{clan.name}</option>)}</select></label>
-              <label className="course-field"><span>{t('Clan B', 'Clan B')}</span><select required value={proposalClanB} onChange={(e) => setProposalClanB(e.target.value)}><option value="">Ã¢â‚¬â€</option>{clans.map((clan) => <option key={clan.id} value={clan.id}>{clan.name}</option>)}</select></label>
-              <label className="course-field"><span>{t('Proposed start', 'ThÃ¡Â»Âi gian Ã„â€˜Ã¡Â»Â xuÃ¡ÂºÂ¥t')}</span><input type="datetime-local" required value={proposalStart} onChange={(e) => setProposalStart(e.target.value)} /></label>
+              <label className="course-field"><span>{t('Clan A', 'Clan A')}</span><select required value={proposalClanA} onChange={(e) => setProposalClanA(e.target.value)}><option value="">—</option>{clans.map((clan) => <option key={clan.id} value={clan.id}>{clan.name}</option>)}</select></label>
+              <label className="course-field"><span>{t('Clan B', 'Clan B')}</span><select required value={proposalClanB} onChange={(e) => setProposalClanB(e.target.value)}><option value="">—</option>{clans.map((clan) => <option key={clan.id} value={clan.id}>{clan.name}</option>)}</select></label>
+              <label className="course-field"><span>{t('Proposed start', 'Thời gian đề xuất')}</span><input type="datetime-local" required value={proposalStart} onChange={(e) => setProposalStart(e.target.value)} /></label>
             </div>
-            <button className="button primary" disabled={busy || !proposalCourseId || proposalClanA === proposalClanB}>{t('Submit proposal', 'GÃ¡Â»Â­i Ã„â€˜Ã¡Â»Â xuÃ¡ÂºÂ¥t')}</button>
+            <button className="button primary" disabled={busy || !proposalCourseId || proposalClanA === proposalClanB}>{t('Submit proposal', 'Gửi đề xuất')}</button>
           </form>}
           {isAdmin && <div className="attendance-create">
-            <h4>{t('Admin: Clan War proposals', 'Admin: Ã„ÂÃ¡Â»Â xuÃ¡ÂºÂ¥t chiÃ¡ÂºÂ¿n Clan')}</h4>
+            <h4>{t('Admin: Clan War proposals', 'Admin: Đề xuất chiến Clan')}</h4>
             {warProposals.length ? <div className="mission-card-grid">{warProposals.map((proposal) => <article className="mission-card" key={proposal.id}>
-              <span className="eyebrow">{proposal.courseTitle} Ã‚Â· {proposal.authorName}</span><h4>{proposal.title}</h4><p>{proposal.clanA.name} Ã‚Â· {proposal.clanB.name}</p><p>{proposal.description}</p><p>{new Date(proposal.startsAt).toLocaleString(locale)}</p>
-              <label className="course-field"><span>{t('Approved winner Clan EXP', 'Clan EXP cho Ã„â€˜Ã¡Â»â„¢i thÃ¡ÂºÂ¯ng')}</span><input type="number" min={0} value={proposalExpReward} onChange={(e) => setProposalExpReward(Number(e.target.value))} /></label>              {proposal.competitionType !== 'war' && <><label className="course-field"><span>{t('Participant EXP each', 'Participant EXP each')}</span><input type="number" min={0} max={2000000000} value={proposalParticipantExp} onChange={(e) => setProposalParticipantExp(Number(e.target.value))} /></label><label className="course-field"><span>{t('Participant Coin each', 'Participant Coin each')}</span><input type="number" min={0} max={2000000000} value={proposalParticipantCoin} onChange={(e) => setProposalParticipantCoin(Number(e.target.value))} /></label><label className="course-field"><span>{t('Supported shop item prize', 'Supported shop item prize')}</span><select value={proposalRewardItemId} onChange={(e) => { setProposalRewardItemId(e.target.value); if (e.target.value && proposalRewardItemQuantity === 0) setProposalRewardItemQuantity(1); }}><option value="">{t('No item prize', 'No item prize')}</option>{rewardCatalog.map((item) => <option key={item.id} value={item.id}>{item.name} Â· {item.effectType} Â· {item.stock}</option>)}</select></label>{proposalRewardItemId && <label className="course-field"><span>{t('Items per participant', 'Items per participant')}</span><input type="number" min={1} max={10} value={proposalRewardItemQuantity || 1} onChange={(e) => setProposalRewardItemQuantity(Number(e.target.value))} /></label>}</>}
-              <div className="assessment-action-row"><button className="button primary" type="button" disabled={busy} onClick={() => void act(() => api(`/admin/clan-war-proposals/${proposal.id}/decisions`, 'POST', { decision: 'approve', expReward: proposalExpReward, rewardExp: proposal.competitionType === 'war' ? 0 : proposalParticipantExp, rewardCoin: proposal.competitionType === 'war' ? 0 : proposalParticipantCoin, rewardItemId: proposal.competitionType === 'war' || !proposalRewardItemId ? null : proposalRewardItemId, rewardItemQuantity: proposal.competitionType === 'war' || !proposalRewardItemId ? 0 : proposalRewardItemQuantity }), t('Proposal approved and scheduled.', 'Ã„ÂÃƒÂ£ duyÃ¡Â»â€¡t vÃƒÂ  lÃƒÂªn lÃ¡Â»â€¹ch trÃ¡ÂºÂ­n Ã„â€˜Ã¡ÂºÂ¥u.'))}>{t('Approve and schedule', 'DuyÃ¡Â»â€¡t vÃƒÂ  lÃƒÂªn lÃ¡Â»â€¹ch')}</button><button className="button secondary" type="button" disabled={busy} onClick={() => void act(() => api(`/admin/clan-war-proposals/${proposal.id}/decisions`, 'POST', { decision: 'reject' }), t('Proposal rejected.', 'Ã„ÂÃƒÂ£ tÃ¡Â»Â« chÃ¡Â»â€˜i Ã„â€˜Ã¡Â»Â xuÃ¡ÂºÂ¥t.'))}>{t('Reject', 'TÃ¡Â»Â« chÃ¡Â»â€˜i')}</button></div>
-            </article>)}</div> : <p className="course-empty">{t('No pending Clan War proposals.', 'KhÃƒÂ´ng cÃƒÂ³ Ã„â€˜Ã¡Â»Â xuÃ¡ÂºÂ¥t chiÃ¡ÂºÂ¿n Clan Ã„â€˜ang chÃ¡Â»Â.')}</p>}
+              <span className="eyebrow">{proposal.courseTitle} · {proposal.authorName}</span><h4>{proposal.title}</h4><p>{proposal.clanA.name} · {proposal.clanB.name}</p><p>{proposal.description}</p><p>{new Date(proposal.startsAt).toLocaleString(locale)}</p>
+              <label className="course-field"><span>{t('Approved winner Clan EXP', 'Clan EXP cho đội thắng')}</span><input type="number" min={0} value={proposalExpReward} onChange={(e) => setProposalExpReward(Number(e.target.value))} /></label>              {proposal.competitionType !== 'war' && <><label className="course-field"><span>{t('Participant EXP each', 'Participant EXP each')}</span><input type="number" min={0} max={2000000000} value={proposalParticipantExp} onChange={(e) => setProposalParticipantExp(Number(e.target.value))} /></label><label className="course-field"><span>{t('Participant Coin each', 'Participant Coin each')}</span><input type="number" min={0} max={2000000000} value={proposalParticipantCoin} onChange={(e) => setProposalParticipantCoin(Number(e.target.value))} /></label><label className="course-field"><span>{t('Supported shop item prize', 'Supported shop item prize')}</span><select value={proposalRewardItemId} onChange={(e) => { setProposalRewardItemId(e.target.value); if (e.target.value && proposalRewardItemQuantity === 0) setProposalRewardItemQuantity(1); }}><option value="">{t('No item prize', 'No item prize')}</option>{rewardCatalog.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.effectType} · {item.stock}</option>)}</select></label>{proposalRewardItemId && <label className="course-field"><span>{t('Items per participant', 'Items per participant')}</span><input type="number" min={1} max={10} value={proposalRewardItemQuantity || 1} onChange={(e) => setProposalRewardItemQuantity(Number(e.target.value))} /></label>}</>}
+              <div className="assessment-action-row"><button className="button primary" type="button" disabled={busy} onClick={() => void act(() => api(`/admin/clan-war-proposals/${proposal.id}/decisions`, 'POST', { decision: 'approve', expReward: proposalExpReward, rewardExp: proposal.competitionType === 'war' ? 0 : proposalParticipantExp, rewardCoin: proposal.competitionType === 'war' ? 0 : proposalParticipantCoin, rewardItemId: proposal.competitionType === 'war' || !proposalRewardItemId ? null : proposalRewardItemId, rewardItemQuantity: proposal.competitionType === 'war' || !proposalRewardItemId ? 0 : proposalRewardItemQuantity }), t('Proposal approved and scheduled.', 'Đã duyệt và lên lịch trận đấu.'))}>{t('Approve and schedule', 'Duyệt và lên lịch')}</button><button className="button secondary" type="button" disabled={busy} onClick={() => void act(() => api(`/admin/clan-war-proposals/${proposal.id}/decisions`, 'POST', { decision: 'reject' }), t('Proposal rejected.', 'Đã từ chối đề xuất.'))}>{t('Reject', 'Từ chối')}</button></div>
+            </article>)}</div> : <p className="course-empty">{t('No pending Clan War proposals.', 'Không có đề xuất chiến Clan đang chờ.')}</p>}
           </div>}
           <div className="mission-card-grid">{wars.length ? wars.map((war) => <article className="mission-card" key={war.id}>
             <span className="state-badge">{war.status}</span><h4>{war.title}</h4>
-            <p>{war.clanA.name} Ã‚Â· {war.clanB.name}</p><p>{new Date(war.startsAt).toLocaleString(locale)} Ã‚Â· {war.expReward.toLocaleString(locale)} EXP</p>
+            <p>{war.clanA.name} · {war.clanB.name}</p><p>{new Date(war.startsAt).toLocaleString(locale)} · {war.expReward.toLocaleString(locale)} EXP</p>
             {isAdmin && war.status === 'scheduled' && <><div className="assessment-action-row">{war.competitionType !== 'war' && <button type="button" className="button secondary" disabled={busy} onClick={() => void loadWarParticipants(war.id)}>{t('Load participants', 'Tải danh sách tham gia')}</button>}{(['clan_a', 'draw', 'clan_b', 'cancelled'] as const).map((outcome) => <button type="button" className="button secondary" disabled={busy || (outcome !== 'cancelled' && (war.participantReward.exp > 0 || war.participantReward.coin > 0 || war.participantReward.itemQuantity > 0) && (selectedWarParticipants[war.id] || []).length === 0)} key={outcome} onClick={() => void act(() => api(`/admin/clan-wars/${war.id}/results`, 'POST', { outcome, participantIds: outcome === 'cancelled' ? [] : (selectedWarParticipants[war.id] || []) }), t('War result saved.', 'Đã lưu kết quả cuộc thi.'))}>{outcome === 'clan_a' ? war.clanA.name : outcome === 'clan_b' ? war.clanB.name : outcome === 'draw' ? t('Draw', 'Hòa') : t('Cancel', 'Hủy')}</button>)}</div>{(warParticipants[war.id] || []).map((person) => <label className="assessment-attempt-heading" key={person.userId}><span>{person.name} · {person.clanId === war.clanA.id ? war.clanA.name : war.clanB.name}</span><input type="checkbox" checked={(selectedWarParticipants[war.id] || []).includes(person.userId)} onChange={() => toggleWarParticipant(war.id, person.userId)} /></label>)}</>}
-          </article>) : <p className="course-empty">{t('No Clan Wars scheduled.', 'ChÃ†Â°a cÃƒÂ³ trÃ¡ÂºÂ­n chiÃ¡ÂºÂ¿n Clan.')}</p>}</div>
+          </article>) : <p className="course-empty">{t('No Clan Wars scheduled.', 'Chưa có trận chiến Clan.')}</p>}</div>
         </section>
         {detail && (
           <section className="mission-card clan-detail">
             <div className="assessment-attempt-heading">
               <div>
                 <span className="eyebrow">
-                  {t('Level', 'CÃ¡ÂºÂ¥p')} {detail.level} Ã‚Â· {detail.clanExp.toLocaleString(locale)} Clan
+                  {t('Level', 'Cấp')} {detail.level} · {detail.clanExp.toLocaleString(locale)} Clan
                   EXP
                 </span>
                 <h3>{detail.name}</h3>
@@ -492,11 +492,11 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                           requestId: detail.myRequest!.id,
                           decision: 'approve',
                         }),
-                      t('Invitation accepted.', 'Ã„ÂÃƒÂ£ chÃ¡ÂºÂ¥p nhÃ¡ÂºÂ­n lÃ¡Â»Âi mÃ¡Â»Âi.'),
+                      t('Invitation accepted.', 'Đã chấp nhận lời mời.'),
                     )
                   }
                 >
-                  {t('Accept invitation', 'ChÃ¡ÂºÂ¥p nhÃ¡ÂºÂ­n lÃ¡Â»Âi mÃ¡Â»Âi')}
+                  {t('Accept invitation', 'Chấp nhận lời mời')}
                 </button>
                 <button
                   className="button secondary"
@@ -508,27 +508,27 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                           requestId: detail.myRequest!.id,
                           decision: 'reject',
                         }),
-                      t('Invitation declined.', 'Ã„ÂÃƒÂ£ tÃ¡Â»Â« chÃ¡Â»â€˜i lÃ¡Â»Âi mÃ¡Â»Âi.'),
+                      t('Invitation declined.', 'Đã từ chối lời mời.'),
                     )
                   }
                 >
-                  {t('Decline', 'TÃ¡Â»Â« chÃ¡Â»â€˜i')}
+                  {t('Decline', 'Từ chối')}
                 </button>
               </div>
             )}
             {detail.myRequest?.status === 'requested' && (
               <p className="state-badge">
-                {t('Join request pending', 'YÃƒÂªu cÃ¡ÂºÂ§u tham gia Ã„â€˜ang chÃ¡Â»Â')}
+                {t('Join request pending', 'Yêu cầu tham gia đang chờ')}
               </p>
             )}
             {detail.isMember && (
               <>
-                <h4>{t('Members', 'ThÃƒÂ nh viÃƒÂªn')}</h4>
+                <h4>{t('Members', 'Thành viên')}</h4>
                 {detail.members?.map((member) => (
                   <div className="assessment-attempt-heading" key={member.userId}>
                     <span>
                       {member.name}
-                      {member.isOwner ? ` Ã‚Â· ${t('Owner', 'ChÃ¡Â»Â§ clan')}` : ''}
+                      {member.isOwner ? ` · ${t('Owner', 'Chủ clan')}` : ''}
                     </span>
                     <span>
                       {detail.roles?.find((role) => role.roleKey === member.roleKey)?.name ||
@@ -539,19 +539,19 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                           type="button"
                           disabled={busy}
                           onClick={() => {
-                            if (!window.confirm(t(`Transfer clan ownership to ${member.name}?`, `ChuyÃ¡Â»Æ’n quyÃ¡Â»Ân chÃ¡Â»Â§ clan cho ${member.name}?`))) return;
+                            if (!window.confirm(t(`Transfer clan ownership to ${member.name}?`, `Chuyển quyền chủ clan cho ${member.name}?`))) return;
                             void act(
                               () => api(`/clans/${detail.id}/owner-transfer`, 'POST', { userId: member.userId }),
-                              t('Clan ownership transferred.', 'Ã„ÂÃƒÂ£ chuyÃ¡Â»Æ’n quyÃ¡Â»Ân chÃ¡Â»Â§ clan.'),
+                              t('Clan ownership transferred.', 'Đã chuyển quyền chủ clan.'),
                             );
                           }}
                         >
-                          {t('Transfer ownership', 'ChuyÃ¡Â»Æ’n quyÃ¡Â»Ân sÃ¡Â»Å¸ hÃ¡Â»Â¯u')}
+                          {t('Transfer ownership', 'Chuyển quyền sở hữu')}
                         </button>
                       )}
                       {detail.canManageRoles && !member.isOwner && (
                         <select
-                          aria-label={t('Member role', 'Vai trÃƒÂ² thÃƒÂ nh viÃƒÂªn')}
+                          aria-label={t('Member role', 'Vai trò thành viên')}
                           value={member.roleKey}
                           onChange={(event) =>
                             void act(
@@ -559,7 +559,7 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                                 api(`/clans/${detail.id}/members/${member.userId}/role`, 'PUT', {
                                   roleKey: event.target.value,
                                 }),
-                              t('Member role updated.', 'Ã„ÂÃƒÂ£ cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t vai trÃƒÂ².'),
+                              t('Member role updated.', 'Đã cập nhật vai trò.'),
                             )
                           }
                         >
@@ -575,9 +575,9 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                 ))}
                 {detail.canManageMembership && (
                   <>
-                    <h4>{t('Invite a student', 'MÃ¡Â»Âi hÃ¡Â»Âc viÃƒÂªn')}</h4>
+                    <h4>{t('Invite a student', 'Mời học viên')}</h4>
                     <label className="course-field">
-                      <span>{t('Search active students', 'TÃƒÂ¬m hÃ¡Â»Âc viÃƒÂªn Ã„â€˜ang hoÃ¡ÂºÂ¡t Ã„â€˜Ã¡Â»â„¢ng')}</span>
+                      <span>{t('Search active students', 'Tìm học viên đang hoạt động')}</span>
                       <input
                         minLength={2}
                         value={query}
@@ -587,7 +587,7 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                     {candidates.map((candidate) => (
                       <div className="assessment-attempt-heading" key={candidate.userId}>
                         <span>
-                          {candidate.name} Ã‚Â· {candidate.username}
+                          {candidate.name} · {candidate.username}
                         </span>
                         <button
                           type="button"
@@ -599,19 +599,19 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                                 api(`/clans/${detail.id}/invitations`, 'POST', {
                                   userId: candidate.userId,
                                 }),
-                              t('Invitation sent.', 'Ã„ÂÃƒÂ£ gÃ¡Â»Â­i lÃ¡Â»Âi mÃ¡Â»Âi.'),
+                              t('Invitation sent.', 'Đã gửi lời mời.'),
                             )
                           }
                         >
-                          {t('Invite', 'MÃ¡Â»Âi')}
+                          {t('Invite', 'Mời')}
                         </button>
                       </div>
                     ))}
-                    <h4>{t('Membership requests', 'YÃƒÂªu cÃ¡ÂºÂ§u thÃƒÂ nh viÃƒÂªn')}</h4>
+                    <h4>{t('Membership requests', 'Yêu cầu thành viên')}</h4>
                     {detail.pending?.map((request) => (
                       <div className="assessment-attempt-heading" key={request.id}>
                         <span>
-                          {request.name} Ã‚Â· {request.status}
+                          {request.name} · {request.status}
                         </span>
                         <div className="assessment-action-row">
                           <button
@@ -625,11 +625,11 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                                     requestId: request.id,
                                     decision: 'approve',
                                   }),
-                                t('Member approved.', 'Ã„ÂÃƒÂ£ duyÃ¡Â»â€¡t thÃƒÂ nh viÃƒÂªn.'),
+                                t('Member approved.', 'Đã duyệt thành viên.'),
                               )
                             }
                           >
-                            {t('Approve', 'DuyÃ¡Â»â€¡t')}
+                            {t('Approve', 'Duyệt')}
                           </button>
                           <button
                             type="button"
@@ -642,11 +642,11 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                                     requestId: request.id,
                                     decision: 'reject',
                                   }),
-                                t('Request declined.', 'Ã„ÂÃƒÂ£ tÃ¡Â»Â« chÃ¡Â»â€˜i yÃƒÂªu cÃ¡ÂºÂ§u.'),
+                                t('Request declined.', 'Đã từ chối yêu cầu.'),
                               )
                             }
                           >
-                            {t('Reject', 'TÃ¡Â»Â« chÃ¡Â»â€˜i')}
+                            {t('Reject', 'Từ chối')}
                           </button>
                         </div>
                       </div>
@@ -665,13 +665,13 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                             name: roleName,
                             permissions: rolePermissions,
                           }),
-                        t('Clan role created.', 'Ã„ÂÃƒÂ£ tÃ¡ÂºÂ¡o vai trÃƒÂ² clan.'),
+                        t('Clan role created.', 'Đã tạo vai trò clan.'),
                       );
                     }}
                   >
-                    <h4>{t('Create internal role', 'TÃ¡ÂºÂ¡o vai trÃƒÂ² nÃ¡Â»â„¢i bÃ¡Â»â„¢')}</h4>
+                    <h4>{t('Create internal role', 'Tạo vai trò nội bộ')}</h4>
                     <label className="course-field">
-                      <span>{t('Role key', 'MÃƒÂ£ vai trÃƒÂ²')}</span>
+                      <span>{t('Role key', 'Mã vai trò')}</span>
                       <input
                         required
                         minLength={2}
@@ -681,7 +681,7 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                       />
                     </label>
                     <label className="course-field">
-                      <span>{t('Role name', 'TÃƒÂªn vai trÃƒÂ²')}</span>
+                      <span>{t('Role name', 'Tên vai trò')}</span>
                       <input
                         required
                         minLength={2}
@@ -702,7 +702,7 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                           )
                         }
                       />{' '}
-                      {t('Manage membership', 'QuÃ¡ÂºÂ£n lÃƒÂ½ thÃƒÂ nh viÃƒÂªn')}
+                      {t('Manage membership', 'Quản lý thành viên')}
                     </label>
                     <label>
                       <input
@@ -716,7 +716,7 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                           )
                         }
                       />{' '}
-                      {t('Manage clan roles', 'QuÃ¡ÂºÂ£n lÃƒÂ½ vai trÃƒÂ² clan')}
+                      {t('Manage clan roles', 'Quản lý vai trò clan')}
                     </label>
                     <label>
                       <input
@@ -730,10 +730,10 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                           )
                         }
                       />{' '}
-                      {t('Manage clan activities', 'QuÃ¡ÂºÂ£n lÃƒÂ½ hoÃ¡ÂºÂ¡t Ã„â€˜Ã¡Â»â„¢ng clan')}
+                      {t('Manage clan activities', 'Quản lý hoạt động clan')}
                     </label>
                     <button className="button primary" disabled={busy || !roleKey || !roleName}>
-                      {t('Create role', 'TÃ¡ÂºÂ¡o vai trÃƒÂ²')}
+                      {t('Create role', 'Tạo vai trò')}
                     </button>
                   </form>
                 )}
@@ -745,11 +745,11 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                     onClick={() =>
                       void act(
                         () => api(`/clans/${detail.id}/leave`, 'POST'),
-                        t('You left the clan.', 'BÃ¡ÂºÂ¡n Ã„â€˜ÃƒÂ£ rÃ¡Â»Âi clan.'),
+                        t('You left the clan.', 'Bạn đã rời clan.'),
                       )
                     }
                   >
-                    {t('Leave clan', 'RÃ¡Â»Âi clan')}
+                    {t('Leave clan', 'Rời clan')}
                   </button>
                 )}
                 {detail.ownerId === userId && (
@@ -766,14 +766,14 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                           }),
                         t(
                           'Clan renamed; the rename card was consumed.',
-                          'Ã„ÂÃƒÂ£ Ã„â€˜Ã¡Â»â€¢i tÃƒÂªn clan vÃƒÂ  dÃƒÂ¹ng thÃ¡ÂºÂ» Ã„â€˜Ã¡Â»â€¢i tÃƒÂªn.',
+                          'Đã đổi tên clan và dùng thẻ đổi tên.',
                         ),
                       );
                     }}
                   >
-                    <h4>{t('Rename clan', 'Ã„ÂÃ¡Â»â€¢i tÃƒÂªn clan')}</h4>
+                    <h4>{t('Rename clan', 'Đổi tên clan')}</h4>
                     <label className="course-field">
-                      <span>{t('New name', 'TÃƒÂªn mÃ¡Â»â€ºi')}</span>
+                      <span>{t('New name', 'Tên mới')}</span>
                       <input
                         required
                         minLength={3}
@@ -785,13 +785,13 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                     {renameCards.length ? (
                       <>
                         <label className="course-field">
-                          <span>{t('Rename card', 'ThÃ¡ÂºÂ» Ã„â€˜Ã¡Â»â€¢i tÃƒÂªn')}</span>
+                          <span>{t('Rename card', 'Thẻ đổi tên')}</span>
                           <select
                             required
                             value={renameCard}
                             onChange={(event) => setRenameCard(event.target.value)}
                           >
-                            <option value="">{t('Choose a card', 'ChÃ¡Â»Ân thÃ¡ÂºÂ»')}</option>
+                            <option value="">{t('Choose a card', 'Chọn thẻ')}</option>
                             {renameCards.map((item) => (
                               <option key={item.id} value={item.id}>
                                 {item.item.name}
@@ -800,14 +800,14 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
                           </select>
                         </label>
                         <button className="button secondary" disabled={busy || !renameCard}>
-                          {t('Rename', 'Ã„ÂÃ¡Â»â€¢i tÃƒÂªn')}
+                          {t('Rename', 'Đổi tên')}
                         </button>
                       </>
                     ) : (
                       <a href="/shop">
                         {t(
                           'Get a Rename Clan card from the shop',
-                          'Mua thÃ¡ÂºÂ» Ã„ÂÃ¡Â»â€¢i tÃƒÂªn Clan Ã¡Â»Å¸ cÃ¡Â»Â­a hÃƒÂ ng',
+                          'Mua thẻ Đổi tên Clan ở cửa hàng',
                         )}
                       </a>
                     )}
@@ -817,7 +817,7 @@ export function ClansWorkspace({ locale, userId, isAdmin }: { locale: Locale; us
             )}
           </section>
         )}
-        {isAdmin && detail && <form className="attendance-create" onSubmit={(event) => { event.preventDefault(); void act(() => api(`/admin/clans/${detail.id}/exp`, 'POST', { delta: expAmount, reason: expReason }, { 'Idempotency-Key': crypto.randomUUID() }), t('Approved Clan EXP reward recorded.', 'Ã„ÂÃƒÂ£ ghi thÃ†Â°Ã¡Â»Å¸ng Clan EXP Ã„â€˜Ã†Â°Ã¡Â»Â£c duyÃ¡Â»â€¡t.')); }}><h4>{t('Admin: record Clan EXP reward', 'Admin: Ghi thÃ†Â°Ã¡Â»Å¸ng Clan EXP')}</h4><label className="course-field"><span>{t('Approved Clan EXP', 'Clan EXP Ã„â€˜Ã†Â°Ã¡Â»Â£c duyÃ¡Â»â€¡t')}</span><input type="number" min={1} max={2000000000} required value={expAmount} onChange={(event) => setExpAmount(Number(event.target.value))} /></label><label className="course-field"><span>{t('Mission or event approval reason', 'LÃƒÂ½ do duyÃ¡Â»â€¡t nhiÃ¡Â»â€¡m vÃ¡Â»Â¥ hoÃ¡ÂºÂ·c sÃ¡Â»Â± kiÃ¡Â»â€¡n')}</span><textarea minLength={10} maxLength={500} required value={expReason} onChange={(event) => setExpReason(event.target.value)} /></label><button className="button secondary" disabled={busy || expReason.trim().length < 10}>{t('Record reward', 'Ghi thÃ†Â°Ã¡Â»Å¸ng')}</button></form>}
+        {isAdmin && detail && <form className="attendance-create" onSubmit={(event) => { event.preventDefault(); void act(() => api(`/admin/clans/${detail.id}/exp`, 'POST', { delta: expAmount, reason: expReason }, { 'Idempotency-Key': crypto.randomUUID() }), t('Approved Clan EXP reward recorded.', 'Đã ghi thưởng Clan EXP được duyệt.')); }}><h4>{t('Admin: record Clan EXP reward', 'Admin: Ghi thưởng Clan EXP')}</h4><label className="course-field"><span>{t('Approved Clan EXP', 'Clan EXP được duyệt')}</span><input type="number" min={1} max={2000000000} required value={expAmount} onChange={(event) => setExpAmount(Number(event.target.value))} /></label><label className="course-field"><span>{t('Mission or event approval reason', 'Lý do duyệt nhiệm vụ hoặc sự kiện')}</span><textarea minLength={10} maxLength={500} required value={expReason} onChange={(event) => setExpReason(event.target.value)} /></label><button className="button secondary" disabled={busy || expReason.trim().length < 10}>{t('Record reward', 'Ghi thưởng')}</button></form>}
       </div>
     </section>
   );

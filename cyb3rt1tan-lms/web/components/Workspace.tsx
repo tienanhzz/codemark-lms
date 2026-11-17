@@ -37,6 +37,7 @@ import { NotificationsWorkspace } from './NotificationsWorkspace';
 import { CriticalNoticePrompt } from './CriticalNoticePrompt';
 import { SharedCourseRules } from './CourseRules';
 import { HomePage } from './HomePage';
+import { HomeCarousel } from './HomeCarousel';
 import { LeaderboardWorkspace } from './LeaderboardWorkspace';
 import { RoleOverview } from './RoleOverview';
 import { PersistenceStatus } from './PersistenceStatus';
@@ -56,7 +57,7 @@ import { identityMessages, identityError } from '../lib/identityMessages';
 import type { LoginResponse, MfaSetupChallengeResponse } from '../lib/contracts';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api, applyPreferences, defaultPreferences, userInitials } from '../lib/api';
+import { api, applyPreferences, defaultPreferences, readGuestLocale, rememberGuestLocale, userInitials } from '../lib/api';
 import type { CurrentUser, Summary, UserPreferences } from '../lib/api';
 import { messages, type MessageKey } from '../lib/messages';
 
@@ -105,47 +106,47 @@ const navigation = [
 ];
 const palettes: {
   id: UserPreferences['colorPalette'];
-  name: string;
+  name: readonly [string, string];
   colors: string[];
 }[] = [
   {
     id: 'navy-cyan-gold',
-    name: 'Navy · Cyan · Gold',
+    name: ['Navy · Cyan · Gold', 'Xanh navy · Xanh cyan · Vàng'],
     colors: ['#152b49', '#086b87', '#e2b356'],
   },
   {
     id: 'ocean-teal',
-    name: 'Ocean · Teal',
+    name: ['Ocean · Teal', 'Đại dương · Xanh ngọc'],
     colors: ['#143f4b', '#086c64', '#9dc9c3'],
   },
   {
     id: 'indigo-cyan',
-    name: 'Indigo · Cyan',
+    name: ['Indigo · Cyan', 'Chàm · Xanh cyan'],
     colors: ['#343768', '#5156b8', '#5dcad4'],
   },
   {
     id: 'forest-lime',
-    name: 'Forest · Lime',
+    name: ['Forest · Lime', 'Xanh rừng · Xanh chanh'],
     colors: ['#1b4235', '#357344', '#b6ce74'],
   },
   {
     id: 'rose-slate',
-    name: 'Rose · Slate',
+    name: ['Rose · Slate', 'Hồng · Xám đá'],
     colors: ['#3d3344', '#a04469', '#e3acbd'],
   },
   {
     id: 'sunset-coral',
-    name: 'Sunset · Coral',
+    name: ['Sunset · Coral', 'Hoàng hôn · San hô'],
     colors: ['#543b37', '#b24d39', '#efa783'],
   },
   {
     id: 'violet-amber',
-    name: 'Violet · Amber',
+    name: ['Violet · Amber', 'Tím · Hổ phách'],
     colors: ['#38304d', '#7950a1', '#e8b44e'],
   },
   {
     id: 'graphite-cyan',
-    name: 'Graphite · Cyan',
+    name: ['Graphite · Cyan', 'Xám than · Xanh cyan'],
     colors: ['#28313b', '#257287', '#83bac9'],
   },
 ];
@@ -214,16 +215,18 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
   async function refresh(): Promise<void> {
     try {
       const account = await api<CurrentUser>('/me');
-      const [settings, data] = await Promise.all([
+      const [storedSettings, data] = await Promise.all([
         api<UserPreferences>('/me/preferences'),
         api<Summary>('/workspace/summary'),
       ]);
+      const settings = { ...defaultPreferences, ...storedSettings };
       setUser(account);
       setPreferences(settings);
       setDraft(settings);
       setSummary(data);
       setError('');
       applyPreferences(settings);
+      rememberGuestLocale(settings.locale);
     } catch (problem) {
       const code = problem instanceof Error ? problem.message : 'connection_error';
       if (code !== 'authentication_required') setError(code);
@@ -232,6 +235,8 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
     }
   }
   useEffect(() => {
+    const guestLocale = readGuestLocale();
+    if (guestLocale) setDraft(current => ({ ...current, locale: guestLocale }));
     void refresh();
     const unauthorized = () => {
       setUser(null);
@@ -241,8 +246,8 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
     return () => window.removeEventListener('codemark:unauthorized', unauthorized);
   }, []);
   useEffect(() => {
-    applyPreferences(draft);
-  }, [draft]);
+    if (!loading) applyPreferences(draft);
+  }, [draft, loading]);
   useLayoutEffect(() => {
     if (loading || !user || !sidebarNavigation.current) return;
     // Each route mounts its own workspace, so restore before the menu is painted.
@@ -339,6 +344,12 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
     }
   }
   async function switchLanguage() {
+    if (!user) {
+      const nextLocale = locale === 'en' ? 'vi' : 'en';
+      setDraft(current => ({ ...current, locale: nextLocale }));
+      rememberGuestLocale(nextLocale);
+      return;
+    }
     setBusy(true);
     setError('');
     try {
@@ -348,6 +359,7 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
       });
       setPreferences(saved);
       setDraft((current) => ({ ...current, locale: saved.locale }));
+      rememberGuestLocale(saved.locale);
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : 'connection_error');
     } finally {
@@ -362,12 +374,18 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
       const saved = await api<UserPreferences>('/me/preferences', 'PUT', draft);
       setPreferences(saved);
       setDraft(saved);
+      rememberGuestLocale(saved.locale);
       setNotice('saved');
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : 'connection_error');
     } finally {
       setBusy(false);
     }
+  }
+  function updateDraft(changes: Partial<UserPreferences>) {
+    setDraft(current => ({ ...current, ...changes }));
+    setNotice('');
+    setError('');
   }
   async function changePassword(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -437,10 +455,11 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
   if (!user && !initialView)
     return <div className="public-home">
       <header className="public-header"><Brand /><div>
-        <button className="button secondary" onClick={() => setDraft({ ...draft, locale: locale === 'en' ? 'vi' : 'en' })}><Icon name="fa-globe" />{locale === 'en' ? 'Tiếng Việt' : 'English'}</button>
+        <button className="button secondary" onClick={() => void switchLanguage()}><Icon name="fa-globe" />{locale === 'en' ? 'Tiếng Việt' : 'English'}</button>
         <Link className="button primary" href="/login">{t('signIn')}</Link>
       </div></header>
-      <main><HomePage locale={locale} roles={[]} /></main>
+      <HomeCarousel locale={locale} />
+      <main><HomePage locale={locale} roles={[]} showCarousel={false} /></main>
     </div>;
   if (!user)
     return (
@@ -449,14 +468,14 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
           <Link className="legacy-back" href="/">{locale === 'vi' ? '← Quay lại trang chủ' : '← Back to home'}</Link>
           <button
             className="language-toggle"
-            onClick={() => setDraft({ ...draft, locale: locale === 'en' ? 'vi' : 'en' })}
+            onClick={() => void switchLanguage()}
           >
             <Icon name="fa-globe" /> {locale === 'en' ? 'Tiếng Việt' : 'English'}
           </button>
           <div className="login-form">
 <img className="legacy-login-logo" src="/branding/legacy-logo.png" alt="CodeMark" width={1156} height={359} />
             <h1>{locale === 'vi' ? 'Chào mừng trở lại' : 'Welcome back'}</h1>
-            <p className="muted">{locale === 'vi' ? 'Sinh viên đăng nhập bằng mã sinh viên. Giảng viên và Admin dùng tên đăng nhập.' : 'Students sign in with their student ID. Teachers and administrators use their username.'}</p>
+            <p className="muted">{locale === 'vi' ? 'Sinh viên dùng mã sinh viên. Giảng viên dùng Gmail đã đăng ký và mật khẩu tài khoản CodeMark. Admin dùng tên đăng nhập.' : 'Students use their student ID. Teachers use their registered Gmail address and CodeMark password. Administrators use their username.'}</p>
             {banners}
             {setupToken ? (
               <MfaEnrollment
@@ -471,13 +490,13 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
             ) : (
               <form onSubmit={login}>
                 <label>
-                  {locale === 'vi' ? 'Mã sinh viên / tên đăng nhập' : 'Student ID / username'}
+                  {locale === 'vi' ? 'Mã sinh viên / Gmail / tên đăng nhập' : 'Student ID / Gmail / username'}
                   <input
                     name="username"
                     autoComplete="username"
                     required
-                    maxLength={128}
-                    placeholder={locale === 'vi' ? 'Mã sinh viên hoặc tài khoản giảng viên/Admin' : 'Student ID or staff username'}
+                    maxLength={320}
+                    placeholder={locale === 'vi' ? 'Mã sinh viên, Gmail giảng viên hoặc tên Admin' : 'Student ID, teacher Gmail or admin username'}
                   />
                 </label>
                 <label>
@@ -724,6 +743,7 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
             </Link>
           </div>
         </header>
+        {(!initialView || initialView === 'login') && <HomeCarousel locale={locale} />}
         <div className={`workspace-body${initialView !== 'leaderboard' ? ' with-quick-rank' : ''}${rankCollapsed ? ' rank-rail-closed' : ''}`}>
         <main id="main" className="main-content" tabIndex={-1}>
           {initialView && initialView !== 'login' && <div className="page-heading">
@@ -772,7 +792,7 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
             )}
           </div>}
           {banners}
-          {(!initialView || initialView === 'login') && <HomePage locale={locale} roles={user.roles} />}
+          {(!initialView || initialView === 'login') && <HomePage locale={locale} roles={user.roles} showCarousel={false} />}
           {initialView === 'leaderboard' && <LeaderboardWorkspace locale={locale} userId={user.id} />}
           {initialView === 'calendar' && <WeeklyTimetable locale={locale} timeZone={preferences.timeZone || 'Asia/Ho_Chi_Minh'} />}
           {initialView === 'dashboard' && workspaceRole(user.roles) === 'student' && (
@@ -1131,10 +1151,10 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
                 </div>
                 <select
                   value={draft.locale}
+                  disabled={busy}
                   aria-label={t('language')}
                   onChange={(event) =>
-                    setDraft({
-                      ...draft,
+                    updateDraft({
                       locale: event.target.value as 'en' | 'vi',
                     })
                   }
@@ -1152,9 +1172,11 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
                   {(['light', 'dark'] as const).map((theme) => (
                     <button
                       className={`appearance-option ${draft.theme === theme ? 'chosen' : ''}`}
+                      type="button"
+                      disabled={busy}
                       aria-pressed={draft.theme === theme}
                       key={theme}
-                      onClick={() => setDraft({ ...draft, theme })}
+                      onClick={() => updateDraft({ theme })}
                     >
                       <span className={`theme-mini ${theme}`}>
                         <span />
@@ -1176,16 +1198,18 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
                   {palettes.map((p) => (
                     <button
                       className={`palette-option ${draft.colorPalette === p.id ? 'chosen' : ''}`}
+                      type="button"
+                      disabled={busy}
                       aria-pressed={draft.colorPalette === p.id}
                       key={p.id}
-                      onClick={() => setDraft({ ...draft, colorPalette: p.id })}
+                      onClick={() => updateDraft({ colorPalette: p.id })}
                     >
                       <span className="palette-colors">
                         {p.colors.map((color) => (
                           <span key={color} style={{ background: color }} />
                         ))}
                       </span>
-                      <span>{p.name}</span>
+                      <span>{copy(locale, p.name)}</span>
                       {draft.colorPalette === p.id && <Icon name="fa-check-circle" />}
                     </button>
                   ))}
@@ -1199,7 +1223,8 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
                 <select
                   aria-label={t('timezone')}
                   value={draft.timeZone}
-                  onChange={(event) => setDraft({ ...draft, timeZone: event.target.value })}
+                  disabled={busy}
+                  onChange={(event) => updateDraft({ timeZone: event.target.value })}
                 >
                   {[
                     'Asia/Bangkok',
@@ -1230,9 +1255,9 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
                           <input
                             type="checkbox"
                             checked={checked}
+                            disabled={busy}
                             onChange={(event) =>
-                              setDraft({
-                                ...draft,
+                              updateDraft({
                                 [field]:
                                   field === 'textScale'
                                     ? event.target.checked
@@ -1256,6 +1281,7 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
                   onClick={() => {
                     setDraft(preferences);
                     setNotice('');
+                    setError('');
                   }}
                 >
                   {t('cancel')}

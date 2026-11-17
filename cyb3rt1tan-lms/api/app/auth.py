@@ -9,7 +9,7 @@ from typing import Annotated
 
 from argon2.exceptions import InvalidHashError, VerificationError
 from fastapi import Depends, HTTPException, Request, Response
-from sqlalchemy import delete, select, text
+from sqlalchemy import delete, func, select, text
 from sqlalchemy.orm import Session
 
 from . import mfa
@@ -35,7 +35,9 @@ def audit(
 ) -> None:
     ip_digest = None
     if request.client and request.client.host:
-        ip_digest = hmac.new(HMAC_KEY.encode("utf-8"), request.client.host.encode("utf-8"), hashlib.sha256).hexdigest()
+        ip_digest = hmac.new(
+            HMAC_KEY.encode("utf-8"), request.client.host.encode("utf-8"), hashlib.sha256
+        ).hexdigest()
     record_audit(db, request.state.request_id, action, user.id if user else None, detail, ip_digest)
 
 
@@ -205,6 +207,23 @@ def establish(
     }
 
 
+def login_account(db: Session, identifier: str) -> User | None:
+    """Resolve the role's login identifier; reject cross-account ambiguity."""
+    identifier = identifier.strip()
+    normalized = identifier.lower()
+    candidates: dict[str, User] = {}
+    by_code = db.scalar(select(User).where(User.institutional_id == identifier))
+    if by_code is not None and "student" in by_code.roles:
+        candidates[by_code.id] = by_code
+    by_name = db.scalar(select(User).where(User.username == normalized))
+    if by_name is not None and "student" not in by_name.roles:
+        candidates[by_name.id] = by_name
+    for by_email in db.scalars(select(User).where(func.lower(User.email) == normalized)):
+        if "teacher" in by_email.roles and "student" not in by_email.roles:
+            candidates[by_email.id] = by_email
+    return next(iter(candidates.values())) if len(candidates) == 1 else None
+
+
 def authenticate(
     db: Session,
     request: Request,
@@ -218,14 +237,7 @@ def authenticate(
     username = identifier.lower()
     network = request.client.host if request.client else "local"
     buckets = throttle(db, "account:" + username, "network:" + network)
-    by_name = db.scalar(select(User).where(User.username == username))
-    by_code = db.scalar(select(User).where(User.institutional_id == identifier))
-    user = None
-    if by_code is not None and "student" in by_code.roles:
-        if by_name is None or by_name.id == by_code.id:
-            user = by_code
-    elif by_name is not None and "student" not in by_name.roles:
-        user = by_name
+    user = login_account(db, identifier)
     if user is None:
         try:
             passwords.verify(dummy_hash, password)

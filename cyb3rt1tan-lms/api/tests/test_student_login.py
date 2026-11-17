@@ -1,3 +1,4 @@
+import pytest
 from sqlalchemy import select
 from test_access import ORIGIN, PASSWORD
 
@@ -62,7 +63,7 @@ def test_unassigned_student_code_does_not_fall_back_to_username(clients):
     )
 
 
-def test_teacher_username_and_ambiguous_identifiers(clients):
+def test_teacher_email_and_ambiguous_identifiers(clients):
     admin, student, factory = clients
     with factory.begin() as db:
         root = db.scalar(select(User).where(User.username == "admin"))
@@ -79,6 +80,14 @@ def test_teacher_username_and_ambiguous_identifiers(clients):
         )
     assert (
         admin.post(
+            "/v1/auth/login",
+            headers=ORIGIN,
+            json={"username": "  TEACHER@EXAMPLE.TEST  ", "password": PASSWORD},
+        ).status_code
+        == 200
+    )
+    assert (
+        admin.post(
             "/v1/auth/login", headers=ORIGIN, json={"username": "teacher", "password": PASSWORD}
         ).status_code
         == 200
@@ -90,7 +99,7 @@ def test_teacher_username_and_ambiguous_identifiers(clients):
                 username="2025000001",
                 email="numeric.staff@example.test",
                 official_name="Numeric staff",
-                roles=["teacher"],
+                roles=["admin"],
                 password_hash=root.password_hash,
             )
         )
@@ -99,4 +108,107 @@ def test_teacher_username_and_ambiguous_identifiers(clients):
             "/v1/auth/login", headers=ORIGIN, json={"username": "2025000001", "password": PASSWORD}
         ).status_code
         == 401
+    )
+
+
+@pytest.mark.parametrize(
+    "status,password,identifier",
+    [
+        ("active", "wrong-password", "teacher@gmail.com"),
+        ("suspended", PASSWORD, "teacher@gmail.com"),
+    ],
+)
+def test_teacher_rejects_wrong_password_and_suspended_account(
+    clients, status, password, identifier
+):
+    admin, _, factory = clients
+    with factory.begin() as db:
+        root = db.scalar(select(User).where(User.username == "admin"))
+        db.add(
+            User(
+                username="teacher",
+                email="teacher@gmail.com",
+                official_name="Teacher",
+                roles=["teacher"],
+                status=status,
+                password_hash=root.password_hash,
+            )
+        )
+    response = admin.post(
+        "/v1/auth/login", headers=ORIGIN, json={"username": identifier, "password": password}
+    )
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "invalid_credentials"
+
+
+def test_teacher_email_login_preserves_teacher_permissions(clients):
+    teacher, _, factory = clients
+    with factory.begin() as db:
+        root = db.scalar(select(User).where(User.username == "admin"))
+        db.add(
+            User(
+                username="teacher",
+                email="teacher@gmail.com",
+                official_name="Teacher",
+                roles=["teacher"],
+                password_hash=root.password_hash,
+            )
+        )
+    assert (
+        teacher.post(
+            "/v1/auth/login",
+            headers=ORIGIN,
+            json={"username": "Teacher@GMAIL.com", "password": PASSWORD},
+        ).status_code
+        == 200
+    )
+    assert teacher.get("/v1/me").json()["roles"] == ["teacher"]
+    assert teacher.get("/v1/admin/users").status_code == 403
+
+
+def test_case_insensitive_duplicate_teacher_emails_fail_closed(clients):
+    teacher, _, factory = clients
+    with factory.begin() as db:
+        root = db.scalar(select(User).where(User.username == "admin"))
+        for name, email in (
+            ("first-teacher", "teacher@gmail.com"),
+            ("second-teacher", "TEACHER@gmail.com"),
+        ):
+            db.add(
+                User(
+                    username=name,
+                    email=email,
+                    official_name=name,
+                    roles=["teacher"],
+                    password_hash=root.password_hash,
+                )
+            )
+    assert (
+        teacher.post(
+            "/v1/auth/login",
+            headers=ORIGIN,
+            json={"username": "teacher@gmail.com", "password": PASSWORD},
+        ).status_code
+        == 401
+    )
+
+
+def test_mixed_student_teacher_roles_still_require_student_id(clients):
+    _, student, factory = clients
+    with factory.begin() as db:
+        learner = db.scalar(select(User).where(User.username == "student"))
+        learner.roles = ["student", "teacher"]
+    assert (
+        student.post(
+            "/v1/auth/login",
+            headers=ORIGIN,
+            json={"username": "student@example.test", "password": PASSWORD},
+        ).status_code
+        == 401
+    )
+    assert (
+        student.post(
+            "/v1/auth/login", headers=ORIGIN, json={"username": "9999000001", "password": PASSWORD}
+        ).status_code
+        == 200
     )

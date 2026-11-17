@@ -1,5 +1,6 @@
 """BUILD-025 configuration, atomic audit/outbox, redaction and operational boundaries."""
 
+import base64
 import uuid
 from unittest.mock import Mock
 
@@ -89,6 +90,8 @@ def test_migration_target_cannot_cross_database_even_in_local_mode(monkeypatch):
                 "DATABASE_URL": "postgresql+psycopg://runtime:private@localhost/lms?sslmode=verify-full&sslrootcert=/ca",
                 "APP_ORIGIN": "https://lms.example.test",
                 "COOKIE_SECURE": "true",
+                "LOGIN_HMAC_KEY": "test-login-key-" + "x" * 32,
+                "MFA_ENCRYPTION_KEY": base64.b64encode(b"m" * 32).decode(),
             }
         ),
     )

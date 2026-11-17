@@ -62,7 +62,9 @@ class MemoryStreams:
     def xautoclaim(self, *_args: object, **_kwargs: object) -> tuple[str, list[object], list[str]]:
         return "0-0", [], []
 
-    def xreadgroup(self, _group: str, _consumer: str, streams: dict[str, str], **_kwargs: object) -> list[object]:
+    def xreadgroup(
+        self, _group: str, _consumer: str, streams: dict[str, str], **_kwargs: object
+    ) -> list[object]:
         stream = next(iter(streams))
         entries = []
         for entry_id, fields in self.streams.get(stream, []):
@@ -110,7 +112,9 @@ def test_queue_url_requires_named_acl_and_tls_in_production():
         redis_url({**base, "RUNNER_REDIS_URL": "rediss://default:secret@redis.test/0"})
     with pytest.raises(ValueError, match="runner_redis_tls_required"):
         redis_url({**base, "RUNNER_REDIS_URL": "redis://worker:secret@redis.test/0"})
-    assert redis_url({**base, "RUNNER_REDIS_URL": "rediss://queue_worker:secret@redis.test/0"}).startswith("rediss://")
+    assert redis_url(
+        {**base, "RUNNER_REDIS_URL": "rediss://queue_worker:secret@redis.test/0"}
+    ).startswith("rediss://")
     assert [retry_delay(value) for value in (0, 1, 2, 9)] == [1, 2, 4, 256]
 
 
@@ -168,8 +172,14 @@ def test_dispatch_retries_redis_failures_and_exhausts_invalid_outbox(clients):
     with factory() as db:
         failed_row = db.get(OutboxMessage, failed.id)
         invalid_row = db.get(OutboxMessage, invalid_id)
-        assert failed_row is not None and failed_row.status == "pending" and failed_row.attempts == 1
-        assert invalid_row is not None and invalid_row.status == "exhausted" and invalid_row.attempts == 1
+        assert (
+            failed_row is not None and failed_row.status == "pending" and failed_row.attempts == 1
+        )
+        assert (
+            invalid_row is not None
+            and invalid_row.status == "exhausted"
+            and invalid_row.attempts == 1
+        )
 
 
 def test_invalid_stream_message_dead_letters_metadata_only(clients):
@@ -199,7 +209,10 @@ def test_admin_queue_metrics_fail_closed_and_never_expose_payload(clients, monke
     assert student.get("/v1/admin/runner-queue/outbox-metrics").status_code == 403
     headers = login(admin, "admin")
     unavailable = admin.get("/v1/admin/runner-queue/outbox-metrics", headers=headers)
-    assert unavailable.status_code == 503 and unavailable.json()["error"]["code"] == "runner_queue_unavailable"
+    assert (
+        unavailable.status_code == 503
+        and unavailable.json()["error"]["code"] == "runner_queue_unavailable"
+    )
 
     memory = MemoryStreams()
     monkeypatch.setattr(routes, "redis_client", lambda: memory)

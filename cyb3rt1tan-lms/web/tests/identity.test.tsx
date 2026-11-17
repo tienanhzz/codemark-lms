@@ -64,7 +64,7 @@ describe('Identity UI behavior in a simulated DOM, without browser automation or
     const user = userEvent.setup();
     render(<Workspace initialView="login" />);
     await screen.findByRole('button', { name: /^Sign in$/ });
-    await user.type(screen.getByLabelText('Student ID / username'), 'test.admin');
+    await user.type(screen.getByLabelText('Student ID / Gmail / username'), 'test.admin');
     await user.type(screen.getByLabelText(/^Password$/), 'Test-only password!');
     await user.click(screen.getByText('Multi-factor authentication'));
     await user.type(screen.getByLabelText('6-digit authenticator code'), '123456');

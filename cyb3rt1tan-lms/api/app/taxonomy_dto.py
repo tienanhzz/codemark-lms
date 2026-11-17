@@ -19,11 +19,13 @@ def stable_id(value: str) -> str:
 
 def localized_names(value: dict[str, str]) -> dict[str, str]:
     names = {key: name.strip() for key, name in value.items()}
-    if not names or len(names) > 10 or any(
-        not re.fullmatch(r"[a-z]{2}(?:-[A-Z]{2})?", key)
-        or not name
-        or len(name) > 160
-        for key, name in names.items()
+    if (
+        not names
+        or len(names) > 10
+        or any(
+            not re.fullmatch(r"[a-z]{2}(?:-[A-Z]{2})?", key) or not name or len(name) > 160
+            for key, name in names.items()
+        )
     ):
         raise ValueError("Provide nonempty localized names")
     return names
@@ -103,7 +105,9 @@ class TaxonomySeedTag(TaxonomySeedCategory):
 
     @field_validator("appliesTo")
     @classmethod
-    def unique_scopes(cls, values: list[Literal["lesson", "question"]]) -> list[Literal["lesson", "question"]]:
+    def unique_scopes(
+        cls, values: list[Literal["lesson", "question"]]
+    ) -> list[Literal["lesson", "question"]]:
         if len(values) != len(set(values)):
             raise ValueError("Duplicate taxonomy scope")
         return values

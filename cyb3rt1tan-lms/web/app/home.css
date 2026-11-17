@@ -28,21 +28,23 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border-radius: 24px;
-  border: 1px solid #164e634d;
+  width: 100%;
+  min-width: 0;
   background: #061322;
-  box-shadow: 0 18px 50px -24px #082f498c;
 }
 .home-carousel-screen {
   position: relative;
-  height: 320px;
+  height: calc(100vh - var(--home-header-height, 0px));
+  height: calc(100svh - var(--home-header-height, 0px));
 }
 .home-carousel-slide {
   position: absolute;
   inset: 0;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 1s ease-in-out;
+}
+.home-carousel .home-carousel-slide {
+  transition: opacity 0.8s ease-in-out !important;
 }
 .home-carousel-slide.is-active {
   opacity: 1;
@@ -51,68 +53,6 @@
   display: block;
   width: 100%;
   height: 100%;
-}
-.home-carousel-controls {
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  padding: 32px 12px 12px;
-  background: linear-gradient(0deg, #061322e6, transparent);
-}
-.home-carousel-arrows {
-  display: flex;
-  gap: 6px;
-}
-.home-carousel .home-carousel-control {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  border: 1px solid #ffffff26;
-  color: #cffafe;
-  background: #0b2036cc;
-  backdrop-filter: blur(4px);
-  font-size: 14px;
-  transition: background 0.2s;
-}
-.home-carousel .home-carousel-control:hover {
-  background: #ffffff1a;
-}
-.home-carousel button:focus-visible {
-  outline: 2px solid #99f6e4;
-  outline-offset: 2px;
-}
-.home-carousel-dots {
-  display: flex;
-  align-items: center;
-}
-.home-carousel-dots button {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 40px;
-  border-radius: 50%;
-  background: transparent;
-}
-.home-carousel-dots span {
-  display: block;
-  width: 6px;
-  height: 6px;
-  border-radius: 10px;
-  background: #ffffff59;
-  transition:
-    width 0.5s,
-    background 0.5s;
-}
-.home-carousel-dots [aria-current='true'] span {
-  width: 20px;
-  background: #a5f3fc;
 }
 .home-quicklinks {
   display: grid;
@@ -441,8 +381,8 @@
 .learning-motion-satellite {
   transform-origin: 500px 270px;
 }
-.learning-motion[data-paused='true'] svg *,
-.learning-motion [data-paused='true'] svg * {
+.home-carousel.learning-motion[data-paused='true'] svg *,
+.home-carousel.learning-motion .home-carousel-slide[data-paused='true'] svg * {
   animation-play-state: paused !important;
 }
 
@@ -452,7 +392,7 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-12px);
+    transform: translateY(-22px);
   }
 }
 @keyframes learning-orbit {
@@ -487,58 +427,41 @@
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .learning-motion-float {
-    animation: learning-float 6s ease-in-out infinite;
-  }
-  .learning-motion-float-delayed {
-    animation-delay: -2s;
-    animation-duration: 7s;
-  }
-  .learning-motion-float-slow {
-    animation-delay: -4s;
-    animation-duration: 8s;
-  }
-  .learning-motion-monitor {
-    animation: learning-float 9s ease-in-out infinite;
-  }
-  .learning-motion-orbit {
-    animation: learning-orbit 18s linear infinite;
-  }
-  .learning-motion-satellite {
-    animation: learning-satellite 36s linear infinite;
-  }
-  .learning-motion-beacon {
-    animation: learning-beacon 8s ease-in-out infinite;
-  }
-  .learning-motion-stars {
-    animation: learning-beacon 6s ease-in-out infinite;
-  }
-  .learning-motion-signal {
-    animation: learning-signal 6s linear infinite;
-  }
-  .learning-motion-network {
-    animation: learning-network 8s linear infinite;
-  }
+/* The homepage explicitly requests continuous artwork; keep this override scoped
+ here so the account's motion preference still applies to the rest of the app. */
+.home-carousel.learning-motion .learning-motion-float {
+  animation: learning-float 4s ease-in-out infinite !important;
 }
-@media (prefers-reduced-motion: reduce) {
-  .home-carousel-slide,
-  .home-carousel button span {
-    transition: none !important;
-  }
+.home-carousel.learning-motion .learning-motion-float-delayed {
+  animation-delay: -2s !important;
+  animation-duration: 5s !important;
+}
+.home-carousel.learning-motion .learning-motion-float-slow {
+  animation-delay: -4s !important;
+  animation-duration: 6s !important;
+}
+.home-carousel.learning-motion .learning-motion-monitor {
+  animation: learning-float 6s ease-in-out infinite !important;
+}
+.home-carousel.learning-motion .learning-motion-orbit {
+  animation: learning-orbit 10s linear infinite !important;
+}
+.home-carousel.learning-motion .learning-motion-satellite {
+  animation: learning-satellite 24s linear infinite !important;
+}
+.home-carousel.learning-motion .learning-motion-beacon {
+  animation: learning-beacon 8s ease-in-out infinite !important;
+}
+.home-carousel.learning-motion .learning-motion-stars {
+  animation: learning-beacon 6s ease-in-out infinite !important;
+}
+.home-carousel.learning-motion .learning-motion-signal {
+  animation: learning-signal 3s linear infinite !important;
+}
+.home-carousel.learning-motion .learning-motion-network {
+  animation: learning-network 4s linear infinite !important;
 }
 @media (min-width: 640px) {
-  .home-carousel-screen {
-    aspect-ratio: 50 / 27;
-    height: auto;
-    min-height: 360px;
-  }
-  .home-carousel-controls {
-    padding: 32px 20px 20px;
-  }
-  .home-carousel-dots button {
-    width: 40px;
-  }
   .home-quicklinks {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -560,13 +483,4 @@
   .home-quicklinks > a > i {
     padding: 10px;
   }
-}
-
-.home-carousel-screen {
-  aspect-ratio: 16 / 9;
-  height: auto;
-  min-height: 0;
-}
-.home-carousel-slide img {
-  object-fit: cover;
 }

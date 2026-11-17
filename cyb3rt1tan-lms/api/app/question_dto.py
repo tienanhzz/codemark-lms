@@ -42,9 +42,12 @@ class QuestionDraft(BaseModel):
 
     _category = field_validator("categoryId")(stable_id)
     _tags = field_validator("tagIds")(
-        lambda values: values
-        if len(values) == len(set(values)) and all(stable_id(value) == value for value in values)
-        else (_ for _ in ()).throw(ValueError("Tags must be unique stable IDs"))
+        lambda values: (
+            values
+            if len(values) == len(set(values))
+            and all(stable_id(value) == value for value in values)
+            else (_ for _ in ()).throw(ValueError("Tags must be unique stable IDs"))
+        )
     )
 
     @field_validator("language")
@@ -67,6 +70,7 @@ class QuestionDraft(BaseModel):
         if value is not None and len(json.dumps(value, ensure_ascii=False)) > 100_000:
             raise ValueError("Question configuration exceeds 100 KB")
         return value
+
 
 class RuntimeProfileDraft(BaseModel):
     model_config = ConfigDict(extra="forbid")
