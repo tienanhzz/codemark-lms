@@ -150,7 +150,7 @@ with httpx.Client(base_url='http://127.0.0.1:3100', timeout=20) as client:
     assert client.post('/v1/admin/csv-imports/' + import_id + '/commit', headers=csv_headers, content=enrollment_csv).status_code == 200
     with httpx.Client(base_url='http://127.0.0.1:3100',timeout=20) as student:
         assert student.post('/v1/auth/login', headers={'Origin':'http://127.0.0.1:3100'},
-            json={'username':'qa.student','password':'Build01-test-workspace-only!'}).status_code == 200
+            json={'username':'qa-student-001','password':'Build01-test-workspace-only!'}).status_code == 200
         assert student.get(path).status_code == 404
         assert client.post(path + '/activate', headers=headers,
                             json={'reason':'QA HTTP visibility check'}).status_code == 200

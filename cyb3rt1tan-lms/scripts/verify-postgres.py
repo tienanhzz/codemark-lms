@@ -38,6 +38,7 @@ with SessionLocal.begin() as db:
         db.add(User(username=name, official_name={'qa.admin': 'Workspace Administrator',
                     'qa.teacher': 'Minh Nguyen', 'qa.student': 'An Tran'}[name],
                     email=name + '@example.test', roles=roles,
+                    institutional_id='qa-student-001' if name == 'qa.student' else None,
                     password_hash=passwords.hash('Build01-test-workspace-only!')))
     db.add(AuditEvent(action='integration_verified', request_id=str(uuid.uuid4()), detail={}))
 

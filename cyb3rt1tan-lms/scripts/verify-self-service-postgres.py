@@ -31,12 +31,13 @@ from app.security import digest, passwords
 
 origin = {"Origin": "http://127.0.0.1:3100"}
 username = "qa.selfservice." + uuid.uuid4().hex[:12]
+student_code = "SELF-" + uuid.uuid4().hex[:12]
 email = username + "@example.test"
 password = "Isolated PostgreSQL fixture password only!"
 new_password = "Different PostgreSQL fixture password only!"
 with SessionLocal.begin() as db:
     user = User(username=username, email=email, official_name="Disposable self-service user",
-                roles=["student"], password_hash=passwords.hash(password))
+                institutional_id=student_code, roles=["student"], password_hash=passwords.hash(password))
     db.add(user)
     db.flush()
     user_id = user.id
@@ -46,7 +47,7 @@ with patch("app.mail.configured", return_value=True), patch(
     "app.mail.deliver_password_reset", side_effect=lambda recipient, token: captured.append((recipient, token))
 ), TestClient(app) as client:
     assert client.post("/v1/auth/login", headers=origin,
-                       json={"username": username, "password": password}).status_code == 200
+                       json={"username": student_code, "password": password}).status_code == 200
     headers = {**origin, "X-CSRF-Token": client.cookies["lms_csrf"]}
     profile = client.get("/v1/me/profile").json()
     body = {"expectedRevision": profile["revision"], "nickname": "Learner-" + uuid.uuid4().hex[:8],
@@ -77,7 +78,7 @@ with patch("app.mail.configured", return_value=True), patch(
     assert results == [204, 400], results
     assert client.get("/v1/me").status_code == 401
     assert client.post("/v1/auth/login", headers=origin,
-                       json={"username": username, "password": new_password}).status_code == 200
+                       json={"username": student_code, "password": new_password}).status_code == 200
     headers["X-CSRF-Token"] = client.cookies["lms_csrf"]
     session_id = client.get("/v1/me/sessions").json()["items"][0]["id"]
     assert client.post("/v1/me/sessions/" + session_id + "/revoke", headers=headers,

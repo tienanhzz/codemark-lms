@@ -34,7 +34,7 @@ with SessionLocal.begin() as db:
     db.add(term)
     people = []
     for role in ["teacher", "student", "administrativeAssistant"]:
-        user = User(username="qa.media." + role.lower() + suffix, email=role.lower() + suffix + "@example.test", official_name="QA " + role, roles=[role], password_hash=passwords.hash(password))
+        user = User(username="qa.media." + role.lower() + suffix, email=role.lower() + suffix + "@example.test", official_name="QA " + role, roles=[role], institutional_id="MEDIA-" + suffix if role == "student" else None, password_hash=passwords.hash(password))
         db.add(user); people.append(user)
     db.flush()
     teacher, student, assistant = people
@@ -45,7 +45,7 @@ with SessionLocal.begin() as db:
     db.add(CourseMembership(course_id=course.id, user_id=student.id, status="active"))
     db.add(UserProfile(user_id=teacher.id, academic_title="Dr", phone="private-phone", contact_email="private@example.test", about="Private biography", show_email_in_courses=False))
     teacher_id, student_id, course_id, hidden_id = teacher.id, student.id, course.id, hidden.id
-    names = [person.username for person in people]
+    names = [person.institutional_id if "student" in person.roles else person.username for person in people]
 
 buffer = io.BytesIO(); info = PngImagePlugin.PngInfo(); info.add_text("Comment", "Private camera metadata")
 Image.new("RGB", (512, 512), "navy").save(buffer, format="PNG", pnginfo=info)

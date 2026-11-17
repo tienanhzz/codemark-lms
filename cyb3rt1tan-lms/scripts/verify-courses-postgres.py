@@ -72,7 +72,7 @@ class MemoryStreams:
 origin = {'Origin':'http://127.0.0.1:3100'}
 password = 'Build01-test-workspace-only!'
 with TestClient(app) as admin, TestClient(app) as student, TestClient(app) as teacher:
-    for client, name in [(admin,'qa.admin'),(student,'qa.student'),(teacher,'qa.teacher')]:
+    for client, name in [(admin,'qa.admin'),(student,'qa-student-001'),(teacher,'qa.teacher')]:
         assert client.post('/v1/auth/login', headers=origin, json={'username':name,'password':password}).status_code == 200
     headers = {**origin,'X-CSRF-Token':admin.cookies['lms_csrf']}
     student_id = student.get('/v1/me').json()['id']
