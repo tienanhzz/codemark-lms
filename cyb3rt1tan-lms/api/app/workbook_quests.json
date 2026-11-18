@@ -1,0 +1,218 @@
+[
+  {
+    "target_role": "student",
+    "quest_code": "STU_LOGIN_DAILY",
+    "category": "Chuyên cần",
+    "quest_name": "Điểm danh hằng ngày",
+    "condition_desc": "Đăng nhập hệ thống và bấm xác nhận điểm danh",
+    "reset_type": "DAILY",
+    "limit_rule": "Tối đa 1 lần/ngày"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_DOC_VIEW",
+    "category": "Chuyên cần",
+    "quest_name": "Đọc/Tải tài liệu bài giảng",
+    "condition_desc": "Mở xem trực tuyến hoặc tải slide/PDF mới",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/tài liệu, mở tối thiểu 30 giây"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_STREAK_7D",
+    "category": "Chuyên cần",
+    "quest_name": "Chuỗi học tập 7 ngày",
+    "condition_desc": "Đăng nhập và có ít nhất 1 hoạt động mỗi ngày suốt 7 ngày",
+    "reset_type": "WEEKLY",
+    "limit_rule": "Tối đa 1 lần/tuần"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_QUIZ_PASS",
+    "category": "Học thuật",
+    "quest_name": "Hoàn thành Quiz luyện tập",
+    "condition_desc": "Hoàn thành trắc nghiệm chương và đạt từ 70% câu đúng trở lên",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/bài Quiz"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_ASSIGN_ONTIME",
+    "category": "Học thuật",
+    "quest_name": "Nộp bài tập đúng hạn",
+    "condition_desc": "Nộp bài tập hoặc bài Lab trước thời điểm đóng cổng",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/bài tập"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_ASSIGN_EARLY",
+    "category": "Học thuật",
+    "quest_name": "Chiến thần Deadline",
+    "condition_desc": "Nộp bài tập hoặc đồ án trước deadline tối thiểu 24 giờ",
+    "reset_type": "UPGRADE_TIER",
+    "limit_rule": "Thay thế mức nộp đúng hạn, không cộng dồn"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_PERFECT_SCORE",
+    "category": "Học thuật",
+    "quest_name": "Chinh phục điểm tối đa",
+    "condition_desc": "Đạt điểm tuyệt đối 10/10 ở bài kiểm tra hoặc đồ án",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/đầu điểm lớn"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_FORUM_ASK",
+    "category": "Cộng đồng",
+    "quest_name": "Đặt câu hỏi thảo luận",
+    "condition_desc": "Tạo chủ đề hỏi đáp mới trên diễn đàn môn học",
+    "reset_type": "DAILY",
+    "limit_rule": "Tối thiểu 50 ký tự, tối đa 2 câu/ngày"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_FORUM_REPLY",
+    "category": "Cộng đồng",
+    "quest_name": "Giải đáp thắc mắc bạn học",
+    "condition_desc": "Bình luận hỗ trợ câu hỏi của sinh viên khác",
+    "reset_type": "DAILY",
+    "limit_rule": "Tối thiểu 80 ký tự, tối đa 3 lần/ngày"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_PEER_REVIEW",
+    "category": "Cộng đồng",
+    "quest_name": "Đánh giá chéo (Peer-Review)",
+    "condition_desc": "Chấm điểm và viết góp ý bài làm của bạn theo rubric",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "Tối thiểu 100 ký tự, 1 lần/bài được giao"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_BEST_ANSWER",
+    "category": "Cộng đồng",
+    "quest_name": "Lời giải vàng (Best Answer)",
+    "condition_desc": "Câu trả lời được giảng viên hoặc chủ topic ghim hữu ích nhất",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/topic thảo luận"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_MILESTONE_DRAFT",
+    "category": "Cột mốc",
+    "quest_name": "Nộp đề cương / Bản nháp",
+    "condition_desc": "Hoàn thành checkpoint tiến độ đồ án nhóm đúng lịch hẹn",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/mốc kiểm tra"
+  },
+  {
+    "target_role": "student",
+    "quest_code": "STU_MODULE_100",
+    "category": "Cột mốc",
+    "quest_name": "Hoàn thành 100% chương học",
+    "condition_desc": "Xem hết tài liệu và nộp đủ bài tập của một chương",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/chương học"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_DOC_UPLOAD",
+    "category": "Học liệu",
+    "quest_name": "Cập nhật tài liệu bài giảng",
+    "condition_desc": "Đăng tải slide bài giảng hoặc giáo trình mới lên khóa học",
+    "reset_type": "WEEKLY",
+    "limit_rule": "Tối đa 2 lần/tuần/môn học"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_CASE_STUDY",
+    "category": "Học liệu",
+    "quest_name": "Bổ sung tài liệu nâng cao",
+    "condition_desc": "Đăng bài đọc mở rộng, code mẫu hoặc tình huống phân tích",
+    "reset_type": "WEEKLY",
+    "limit_rule": "Tối đa 2 lần/tuần/môn học"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_QUIZ_CREATE",
+    "category": "Học liệu",
+    "quest_name": "Thiết kế bài Quiz tương tác",
+    "condition_desc": "Tạo bộ câu hỏi trắc nghiệm ôn tập cho sinh viên",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "Tối thiểu 10 câu hỏi/bộ Quiz"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_GRADE_ONTIME",
+    "category": "Chấm bài",
+    "quest_name": "Chấm điểm toàn lớp đúng hạn",
+    "condition_desc": "Nhập đủ điểm cho 100% bài nộp trong vòng 5 ngày sau deadline",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/đợt bài tập"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_GRADE_FAST",
+    "category": "Chấm bài",
+    "quest_name": "Chấm bài siêu tốc (48h)",
+    "condition_desc": "Công bố điểm cho toàn bộ lớp trong vòng 48 giờ sau deadline",
+    "reset_type": "UPGRADE_TIER",
+    "limit_rule": "Thay thế mức chấm đúng hạn, không cộng dồn"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_DEEP_FEEDBACK",
+    "category": "Chấm bài",
+    "quest_name": "Nhận xét sửa lỗi chi tiết",
+    "condition_desc": "Viết góp ý chuyên sâu hoặc sửa lỗi trực tiếp trên bài sinh viên",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "Tối thiểu 100 ký tự/bài, tính theo đợt"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_PIN_ANSWER",
+    "category": "Tương tác",
+    "quest_name": "Duyệt và ghim Best Answer",
+    "condition_desc": "Xác nhận câu trả lời chuẩn của sinh viên trên diễn đàn",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/topic thảo luận"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_POLL_CREATE",
+    "category": "Tương tác",
+    "quest_name": "Tạo Poll khảo sát nhanh",
+    "condition_desc": "Mở bình chọn hoặc chủ đề thảo luận tình huống trước/trong giờ",
+    "reset_type": "WEEKLY",
+    "limit_rule": "Tối đa 1 lần/tuần/lớp"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_REPLY_24H",
+    "category": "Tương tác",
+    "quest_name": "Phản hồi thắc mắc trong 24h",
+    "condition_desc": "Trả lời câu hỏi của sinh viên trên diễn đàn trong vòng 24 giờ",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/topic câu hỏi"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_CLASS_DISCIPLINE",
+    "category": "Chất lượng",
+    "quest_name": "Lớp học kỷ luật cao",
+    "condition_desc": "Duy trì tỷ lệ trên 85% sinh viên nộp bài đúng hạn ở bài Lab lớn",
+    "reset_type": "PER_ENTITY",
+    "limit_rule": "1 lần/bài Lab hoặc chương lớn"
+  },
+  {
+    "target_role": "teacher",
+    "quest_code": "LEC_TOP_RATING",
+    "category": "Chất lượng",
+    "quest_name": "Giảng viên được yêu thích",
+    "condition_desc": "Đạt điểm đánh giá hài lòng trung bình từ 4.5/5 sao trở lên",
+    "reset_type": "END_OF_TERM",
+    "limit_rule": "1 lần/lớp khi kết thúc học phần"
+  }
+]

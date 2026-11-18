@@ -170,11 +170,19 @@ def replace_resources(
         https_url(item.url)
         if item.kind == "usefulUrl" and not item.url:
             raise HTTPException(422, "resource_url_required")
+    prior_urls = set(
+        db.scalars(select(CourseResource.url).where(CourseResource.course_id == course.id))
+    )
     db.query(CourseResource).filter(CourseResource.course_id == course.id).delete()
     resources = [CourseResource(course_id=course.id, **item.model_dump()) for item in body.items]
     db.add_all(resources)
     touch(course)
     db.flush()
+    from .quests import record_resource_publication
+
+    for resource in resources:
+        if resource.url and resource.url not in prior_urls:
+            record_resource_publication(db, user, resource)
     audit(
         db,
         request,

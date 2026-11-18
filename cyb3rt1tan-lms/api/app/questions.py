@@ -214,6 +214,7 @@ def search_questions(
     response: Response,
     q: str = Query(default="", max_length=200),
     categoryId: str | None = None,
+    includeSubcategories: bool = False,
     tagIds: list[str] | None = None,
     tagMatch: Literal["any", "all"] = "any",
     questionType: str | None = None,
@@ -249,7 +250,19 @@ def search_questions(
             or_(QuestionVersion.title.ilike(pattern), QuestionVersion.prompt.ilike(pattern))
         )
     if categoryId:
-        statement = statement.where(QuestionVersion.category_id == categoryId)
+        category_ids = {categoryId}
+        if includeSubcategories:
+            categories = list(
+                db.scalars(select(TaxonomyCategory).where(TaxonomyCategory.scope == "question"))
+            )
+            pending = [categoryId]
+            while pending:
+                parent_id = pending.pop()
+                for category in categories:
+                    if category.parent_id == parent_id and category.id not in category_ids:
+                        category_ids.add(category.id)
+                        pending.append(category.id)
+        statement = statement.where(QuestionVersion.category_id.in_(category_ids))
     if questionType:
         if questionType not in QUESTION_TYPES:
             raise HTTPException(422, "invalid_question_type")

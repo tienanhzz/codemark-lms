@@ -1,0 +1,42 @@
+.expanded-panel {
+  min-width: 0;
+  width: 100%;
+  scroll-margin-top: 24px;
+}
+.expanded-panel > .panel-heading {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--line);
+  gap: 16px;
+}
+.expanded-panel > .panel-heading h2 {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  scroll-margin-top: 24px;
+}
+.expanded-panel > .panel-heading h2:focus {
+  outline: none;
+}
+.expanded-panel > .panel-heading h2:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.expanded-panel-body {
+  min-width: 0;
+  padding: 24px;
+}
+.expanded-panel-body > :is(.course-form, .identity-form, .course-section, .identity-detail) {
+  padding: 0;
+}
+.expanded-panel-body > .expanded-panel {
+  margin-top: 24px;
+}
+.expanded-panel-body > .preview-notice {
+  margin-bottom: 20px;
+}
+@media (max-width: 600px) {
+  .expanded-panel > .panel-heading,
+  .expanded-panel-body {
+    padding: 16px;
+  }
+}

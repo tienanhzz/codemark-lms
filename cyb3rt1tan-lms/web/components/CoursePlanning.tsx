@@ -15,6 +15,8 @@ import {
 import { Modal, IdentityAlert } from './IdentityShared';
 import { Empty, Field, FormActions } from './CourseShared';
 
+type LessonTag = { id: string; names: Record<string, string>; status: string; selectable?: boolean; applicability?: string[] };
+
 function dayKey(value: string, timezone: string) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: timezone,
@@ -44,6 +46,7 @@ export function CoursePlanning({
   const t = translate(locale),
     path = `/courses/${course.id}`;
   const [entries, setEntries] = useState<PlanEntry[]>([]),
+    [lessonTags, setLessonTags] = useState<LessonTag[]>([]),
     [sessions, setSessions] = useState<TeachingSession[]>([]),
     [error, setError] = useState(''),
     [loading, setLoading] = useState(true),
@@ -75,6 +78,14 @@ export function CoursePlanning({
   useEffect(() => {
     void load();
   }, [course.id, course.revision]);
+  useEffect(() => {
+    if (mode !== 'plan') return;
+    let cancelled = false;
+    void api<{ tags: LessonTag[] }>('/taxonomy').then((result) => {
+      if (!cancelled) setLessonTags(result.tags);
+    }).catch((problem) => { if (!cancelled) setError(courseError(problem, locale)); });
+    return () => { cancelled = true; };
+  }, [mode, course.id, locale]);
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -400,6 +411,18 @@ export function CoursePlanning({
                         />
                       </Field>
                     </div>
+                    <Field label={t('Lesson tags', 'Thẻ bài học')}>
+                      <select multiple value={entry.tagIds || []} onChange={(event) => edit(index, {
+                        tagIds: Array.from(event.target.selectedOptions, (option) => option.value),
+                      })}>
+                        {(entry.tagIds || []).filter((id) => !lessonTags.some((tag) => tag.id === id)).map((id) => (
+                          <option key={id} value={id}>{id} ({t('historical', 'lịch sử')})</option>
+                        ))}
+                        {lessonTags.filter((tag) => (entry.tagIds || []).includes(tag.id) || (
+                          tag.status === 'active' && tag.selectable !== false && (!tag.applicability?.length || tag.applicability.includes('lesson'))
+                        )).map((tag) => <option key={tag.id} value={tag.id}>{tag.names[locale] || tag.names.en || tag.id}</option>)}
+                      </select>
+                    </Field>
                     <Field label={t('Content', 'Nội dung')}>
                       <textarea
                         maxLength={5000}

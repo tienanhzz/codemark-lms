@@ -494,7 +494,7 @@ export function CourseWorkspace({
         </>
       )}
       {mode && (
-        <Modal title={titles[mode]} onClose={() => setMode(null)} locked={busy}>
+        <Modal presentation={mode === 'create' || mode === 'edit' ? 'inline' : 'dialog'} title={titles[mode]} onClose={() => setMode(null)} locked={busy}>
           <form className="course-form" onSubmit={save}>
             <IdentityAlert text={error} />
             {error && selected && (

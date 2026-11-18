@@ -155,9 +155,19 @@ class PlanEntry(Input):
     content: LongText = ""
     reading: LongText = ""
     lessonVersionId: str | None = Field(default=None, max_length=64)
+    tagIds: list[Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9-]{0,127}$")]] = Field(
+        default_factory=list, max_length=50
+    )
     outcomes: list[Text] = Field(default_factory=list, max_length=50)
     estimatedHours: float = Field(default=0, ge=0, le=10000)
     position: int = Field(ge=1, le=500)
+
+    @field_validator("tagIds")
+    @classmethod
+    def unique_tags(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("Duplicate lesson tag IDs")
+        return values
 
 
 class Plan(Input):

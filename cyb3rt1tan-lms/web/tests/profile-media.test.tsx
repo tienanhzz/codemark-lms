@@ -53,7 +53,7 @@ describe('Protected profiles and images in simulated DOM, without browser/networ
     const user = userEvent.setup();
     render(<ProfileSupportPanel locale="en" />);
     await user.click(await screen.findByRole('button', { name: 'Open profile' }));
-    const modal = screen.getByRole('dialog', { name: 'Student Name' });
+    const modal = screen.getByRole('region', { name: 'Student Name' });
     expect(within(modal).queryByLabelText('Contact email (optional)')).toBeNull();
     await user.type(
       within(modal).getByLabelText('Reason for accessing or changing this profile'),
@@ -86,7 +86,7 @@ describe('Protected profiles and images in simulated DOM, without browser/networ
     const user = userEvent.setup();
     render(<ProfileSupportPanel locale="en" />);
     await user.click(await screen.findByRole('button', { name: 'Open profile' }));
-    const modal = screen.getByRole('dialog');
+    const modal = screen.getByRole('region', { name: 'Student Name' });
     await user.type(
       within(modal).getByLabelText('Reason for accessing or changing this profile'),
       'Review request',

@@ -27,6 +27,7 @@ import { AuditWorkspace } from './AuditWorkspace';
 import { WalletWorkspace } from './WalletWorkspace';
 import { RanksWorkspace } from './RanksWorkspace';
 import { MissionsWorkspace } from './MissionsWorkspace';
+import { CommunityWorkspace } from './CommunityWorkspace';
 import { AchievementsWorkspace } from './AchievementsWorkspace';
 import { ShopWorkspace } from './ShopWorkspace';
 import { MarketplaceWorkspace } from './MarketplaceWorkspace';
@@ -475,7 +476,6 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
           <div className="login-form">
 <img className="legacy-login-logo" src="/branding/legacy-logo.png" alt="CodeMark" width={1156} height={359} />
             <h1>{locale === 'vi' ? 'Chào mừng trở lại' : 'Welcome back'}</h1>
-            <p className="muted">{locale === 'vi' ? 'Sinh viên dùng mã sinh viên. Giảng viên dùng Gmail đã đăng ký và mật khẩu tài khoản CodeMark. Admin dùng tên đăng nhập.' : 'Students use their student ID. Teachers use their registered Gmail address and CodeMark password. Administrators use their username.'}</p>
             {banners}
             {setupToken ? (
               <MfaEnrollment
@@ -687,7 +687,7 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
                     >
                       <Icon name={item.icon} />
                       <span>{t(item.label)}</span>
-                      {previewPage(item.id) && !['leaderboard', 'calendar'].includes(item.id) && (
+                      {previewPage(item.id) && !['leaderboard', 'calendar', 'missions', 'community'].includes(item.id) && (
                         <small className="preview-nav-tag">
                           {copy(locale, ['Preview', 'Xem trước'])}
                         </small>
@@ -752,7 +752,7 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
               <h1>
                 {initialView && initialView !== 'dashboard'
                   ? previewPage(initialView)
-                    ? (['leaderboard', 'calendar'].includes(initialView) ? t(selected.label) : copy(locale, previewPage(initialView)!.intro))
+                    ? (['leaderboard', 'calendar', 'missions', 'community'].includes(initialView) ? t(selected.label) : copy(locale, previewPage(initialView)!.intro))
                     : t(selected.label)
                   : `${t('greeting')}, ${user.officialName.split(' ').slice(-1)[0]}`}
                 <span className="heading-dot">.</span>
@@ -1024,7 +1024,8 @@ export function Workspace({ initialView = '' }: { initialView?: string }) {
           )}
           {initialView === 'branding' && (admin ? <BrandingWorkspace locale={locale} /> : <div className="alert alert-error">{identityMessages[locale].forbidden}</div>)}
           {initialView === 'notifications' && <NotificationsWorkspace locale={locale} roles={user.roles} />}
-          {previewPage(initialView) && !['calendar', 'leaderboard', 'taxonomy', 'question-bank', 'runtime-profiles', 'assessment-builder', 'grading', 'attendance', 'student-overview', 'reports', 'audit-retention', 'wallet', 'ranks', 'missions', 'achievements', 'shop', 'inventory', 'marketplace', 'staff-events', 'clans', 'branding', 'notifications', ...(user.roles.includes('student') ? ['assessments', 'practice'] : [])].includes(initialView) && (
+          {initialView === 'community' && <CommunityWorkspace locale={locale} roles={user.roles} />}
+          {previewPage(initialView) && !['community', 'calendar', 'leaderboard', 'taxonomy', 'question-bank', 'runtime-profiles', 'assessment-builder', 'grading', 'attendance', 'student-overview', 'reports', 'audit-retention', 'wallet', 'ranks', 'missions', 'achievements', 'shop', 'inventory', 'marketplace', 'staff-events', 'clans', 'branding', 'notifications', ...(user.roles.includes('student') ? ['assessments', 'practice'] : [])].includes(initialView) && (
             <WorkspacePreview page={previewPage(initialView)!} locale={locale} roles={user.roles} />
           )}
           {initialView === 'courses' && (

@@ -154,6 +154,10 @@ def record_domain_event(
     """Apply one event emitted by a trusted domain handler; clients never call this route."""
     if event_key not in EVENT_KEYS:
         return
+    if event_key == "assessment.submitted":
+        from .quests import record_assessment_submission
+
+        record_assessment_submission(db, user, event_id)
     metric_receipt = db.scalar(
         select(RankTaskMetricReceipt.id).where(
             RankTaskMetricReceipt.user_id == user.id,

@@ -43,7 +43,7 @@ describe('Weekly timetable', () => {
     expect(event.style.top).toBe('128px');
     expect(event.style.height).toBe('156px');
     fireEvent.click(event);
-    const details = screen.getByRole('dialog', { name: 'Session details' });
+    const details = screen.getByRole('region', { name: 'Session details' });
     expect(within(details).getByText('Introduction to computing')).toBeTruthy();
     expect(within(details).getByText('A201')).toBeTruthy();
     expect(details.textContent).toContain('08:00');
@@ -124,7 +124,7 @@ describe('Weekly timetable', () => {
     render(<WeeklyTimetable locale="en" timeZone="America/New_York" />);
     const event = await screen.findByRole('button', { name: /01:45.*01:15/ });
     fireEvent.click(event);
-    const details = screen.getByRole('dialog', { name: 'Session details' });
+    const details = screen.getByRole('region', { name: 'Session details' });
     expect(details.textContent).toContain('01:45 GMT-4');
     expect(details.textContent).toContain('01:15 GMT-5');
   });
@@ -151,7 +151,7 @@ describe('Weekly timetable', () => {
     const first = within(sunday).getByRole('button', { name: /First midnight.*00:15.*00:45/ });
     expect(within(sunday).getByRole('button', { name: /Repeated midnight.*00:15.*00:45/ })).toBeTruthy();
     fireEvent.click(first);
-    expect(screen.getByRole('dialog', { name: 'Session details' }).textContent).toContain('00:15 GMT-4');
+    expect(screen.getByRole('region', { name: 'Session details' }).textContent).toContain('00:15 GMT-4');
   });
 
   it('starts a skipped-midnight day at its first valid clock time without inventing midnight', async () => {

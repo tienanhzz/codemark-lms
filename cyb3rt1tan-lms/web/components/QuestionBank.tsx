@@ -66,6 +66,7 @@ export function QuestionBank({ locale, roles }: { locale: Locale; roles: string[
     [items, setItems] = useState<QuestionRow[]>([]),
     [query, setQuery] = useState(''),
     [categoryId, setCategoryId] = useState(''),
+    [includeSubcategories, setIncludeSubcategories] = useState(false),
     [difficulty, setDifficulty] = useState(''),
     [questionType, setQuestionType] = useState(''),
     [selectedTags, setSelectedTags] = useState<string[]>([]),
@@ -100,6 +101,7 @@ export function QuestionBank({ locale, roles }: { locale: Locale; roles: string[
       const params = new URLSearchParams({ page: String(nextPage), pageSize: '20', tagMatch });
       if (query.trim()) params.set('q', query.trim());
       if (categoryId) params.set('categoryId', categoryId);
+      if (categoryId && includeSubcategories) params.set('includeSubcategories', 'true');
       if (difficulty) params.set('difficulty', difficulty);
       if (questionType) params.set('questionType', questionType);
       for (const tag of selectedTags) params.append('tagIds', tag);
@@ -110,7 +112,7 @@ export function QuestionBank({ locale, roles }: { locale: Locale; roles: string[
       setError('');
     } catch (problem) { setError(courseError(problem, locale)); }
     finally { setLoading(false); }
-  }, [courseId, query, categoryId, difficulty, questionType, selectedTags, tagMatch, locale]);
+  }, [courseId, query, categoryId, includeSubcategories, difficulty, questionType, selectedTags, tagMatch, locale]);
 
   useEffect(() => { void loadCourses(); }, []);
   useEffect(() => {
@@ -218,6 +220,7 @@ export function QuestionBank({ locale, roles }: { locale: Locale; roles: string[
         </div>
         <div className="course-form-grid question-filter-grid">
           <Field label={t('Category', 'Danh mục')}><select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}><option value="">{t('All categories', 'Tất cả danh mục')}</option>{taxonomy?.categories.filter((node) => node.status === 'active').map((node) => <option key={node.id} value={node.id}>{node.names[locale] || node.names.en || node.id}</option>)}</select></Field>
+          <label><input type="checkbox" checked={includeSubcategories} disabled={!categoryId} onChange={(event) => setIncludeSubcategories(event.target.checked)} /> {t('Include subcategories', 'Bao gồm danh mục con')}</label>
           <Field label={t('Question type', 'Loại câu hỏi')}><select value={questionType} onChange={(event) => setQuestionType(event.target.value)}><option value="">{t('All types', 'Tất cả loại')}</option>{typeOptions.map(([value, en, vi]) => <option key={value} value={value}>{locale === 'vi' ? vi : en}</option>)}</select></Field>
           <Field label={t('Difficulty', 'Độ khó')}><select value={difficulty} onChange={(event) => setDifficulty(event.target.value)}><option value="">{t('All levels', 'Tất cả mức')}</option>{['newbie', 'noob', 'wannabe', 'gatekeeper', 'legendary'].map((value, index) => <option key={value} value={value}>{index + 1} · {value}</option>)}</select></Field>
           <Field label={t('Match selected tags', 'Khớp thẻ đã chọn')}><select value={tagMatch} onChange={(event) => setTagMatch(event.target.value as 'any' | 'all')}><option value="any">{t('Any', 'Bất kỳ')}</option><option value="all">{t('All', 'Tất cả')}</option></select></Field>

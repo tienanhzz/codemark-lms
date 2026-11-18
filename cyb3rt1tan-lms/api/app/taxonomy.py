@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from .auth import DB, Admin, Principal, audit, lock_admin
 from .models import (
+    Course,
     Question,
     QuestionVersion,
     QuestionVersionTag,
@@ -57,6 +58,16 @@ def nodes_json(
     include_counts = "admin" in user.roles
     category_counts: dict[str, int] = {}
     tag_counts: dict[str, int] = {}
+    if include_counts and scope == "content":
+        for plan in db.scalars(select(Course.lesson_plan)):
+            for entry in plan:
+                values = entry.get("tagIds", [])
+                for tag_id in (
+                    {value for value in values if isinstance(value, str)}
+                    if isinstance(values, list)
+                    else set()
+                ):
+                    tag_counts[tag_id] = tag_counts.get(tag_id, 0) + 1
     if include_counts and scope == "question":
         category_counts = dict(
             db.execute(
@@ -133,6 +144,13 @@ def question_taxonomy(
 @router.post("/admin/taxonomy/seed", status_code=201)
 def seed_taxonomies(body: TaxonomySeed, request: Request, db: DB, user: Admin) -> dict[str, object]:
     lock_admin(db, request, user)
+    result = import_catalog(db, body)
+    audit(db, request, "taxonomy_seed_imported", user, result)
+    return result
+
+
+def import_catalog(db: Session, body: TaxonomySeed) -> dict[str, object]:
+    """Shared atomic importer; callers enforce actor authorization and record audit."""
     record = catalog(db)
     if record.version != body.expectedCatalogVersion:
         raise HTTPException(409, "taxonomy_catalog_version_conflict")
@@ -196,17 +214,6 @@ def seed_taxonomies(body: TaxonomySeed, request: Request, db: DB, user: Admin) -
                 )
     record.version += 1
     db.flush()
-    audit(
-        db,
-        request,
-        "taxonomy_seed_imported",
-        user,
-        {
-            "categories": len(category_order),
-            "tags": len(tag_order),
-            "catalogVersion": record.version,
-        },
-    )
     return {
         "catalogVersion": record.version,
         "categories": len(category_order),

@@ -1728,6 +1728,7 @@ class AssessmentVersion(Base):
     duration_minutes: Mapped[int | None] = mapped_column(nullable=True)
     attempt_limit: Mapped[int] = mapped_column(default=1)
     late_penalty: Mapped[list[dict[str, object]]] = mapped_column(JSON, default=list)
+    selection_criteria: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
     question_items: Mapped[list[dict[str, object]]] = mapped_column(JSON, default=list)
     status: Mapped[str] = mapped_column(String(20), default="draft")
     created_by: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"))

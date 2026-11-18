@@ -351,3 +351,152 @@ def test_assignment_writing_grade_late_penalty_and_release_projection(clients):
     projection = student.get(path + "/released-grades")
     assert projection.status_code == 200 and projection.json()["items"][0]["score"] == 2.4
     assert projection.json()["items"][0]["breakdown"][0]["feedback"] == "Good structure."
+
+
+def test_tag_selection_resolves_direct_matches_at_publish_and_keeps_snapshot(clients):
+    from app.models import (
+        Question,
+        QuestionVersion,
+        QuestionVersionTag,
+        TaxonomyCategory,
+        TaxonomyTag,
+    )
+
+    admin, _, factory = clients
+    headers, course, _ = setup_course(admin)
+    path = f"/v1/courses/{course['id']}/assessments"
+    actor_id = admin.get("/v1/me").json()["id"]
+    with factory.begin() as db:
+        db.add(TaxonomyCategory(scope="question", id="tag-test", names={"en": "Test"}))
+        db.add_all(
+            [
+                TaxonomyTag(scope="question", id="topic", names={"en": "Topic"}),
+                TaxonomyTag(scope="question", id="other", names={"en": "Other"}),
+                TaxonomyTag(scope="question", id="child", parent_id="topic", names={"en": "Child"}),
+                TaxonomyTag(
+                    scope="question", id="code-only", names={"en": "Code"}, applicability=["code"]
+                ),
+            ]
+        )
+        db.flush()
+        ids = []
+        for index, tags in enumerate([["topic"], ["topic", "other"], ["child"], ["other"]]):
+            question = Question(course_id=course["id"], created_by=actor_id)
+            db.add(question)
+            db.flush()
+            version = QuestionVersion(
+                question_id=question.id,
+                version=1,
+                question_type="multipleChoice",
+                title=f"Question {index}",
+                prompt="Choose.",
+                category_id="tag-test",
+                difficulty="newbie",
+                usage_types=["practical"],
+                content={
+                    "contentType": "multipleChoice",
+                    "choices": [{"choiceId": "a", "text": "A"}, {"choiceId": "b", "text": "B"}],
+                },
+                authoring_config={"configType": "multipleChoice", "correctChoiceIds": ["a"]},
+                status="published",
+                created_by=actor_id,
+            )
+            db.add(version)
+            db.flush()
+            ids.append(version.id)
+            db.add_all(
+                [QuestionVersionTag(question_version_id=version.id, tag_id=tag) for tag in tags]
+            )
+    body = {
+        "kind": "assignment",
+        "title": "By topic",
+        "timezone": "Asia/Bangkok",
+        "opensAt": "2026-11-17T10:00:00+07:00",
+        "closesAt": "2026-11-18T10:00:00+07:00",
+        "selection": {"mode": "tags", "tagIds": ["topic", "other"], "match": "all"},
+    }
+    draft = admin.post(path, headers=headers, json=body)
+    assert draft.status_code == 201, draft.text
+    assert draft.json()["draft"]["selection"] == body["selection"]
+    assert draft.json()["draft"]["questionItems"] == []
+    assessment_id = draft.json()["id"]
+    any_body = {**body, "selection": {"mode": "tags", "tagIds": ["topic"], "match": "any"}}
+    any_draft = admin.post(path, headers=headers, json=any_body)
+    assert any_draft.status_code == 201
+    any_published = admin.post(path + "/" + any_draft.json()["id"] + "/publish", headers=headers)
+    assert any_published.status_code == 202
+    assert {
+        item["questionVersionId"] for item in any_published.json()["draft"]["questionItems"]
+    } == set(ids[:2])
+    waiting = admin.post(path, headers=headers, json=any_body)
+    assert waiting.status_code == 201
+    # Matching is resolved at publication, after the draft has been saved.
+    with factory.begin() as db:
+        db.add(QuestionVersionTag(question_version_id=ids[0], tag_id="other"))
+    published = admin.post(path + f"/{assessment_id}/publish", headers=headers)
+    assert published.status_code == 202, published.text
+    snapshot = published.json()["draft"]["questionItems"]
+    assert {item["questionVersionId"] for item in snapshot} == set(ids[:2])
+    assert [item["position"] for item in snapshot] == [1, 2]
+    assert all(item["questionId"] for item in snapshot)
+    assert "correctChoiceIds" not in published.text
+    with factory.begin() as db:
+        db.query(QuestionVersionTag).filter_by(tag_id="topic").delete()
+        db.get(TaxonomyTag, ("question", "topic")).status = "retired"
+        old = db.get(QuestionVersion, ids[0])
+        revised = QuestionVersion(
+            **{
+                column.name: getattr(old, column.name)
+                for column in QuestionVersion.__table__.columns
+                if column.name not in {"id", "version", "title"}
+            }
+        )
+        revised.version = 2
+        revised.title = "Changed after publication"
+        db.add(revised)
+        db.get(Question, old.question_id).latest_version = 2
+    stored = next(item for item in admin.get(path).json()["items"] if item["id"] == assessment_id)[
+        "draft"
+    ]["questionItems"]
+    assert stored == snapshot
+    assert (
+        admin.post(path + "/" + waiting.json()["id"] + "/publish", headers=headers).status_code
+        == 422
+    )
+    invalid = admin.post(path, headers=headers, json=body)
+    assert invalid.status_code == 422
+    body["selection"] = {"mode": "tags", "tagIds": ["code-only"], "match": "any"}
+    assert admin.post(path, headers=headers, json=body).status_code == 422
+    body["selection"] = {"mode": "tags", "tagIds": ["other"], "match": "any"}
+    empty = admin.post(path, headers=headers, json=body)
+    assert empty.status_code == 201
+    with factory.begin() as db:
+        db.query(QuestionVersionTag).filter_by(tag_id="other").delete()
+    assert (
+        admin.post(path + "/" + empty.json()["id"] + "/publish", headers=headers).status_code == 422
+    )
+
+
+def test_assessment_selection_payload_rejects_ambiguous_and_empty_criteria():
+    import pytest
+    from pydantic import ValidationError
+
+    from app.assessment_dto import AssessmentDraft
+
+    base = {"kind": "assignment", "title": "Tags", "timezone": "Asia/Bangkok"}
+    for selection in [
+        {"mode": "tags", "tagIds": [], "match": "any"},
+        {"mode": "tags", "tagIds": ["topic", "topic"], "match": "all"},
+        {"mode": "tags", "tagIds": ["topic"], "match": "descendants"},
+        {"mode": "manual"},
+    ]:
+        with pytest.raises(ValidationError):
+            AssessmentDraft.model_validate({**base, "selection": selection})
+    with pytest.raises(ValidationError):
+        AssessmentDraft.model_validate(
+            {
+                **base,
+                "questionVersionIds": ["version"],
+                "selection": {"mode": "tags", "tagIds": ["topic"], "match": "any"},
+            }
+        )

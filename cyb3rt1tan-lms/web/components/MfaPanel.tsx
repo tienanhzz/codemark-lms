@@ -74,7 +74,7 @@ export function MfaEnrollment({
   }
   if (codes.length)
     return (
-      <Modal title={t.recoveryTitle} locked onClose={() => {}}>
+      <Modal presentation="dialog" title={t.recoveryTitle} locked onClose={() => {}}>
         <div className="identity-form">
           <p>{t.recoveryHelp}</p>
           <div className="recovery-grid">

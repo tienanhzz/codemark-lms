@@ -320,6 +320,14 @@ export function WorkspacePreview({
               </p>
             )}
           </div>
+          {review && (
+            <Modal
+              title={copy(locale, ['Sample question workspace', 'Không gian câu hỏi minh họa'])}
+              onClose={() => setReview(false)}
+            >
+              <QuestionPreview locale={locale} />
+            </Modal>
+          )}
         </Modal>
       )}
       {form && (
@@ -378,14 +386,6 @@ export function WorkspacePreview({
               </button>
             </div>
           </form>
-        </Modal>
-      )}
-      {review && (
-        <Modal
-          title={copy(locale, ['Sample question workspace', 'Không gian câu hỏi minh họa'])}
-          onClose={() => setReview(false)}
-        >
-          <QuestionPreview locale={locale} />
         </Modal>
       )}
     </div>

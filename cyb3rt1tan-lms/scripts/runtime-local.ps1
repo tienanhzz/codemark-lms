@@ -29,7 +29,14 @@ foreach ($name in $services) {
     }
     foreach ($listener in $listeners) {
         $ownedProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$($listener.OwningProcess)"
-        if ($ownedProcess.CommandLine -notlike "*$taskRoot\*") {
+        $ownedByWorkspace = $ownedProcess.CommandLine -like "*$taskRoot\*"
+        if (-not $ownedByWorkspace -and $name -eq 'api' -and $ownedProcess.CommandLine -match '-m uvicorn app\.main:socket_app .*--port 8100') {
+            # Windows venv redirectors launch the base Python executable as a child.
+            $launcher = Get-CimInstance Win32_Process -Filter "ProcessId=$($ownedProcess.ParentProcessId)"
+            $expectedLauncher = Join-Path $taskRoot '.venv\Scripts\python.exe'
+            $ownedByWorkspace = $launcher.ExecutablePath -eq $expectedLauncher -and $launcher.CommandLine -match '-m uvicorn app\.main:socket_app .*--port 8100'
+        }
+        if (-not $ownedByWorkspace) {
             throw "Port $port is owned by another application; refusing to change it."
         }
     }
