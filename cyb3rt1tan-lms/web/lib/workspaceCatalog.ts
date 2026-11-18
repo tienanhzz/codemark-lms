@@ -48,6 +48,12 @@ const row = (
 const learning: WorkspaceRole[] = ['student', 'staff', 'admin'];
 export const previewPages: PreviewPage[] = [
   {
+    id: 'community', title: ['Community discussion', 'Thảo luận cộng đồng'],
+    intro: ['Ask, discuss and learn together.', 'Đặt câu hỏi, chia sẻ và cùng nhau học tập.'],
+    group: 'community', roles: learning, icon: 'fa-comments', kind: 'list',
+    columns: [['Topic', 'Chủ đề'], ['Author', 'Tác giả'], ['Status', 'Trạng thái']], rows: [],
+  },
+  {
     id: 'practice',
     title: ['Practice library', 'Thư viện luyện tập'],
     intro: [
@@ -1602,7 +1608,7 @@ export function previewPage(id: string): PreviewPage | undefined {
   return previewPages.find((p) => p.id === id);
 }
 export function canPreview(page: PreviewPage, roles: readonly string[]): boolean {
-  if (page.id === 'notifications' && roles.length > 0) return true;
+  if (['notifications', 'community'].includes(page.id) && roles.length > 0) return true;
   return page.roles.some((role) =>
     role === 'admin'
       ? roles.includes('admin')

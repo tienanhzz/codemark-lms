@@ -2,6 +2,7 @@
 
 from alembic import context
 
+from app import community_models, quest_models  # noqa: F401
 from app.database import migration_engine
 from app.models import Base
 

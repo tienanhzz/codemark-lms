@@ -59,6 +59,7 @@ export type PlanEntry = {
   estimatedHours: number;
   position: number;
   lessonVersionId?: string | null;
+  tagIds?: string[];
 };
 export type TeachingSession = {
   id: string;

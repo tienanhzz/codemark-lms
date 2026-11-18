@@ -68,4 +68,17 @@ describe('realtime recovery and privacy', () => {
     b();
     expect(fake.disconnect).toHaveBeenCalledOnce();
   });
+
+  it('accepts server outbox invalidations and ignores duplicate deliveries', async () => {
+    const { subscribeRealtime } = await import('../lib/realtime');
+    const onChange = vi.fn();
+    const stop = subscribeRealtime({ onChange, onStatus: vi.fn() });
+    const emit = fake.handlers.get('state.changed')!;
+    const event = { eventId: '00000000-0000-4000-8000-000000000002', action: 'course.updated', requestId: 'request-one' };
+    emit({ ...event, studentEmail: 'private@example.invalid' });
+    emit(event);
+    emit(event);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    stop();
+  });
 });

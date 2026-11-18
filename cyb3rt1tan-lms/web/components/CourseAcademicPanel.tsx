@@ -183,7 +183,7 @@ export function CourseAcademicPanel({ course, locale, onChange }: { course: Cour
           <FormActions locale={locale} busy={busy} onClose={() => setSchemeDraft(false)} />
         </form>
       </Modal>}
-      {publishId && <Modal title={t('Publish grade scheme', 'Công bố cơ cấu đánh giá')} locked={busy} onClose={() => setPublishId(null)}>
+      {publishId && <Modal presentation="dialog" title={t('Publish grade scheme', 'Công bố cơ cấu đánh giá')} locked={busy} onClose={() => setPublishId(null)}>
         <IdentityAlert text={error} />
         <p>{t('This immutable version becomes the course grade scheme. Verify the weights total 100%.', 'Phiên bản bất biến này sẽ được áp dụng cho khóa học. Kiểm tra tổng trọng số bằng 100%.')}</p>
         <div className="modal-actions">

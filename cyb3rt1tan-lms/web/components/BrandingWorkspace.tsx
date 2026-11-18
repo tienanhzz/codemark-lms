@@ -15,6 +15,8 @@ type LogoVersion = {
 
 export function BrandingWorkspace({ locale }: { locale: Locale }) {
   const [versions, setVersions] = useState<LogoVersion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [source, setSource] = useState<File | null>(null);
   const [zoom, setZoom] = useState(1);
   const [offsetX, setOffsetX] = useState(0);
@@ -27,12 +29,14 @@ export function BrandingWorkspace({ locale }: { locale: Locale }) {
   const activeVersion = versions.find((version) => version.isActive);
 
   const refresh = useCallback(async () => {
+    setLoading(true); setLoadFailed(false); setError('');
     try {
       const result = await api<{ items: LogoVersion[] }>('/admin/branding/logos');
       setVersions(result.items);
     } catch (problem) {
+      setLoadFailed(true);
       setError(problem instanceof Error ? problem.message : 'connection_error');
-    }
+    } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { void refresh(); }, [refresh]);
@@ -79,6 +83,7 @@ export function BrandingWorkspace({ locale }: { locale: Locale }) {
       setNotice(vi ? 'Đã lưu và kích hoạt logo mới.' : 'The new logo is saved and active.');
       setSource(null); setZoom(1); setOffsetX(0); setOffsetY(0);
       await refresh();
+      window.dispatchEvent(new Event('platform-logo-updated'));
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : 'connection_error');
     } finally { setBusy(false); }
@@ -90,6 +95,7 @@ export function BrandingWorkspace({ locale }: { locale: Locale }) {
       await api(`/admin/branding/logos/${id}/activation`, 'POST');
       setNotice(vi ? 'Đã khôi phục phiên bản logo.' : 'Logo version restored.');
       await refresh();
+      window.dispatchEvent(new Event('platform-logo-updated'));
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : 'connection_error');
     } finally { setBusy(false); }
@@ -103,7 +109,17 @@ export function BrandingWorkspace({ locale }: { locale: Locale }) {
         {source ? <canvas ref={canvasRef} width={1024} height={1024} aria-label={vi ? 'Xem trước vùng logo đã cắt' : 'Cropped logo preview'} style={{ display: 'block', width: '100%', maxWidth: 320, aspectRatio: '1', borderRadius: 20, border: '1px solid var(--line)', background: 'var(--surface)' }} /> : <div style={{ width: '100%', maxWidth: 320, aspectRatio: '1', display: 'grid', placeItems: 'center', borderRadius: 20, border: '1px dashed var(--line)' }}>{activeVersion ? <img src={activeVersion.url} alt={vi ? `Logo nền tảng đang hoạt động, phiên bản ${activeVersion.version}` : `Active platform logo, version ${activeVersion.version}`} style={{ maxWidth: '72%', maxHeight: '72%', objectFit: 'contain' }} /> : <span aria-hidden="true" style={{ fontSize: 42 }}>◈</span>}</div>}
       </div>
       <div className="course-form-grid">
-        <label className="course-field"><span>{vi ? 'Ảnh nguồn' : 'Source image'}</span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => { const file = event.target.files?.[0] || null; setError(''); setSource(file); }} /></label>
+        <label className="course-field"><span>{vi ? 'Ảnh nguồn' : 'Source image'}</span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => {
+          const file = event.target.files?.[0] || null;
+          setError(''); setSource(null);
+          if (file && !['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+            setError(vi ? 'Chọn ảnh PNG, JPEG hoặc WebP.' : 'Choose a PNG, JPEG, or WebP image.'); return;
+          }
+          if (file && file.size > 2_000_000) {
+            setError(vi ? 'Ảnh nguồn phải có kích thước tối đa 2 MB.' : 'The source image must be 2 MB or smaller.'); return;
+          }
+          setSource(file); setZoom(1); setOffsetX(0); setOffsetY(0);
+        }} /></label>
         {source && <>
           <label className="course-field"><span>{vi ? 'Thu phóng' : 'Zoom'} · {Math.round(zoom * 100)}%</span><input aria-label={vi ? 'Thu phóng vùng cắt' : 'Crop zoom'} type="range" min={100} max={300} value={Math.round(zoom * 100)} onChange={(event) => setZoom(Number(event.target.value) / 100)} /></label>
           <label className="course-field"><span>{vi ? 'Dịch trái/phải' : 'Move left/right'}</span><input aria-label={vi ? 'Dịch ngang vùng cắt' : 'Crop horizontal position'} type="range" min={-100} max={100} value={offsetX} onChange={(event) => setOffsetX(Number(event.target.value))} /></label>
@@ -114,7 +130,7 @@ export function BrandingWorkspace({ locale }: { locale: Locale }) {
     </div>
     {error && <p className="alert alert-error" role="alert">{error}</p>}{notice && <p className="alert alert-success" role="status">{notice}</p>}
     <h3>{vi ? 'Lịch sử logo' : 'Logo history'}</h3>
-    {versions.length ? versions.map((version) => <div className="assessment-attempt-heading" key={version.id}>
+    {loading ? <p role="status">{vi ? 'Đang tải lịch sử logo…' : 'Loading logo history…'}</p> : loadFailed ? <button type="button" className="button secondary" onClick={() => void refresh()}>{vi ? 'Thử lại' : 'Retry'}</button> : versions.length ? versions.map((version) => <div className="assessment-attempt-heading" key={version.id}>
       <span><strong>v{version.version}</strong> · {version.isActive ? (vi ? 'Đang dùng' : 'Active') : new Date(version.createdAt).toLocaleString(vi ? 'vi-VN' : 'en-US')}<small style={{ display: 'block' }}>{version.digest.slice(0, 16)}…</small></span>
       {!version.isActive && <button type="button" className="button secondary" disabled={busy} onClick={() => void activate(version.id)}>{vi ? 'Khôi phục' : 'Restore'}</button>}
     </div>) : <p className="course-empty">{vi ? 'Chưa có logo tùy chỉnh.' : 'No custom logo has been uploaded.'}</p>}

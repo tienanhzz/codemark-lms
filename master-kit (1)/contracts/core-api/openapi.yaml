@@ -7437,8 +7437,17 @@ components:
       - schedule
       - attemptPolicy
       - gradingPolicy
-      - items
+      anyOf:
+      - required: [items]
+      - required: [selection]
+        properties:
+          selection:
+            properties:
+              mode:
+                const: tags
       properties:
+        selection:
+          $ref: './assessment-version.schema.json#/$defs/selection'
         title:
           type: string
         assessmentTypeId:
@@ -9111,6 +9120,14 @@ components:
           - type: 'null'
           default: null
           title: Lessonversionid
+        tagIds:
+          items:
+            pattern: ^[a-z][a-z0-9-]{0,127}$
+            type: string
+          maxItems: 50
+          title: Tagids
+          type: array
+          description: Stable content tag IDs. New assignments require active selectable lesson-applicable tags; retained historical references remain readable.
         outcomes:
           items:
             maxLength: 240

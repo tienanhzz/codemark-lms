@@ -274,22 +274,21 @@ describe('Workspace shell and clearly isolated previews', () => {
     await screen.findByText(/Draft policy created/);
     expect(transport.api).toHaveBeenCalledWith('/admin/rank-policies', 'POST', expect.objectContaining({ track: 'student', tiers: expect.arrayContaining([expect.objectContaining({ tierKey: 'starter', thresholdExp: 0 })]) }));
   });
-  it('shows trusted mission progress and claims only an eligible one-time reward', async () => {
-    const user = userEvent.setup();
-    transport.api.mockImplementation(async (path: string, method?: string) => {
-      if (path === '/me/missions') return { items: [
-        { missionId: 'practice-daily', version: 1, title: 'Practice twice', eventKey: 'practice.attempt', targetCount: 2, cadence: 'daily', timeZone: 'Asia/Bangkok', eligibleRoles: ['student'], reward: { exp: 40, coin: 0 }, progress: 2, status: 'claimed', canClaim: false },
-        { missionId: 'first-correct', version: 1, title: 'First correct answer', eventKey: 'practice.correct', targetCount: 1, cadence: 'once', timeZone: 'Asia/Bangkok', eligibleRoles: ['student'], reward: { exp: 100, coin: 0 }, progress: 1, status: 'complete', canClaim: true },
+  it('shows verified workbook mission progress and navigates unfinished work', async () => {
+    transport.api.mockImplementation(async (path: string) => {
+      if (path === '/quests/evidence') return { items: [] };
+      if (path === '/quests/me') return { items: [
+        { questCode: 'STU_ASSIGN_ONTIME', targetRole: 'student', category: 'Academic', questName: 'Submit on time', conditionDesc: 'Submit before the assignment deadline', resetType: 'PER_ENTITY', limitRule: 'Once per assignment', progress: 1, status: 'complete', actionHref: '/assessments', reviewRequired: false, reward: { exp: 0, coin: 0 }, active: true, revision: 1 },
+        { questCode: 'STU_ASSIGN_EARLY', targetRole: 'student', category: 'Academic', questName: 'Submit early', conditionDesc: 'Submit at least 24 hours early', resetType: 'UPGRADE_TIER', limitRule: 'Replaces on-time tier', progress: 0, status: 'active', actionHref: '/assessments', reviewRequired: false, reward: { exp: 0, coin: 0 }, active: true, revision: 1 },
       ] };
-      if (path === '/missions/first-correct/claims' && method === 'POST') return { missionId: 'first-correct', exp: 100, coin: 0, replayed: false };
-      throw new Error(`Unexpected ${method} ${path}`);
+      throw new Error(`Unexpected ${path}`);
     });
     render(<MissionsWorkspace locale="en" roles={['student']} />);
-    await screen.findByText('Practice twice');
-    expect(screen.getByText('2 / 2 · practice.attempt')).toBeTruthy();
-    await user.click(screen.getByRole('button', { name: 'Claim reward' }));
-    await screen.findByText('Reward claimed and added to your wallet.');
-    expect(transport.api).toHaveBeenCalledWith('/missions/first-correct/claims', 'POST', undefined, expect.objectContaining({ 'Idempotency-Key': expect.any(String) }));
+    await screen.findByText('Submit on time');
+    expect(screen.getByText('Completed')).toBeTruthy();
+    expect(screen.getByText('1 verified')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Do mission' }).getAttribute('href')).toBe('/assessments');
+    expect(screen.queryByRole('button', { name: 'Claim reward' })).toBeNull();
   });
   it('connects unlocked achievement titles to the account title slot', async () => {
     const user = userEvent.setup();
@@ -341,6 +340,36 @@ describe('Workspace shell and clearly isolated previews', () => {
     expect(transport.api).toHaveBeenCalledWith('/courses/course-1/assessments', 'POST', expect.objectContaining({
       kind: 'exam', title: 'Midterm', questionVersionIds: ['qv-1'], timezone: 'Asia/Bangkok',
     }));
+  });
+  it('saves direct tag selection criteria with explicit all matching', async () => {
+    const user = userEvent.setup();
+    transport.api.mockImplementation(async (path: string, method?: string) => {
+      if (path === '/courses?pageSize=100') return { items: [{ id: 'course-1', courseCode: 'CS101', title: 'Algorithms', permissions: ['assessment.manage'] }] };
+      if (path === '/courses/course-1/questions?status=published&pageSize=100') return { items: [] };
+      if (path === '/courses/course-1/assessments' && method === 'POST') return { id: 'assessment-1' };
+      if (path === '/courses/course-1/assessments') return { items: [] };
+      if (path === '/question-taxonomy') return { tags: [
+        { id: 'arrays', names: { en: 'Arrays' }, status: 'active', selectable: true, applicability: [] },
+        { id: 'navigation', names: { en: 'Navigation only' }, status: 'active', selectable: false, applicability: [] },
+        { id: 'code-only', names: { en: 'Code only' }, status: 'active', selectable: true, applicability: ['code'] },
+      ] };
+      throw new Error(`Unexpected ${method} ${path}`);
+    });
+    render(<AssessmentBuilder locale="en" />);
+    await screen.findByLabelText('Question selection');
+    await user.selectOptions(screen.getByLabelText('Question selection'), 'tags');
+    await user.click(await screen.findByLabelText('Arrays'));
+    expect(screen.queryByLabelText('Navigation only')).toBeNull();
+    expect(screen.queryByLabelText('Code only')).toBeNull();
+    await user.selectOptions(screen.getByLabelText('Tag matching'), 'all');
+    await user.type(screen.getByLabelText('Title'), 'By topic');
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    await screen.findByRole('status');
+    expect(transport.api).toHaveBeenCalledWith('/courses/course-1/assessments', 'POST', expect.objectContaining({
+      selection: { mode: 'tags', tagIds: ['arrays'], match: 'all' },
+    }));
+    const request = transport.api.mock.calls.find((call) => call[1] === 'POST')?.[2];
+    expect(request).not.toHaveProperty('questionVersionIds');
   });
   it('starts, autosaves and submits an assessment attempt', async () => {
     const user = userEvent.setup();
@@ -427,7 +456,7 @@ describe('Workspace shell and clearly isolated previews', () => {
     const ids = previewPages.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const page of previewPages) {
-      expect(page.rows.length).toBeGreaterThan(0);
+      if (page.id !== 'community') expect(page.rows.length).toBeGreaterThan(0);
       for (const link of page.links || [])
         expect(ids.includes(link) || ['courses', 'settings'].includes(link)).toBe(true);
     }
@@ -527,7 +556,7 @@ describe('Workspace shell and clearly isolated previews', () => {
     await user.type(screen.getByRole('textbox', { name: 'Search sample records' }), 'sequences');
     expect(screen.queryByText('Order the statements')).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Open preview' }));
-    expect(screen.getByRole('dialog').textContent).toContain('Fictional interface example');
+    expect(screen.getByRole('region', { name: 'Working with sequences' }).textContent).toContain('Fictional interface example');
     expect(transport.api).not.toHaveBeenCalled();
   });
   it('validates an excusal form locally and never sends an actual request', async () => {
@@ -540,7 +569,7 @@ describe('Workspace shell and clearly isolated previews', () => {
       />,
     );
     await user.click(screen.getByRole('button', { name: 'Xem form xin phép' }));
-    const modal = within(screen.getByRole('dialog'));
+    const modal = within(screen.getByRole('region', { name: 'Xem form xin phép' }));
     await user.type(modal.getByLabelText('Lý do'), 'Example absence');
     await user.click(modal.getByRole('button', { name: 'Kiểm tra biểu mẫu' }));
     expect(await screen.findByRole('status')).toBeTruthy();

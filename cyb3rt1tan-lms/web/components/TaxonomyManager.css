@@ -1,0 +1,68 @@
+﻿.taxonomy-manager .taxonomy-search {
+  display: grid;
+  gap: 8px;
+  max-width: 540px;
+  margin-top: 18px;
+  font-weight: 600;
+}
+.taxonomy-manager .taxonomy-search input {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--border, #cad3df);
+  border-radius: 9px;
+  background: var(--surface, transparent);
+  color: inherit;
+  font: inherit;
+}
+.taxonomy-manager .taxonomy-total {
+  font-weight: 700;
+  margin: 14px 0 0;
+}
+.taxonomy-manager .taxonomy-help,
+.taxonomy-manager .taxonomy-result-count {
+  font-size: 0.88rem;
+  color: var(--muted, #64748b);
+}
+.taxonomy-manager .taxonomy-result-count {
+  margin: 0 0 14px;
+}
+.taxonomy-manager .taxonomy-entry {
+  min-width: 220px;
+}
+.taxonomy-manager .taxonomy-entry small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.taxonomy-manager .taxonomy-branch {
+  color: var(--muted, #64748b);
+}
+.taxonomy-manager .taxonomy-breadcrumb {
+  min-width: 130px;
+  font-size: 0.88rem;
+}
+.taxonomy-manager .taxonomy-breadcrumb a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+.taxonomy-manager .taxonomy-context-row {
+  background: color-mix(in srgb, currentColor 3%, transparent);
+}
+.taxonomy-manager .taxonomy-context-label {
+  font-style: italic;
+}
+.taxonomy-manager tr[id] {
+  scroll-margin-top: 80px;
+}
+.taxonomy-manager .taxonomy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+@media (max-width: 700px) {
+  .taxonomy-manager .taxonomy-search {
+    max-width: none;
+  }
+  .taxonomy-manager .taxonomy-entry {
+    min-width: 190px;
+  }
+}

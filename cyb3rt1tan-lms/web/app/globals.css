@@ -2236,7 +2236,7 @@ input::placeholder {
 
 /* Workspace chrome; login keeps its existing presentation. */
 .app-layout {
-  --sidebar-width: 292px;
+  --sidebar-width: 264px;
   --sidebar: var(--sidebar-width);
   background: var(--background);
   color: var(--text);
@@ -2338,7 +2338,7 @@ input::placeholder {
   .app-layout.is-collapsed .sidebar { transform: translateX(-100%); visibility: hidden; }
 }
 @media (max-width: 720px) {
-  .app-layout { --sidebar-width: 280px; --sidebar: var(--sidebar-width); }
+  .app-layout { --sidebar-width: 260px; --sidebar: var(--sidebar-width); }
   .app-layout .sidebar-toggle { display: none; }
   .app-layout .topbar { gap: 8px; padding-inline: 16px; }
   .app-layout .topbar-actions { gap: 8px; }
@@ -2348,6 +2348,9 @@ input::placeholder {
 }
 
 .workspace-body { min-width: 0; }
+.quick-rank .quick-rank-score strong { font-size: 16px; }
+.quick-rank .rank-badge-compact { flex-basis: 40px; }
+.quick-rank .rank-badge-compact img { width: 40px; height: 36px; }
 .workspace-body.rank-rail-closed > .quick-rank-rail { display: none; }
 .rank-rail-toggle {
   position: fixed;
@@ -2381,7 +2384,7 @@ input::placeholder {
 @media (min-width: 1280px) {
   .workspace-body.with-quick-rank {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 356px;
+    grid-template-columns: minmax(0, 1fr) 304px;
     align-items: start;
   }
   .workspace-body.with-quick-rank.rank-rail-closed { grid-template-columns: minmax(0, 1fr); }
@@ -2395,7 +2398,7 @@ input::placeholder {
   }
 }
 @media (min-width: 1600px) {
-  .workspace-body.with-quick-rank { grid-template-columns: minmax(0, 1fr) 400px; }
+  .workspace-body.with-quick-rank { grid-template-columns: minmax(0, 1fr) 320px; }
   .quick-rank-rail { padding-top: 45px; }
 }
 @container (max-width: 760px) {

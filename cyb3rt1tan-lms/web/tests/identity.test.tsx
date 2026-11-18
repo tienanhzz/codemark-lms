@@ -175,7 +175,7 @@ describe('Identity UI behavior in a simulated DOM, without browser automation or
       (await screen.findByRole('button', { name: 'Invite a person' })).hasAttribute('disabled'),
     ).toBe(true);
     await user.click(await screen.findByRole('button', { name: 'View details' }));
-    const modal = await screen.findByRole('dialog', { name: 'Test Student' });
+    const modal = await screen.findByRole('region', { name: 'Test Student' });
     await user.click(within(modal).getByRole('tab', { name: 'Roles & access' }));
     await user.click(within(modal).getByLabelText('Teacher'));
     await user.click(within(modal).getByRole('button', { name: 'Save roles' }));

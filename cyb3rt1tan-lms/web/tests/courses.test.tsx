@@ -61,7 +61,7 @@ describe('Course UI interactions in a simulated DOM', () => {
     render(<CourseWorkspace locale="en" roles={['admin']} onChange={changed} />);
     await screen.findByText('Your learning spaces start here');
     await user.click(screen.getByRole('button', { name: 'Create course' }));
-    const modal = within(screen.getByRole('dialog'));
+    const modal = within(screen.getByRole('region', { name: 'Create course' }));
     await user.type(modal.getByLabelText('Course code'), 'CS101');
     await user.type(modal.getByLabelText('Course title'), 'Foundations');
     await user.selectOptions(modal.getByLabelText('Academic term'), '2026');
@@ -102,7 +102,7 @@ describe('Course UI interactions in a simulated DOM', () => {
     const edit = await screen.findByRole('button', { name: 'Edit plan' });
     await waitFor(() => expect((edit as HTMLButtonElement).disabled).toBe(false));
     await user.click(edit);
-    const modal = within(screen.getByRole('dialog'));
+    const modal = within(screen.getByRole('region', { name: 'Edit lesson plan' }));
     await user.click(modal.getByRole('button', { name: 'Add entry' }));
     await user.type(modal.getByLabelText('Topic'), 'Persistent draft');
     await user.click(modal.getByRole('button', { name: 'Save changes' }));
@@ -152,7 +152,7 @@ describe('Course UI interactions in a simulated DOM', () => {
     for (let month = 0; month < 9; month++)
       await user.click(screen.getByRole('button', { name: 'Previous month' }));
     await user.click(screen.getByRole('button', { name: /A-101/ }));
-    const modal = within(screen.getByRole('dialog'));
+    const modal = within(screen.getByRole('region', { name: 'Schedule exception' }));
     await user.selectOptions(modal.getByLabelText('Session status'), 'cancelled');
     await user.type(modal.getByLabelText('Reason'), 'Room unavailable');
     await user.click(modal.getByRole('button', { name: 'Save changes' }));
@@ -216,7 +216,7 @@ describe('Course UI interactions in a simulated DOM', () => {
     expect(screen.getByText('40%')).toBeTruthy();
     expect(screen.getByText('60%')).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Edit resources' }));
-    const modal = within(screen.getByRole('dialog'));
+    const modal = within(screen.getByRole('region', { name: 'Edit learning resources' }));
     await user.clear(modal.getByLabelText('Note'));
     await user.type(modal.getByLabelText('Note'), 'Updated reading note');
     await user.click(modal.getByRole('button', { name: 'Save changes' }));
@@ -251,7 +251,7 @@ describe('Course UI interactions in a simulated DOM', () => {
     const user = userEvent.setup();
     render(<SharedCourseRules locale="en" />);
     await user.click(await screen.findByRole('button', { name: 'Activate' }));
-    const modal = within(screen.getByRole('dialog'));
+    const modal = within(screen.getByRole('region', { name: 'Activate shared rules' }));
     expect(modal.getByText('Arrive before class.')).toBeTruthy();
     expect(transport.api.mock.calls.some(([, method]) => method === 'POST')).toBe(false);
     await user.click(modal.getByRole('button', { name: 'Save changes' }));
@@ -276,7 +276,7 @@ describe('Course UI interactions in a simulated DOM', () => {
     const user = userEvent.setup();
     render(<CourseAcademicPanel course={course} locale="en" onChange={vi.fn().mockResolvedValue(undefined)} />);
     await user.click(await screen.findByRole('button', { name: 'New grade scheme draft' }));
-    const editor = within(screen.getByRole('dialog'));
+    const editor = within(screen.getByRole('region', { name: 'Grade scheme draft' }));
     await user.click(editor.getByRole('button', { name: 'Save changes' }));
     await screen.findByText(/Version 2 · 100%/);
     await user.click(screen.getByRole('button', { name: 'Publish' }));
@@ -337,12 +337,13 @@ describe('Live taxonomy management', () => {
     });
     render(<TaxonomyManager locale="en" roles={['admin']} />);
     await user.click(await screen.findByRole('button', { name: 'Add category' }));
-    const editor = within(screen.getByRole('dialog'));
+    const editor = within(screen.getByRole('region', { name: 'Create taxonomy entry' }));
     await user.type(editor.getByLabelText('Stable ID'), 'algorithms');
     await user.type(editor.getByLabelText('English name'), 'Algorithms');
     await user.type(editor.getByLabelText('Vietnamese name'), 'Thuật toán');
     await user.click(editor.getByRole('button', { name: 'Save changes' }));
-    await screen.findByText(/algorithms · Algorithms/);
+    await screen.findByText('algorithms · Thuật toán');
+    expect(screen.getByText('Algorithms')).toBeTruthy();
     expect(transport.api).toHaveBeenCalledWith(
       '/admin/question-taxonomy/categories', 'POST', expect.objectContaining({ id: 'algorithms' }),
     );
@@ -369,7 +370,7 @@ describe('Live taxonomy management', () => {
     });
     render(<QuestionBank locale="en" roles={['teacher']} />);
     await user.click(await screen.findByRole('button', { name: 'Create question' }));
-    const editor = within(screen.getByRole('dialog'));
+    const editor = within(screen.getByRole('region', { name: 'Create question draft' }));
     await user.type(editor.getByLabelText('Title'), 'Choose the answer');
     await user.type(editor.getByLabelText('Prompt / instructions'), 'Select one.');
     await user.selectOptions(editor.getByLabelText('Category'), 'basics');

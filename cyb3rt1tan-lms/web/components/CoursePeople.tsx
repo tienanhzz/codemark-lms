@@ -383,7 +383,7 @@ export function CoursePeople({
         </section>
       )}
       {action && (
-        <Modal title={titles[action.kind]} onClose={() => setAction(null)} locked={busy}>
+        <Modal presentation={['remove', 'revoke', 'membership'].includes(action.kind) ? 'dialog' : 'inline'} title={titles[action.kind]} onClose={() => setAction(null)} locked={busy}>
           <form className="course-form" onSubmit={save}>
             <IdentityAlert text={error} />
             {action.kind === 'staff' && (

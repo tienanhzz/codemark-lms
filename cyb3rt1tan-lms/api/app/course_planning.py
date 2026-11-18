@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import UTC, datetime, timedelta
-from typing import Annotated
+from typing import Annotated, cast
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, HTTPException, Query, Request, Response
@@ -19,7 +19,7 @@ from .course_dto import (
     SessionSeriesCreate,
     TemplateDraft,
 )
-from .models import Course, CourseRulePublication, RuleTemplate, TeachingSession
+from .models import Course, CourseRulePublication, RuleTemplate, TaxonomyTag, TeachingSession
 from .security import utc
 
 router = APIRouter(prefix="/v1")
@@ -277,6 +277,18 @@ def save_plan(
     )
     if scheduled - set(retained):
         raise HTTPException(409, "scheduled_plan_entry_required")
+    previous_tags = {
+        entry["entryId"]: set(cast(list[str], entry.get("tagIds", [])))
+        for entry in course.lesson_plan
+    }
+    for entry in body.entries:
+        existing = previous_tags.get(entry.entryId, set())
+        for tag_id in set(entry.tagIds) - existing:
+            tag = db.get(TaxonomyTag, ("content", tag_id))
+            if tag is None or tag.status != "active" or not tag.selectable:
+                raise HTTPException(422, "active_lesson_tags_required")
+            if tag.applicability and "lesson" not in tag.applicability:
+                raise HTTPException(422, "lesson_tag_not_applicable")
     course.lesson_plan = sorted(
         [
             {**entry.model_dump(), "entryId": entry.entryId or str(uuid.uuid4())}

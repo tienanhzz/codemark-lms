@@ -184,6 +184,9 @@ def reject(
 def establish(
     db: Session, user: User, response: Response, verified_mfa: bool = False
 ) -> dict[str, object]:
+    from .quests import record_login
+
+    record_login(db, user)
     token, csrf = secrets.token_urlsafe(48), secrets.token_urlsafe(32)
     db.add(
         UserSession(

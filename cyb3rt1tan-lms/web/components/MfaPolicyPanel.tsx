@@ -90,6 +90,7 @@ export function MfaPolicyPanel({
       )}
       {selected && (
         <Modal
+          presentation="dialog"
           title={roleLabel(selected.role) + ' · ' + (selected.required ? t.required : t.optional)}
           onClose={() => setSelected(null)}
         >

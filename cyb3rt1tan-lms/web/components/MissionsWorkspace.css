@@ -1,0 +1,31 @@
+.workbook-quests { display: grid; gap: 1.4rem; min-width: 0; }
+.quest-tabs { display: flex; flex-wrap: wrap; gap: .5rem; border-bottom: 1px solid var(--border, #dce2eb); padding-bottom: .8rem; }
+.quest-tabs button { border: 1px solid var(--border, #dce2eb); background: transparent; color: inherit; border-radius: .65rem; padding: .7rem 1rem; font-weight: 650; cursor: pointer; }
+.quest-tabs button[aria-pressed="true"] { background: var(--primary, #164e80); border-color: var(--primary, #164e80); color: white; }
+.quest-table-wrap { overflow-x: auto; border: 1px solid var(--border, #dce2eb); border-radius: .9rem; }
+.quest-table { width: 100%; border-collapse: collapse; font-size: .85rem; line-height: 1.65; }
+.quest-table th { background: var(--surface-subtle, rgba(110, 130, 160, .08)); font-weight: 700; text-align: left; white-space: nowrap; padding: 1rem .85rem; }
+.quest-table td { padding: 1rem .85rem; vertical-align: top; border-top: 1px solid var(--border, #dce2eb); }
+.quest-table td:nth-child(3) { min-width: 180px; }
+.quest-table td:nth-child(4) { min-width: 250px; }
+.quest-table td:nth-child(6) { min-width: 180px; }
+.quest-table td:last-child { min-width: 155px; }
+.quest-table code { font-size: .72rem; white-space: nowrap; }
+.quest-table small { display: block; margin-top: .35rem; font-size: .74rem; opacity: .7; }
+.quest-category, .quest-cycle { display: inline-flex; padding: .15rem .5rem; border-radius: .4rem; background: rgba(98, 135, 180, .1); font-size: .75rem; white-space: nowrap; }
+.quest-progress { font-size: .78rem; white-space: nowrap; opacity: .7; }
+.quest-progress.complete, .quest-completed { color: var(--success, #168052); opacity: 1; }
+.quest-completed { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .4rem; font-weight: 650; }
+.quest-completed a { display: block; flex-basis: 100%; font-size: .75rem; }
+.quest-action-panel, .quest-evidence-card { padding: 1.2rem; border: 1px solid var(--border, #dce2eb); border-radius: .8rem; background: var(--surface, transparent); }
+.quest-action-panel h3, .quest-evidence-list h3 { margin-top: 0; }
+.quest-management-heading p, .quest-action-panel p, .quest-evidence-card p { font-size: .88rem; line-height: 1.7; }
+.quest-management-heading .course-field { max-width: 320px; }
+.quest-checkbox { display: flex; gap: .55rem; align-items: center; font-size: .85rem; }
+.quest-checkbox input { width: 1rem; height: 1rem; }
+.quest-evidence-list { display: grid; gap: .8rem; }
+.quest-evidence-card > div { display: flex; justify-content: space-between; align-items: center; gap: .7rem; flex-wrap: wrap; }
+.quest-documents { display: flex; flex-wrap: wrap; gap: .6rem; }
+.quest-reader { display: grid; gap: .8rem; margin-top: 1rem; }
+.quest-reader iframe { width: 100%; min-height: 480px; border: 1px solid var(--border, #dce2eb); border-radius: .7rem; background: white; }
+@media (max-width: 700px) { .quest-action-panel, .quest-evidence-card { padding: .9rem; } .quest-table td, .quest-table th { padding: .75rem; } .quest-reader iframe { min-height: 320px; } }

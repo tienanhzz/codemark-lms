@@ -103,6 +103,7 @@ export function PersonalSessionsPanel({
       </div>
       {selected && (
         <Modal
+          presentation="dialog"
           title={t('end')}
           onClose={() => {
             setSelected(null);

@@ -1,6 +1,7 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { identityMessages, type IdentityKey } from '../lib/identityMessages';
+import '../app/expanded-panels.css';
 
 export const roles = [
   'student',
@@ -25,18 +26,46 @@ export function Modal({
   children,
   onClose,
   locked = false,
+  presentation = 'inline',
 }: {
   title: string;
   children: React.ReactNode;
   onClose: () => void;
   locked?: boolean;
+  presentation?: 'inline' | 'dialog';
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const titleId = useId();
   useEffect(() => {
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const element = dialog.current;
-    element?.showModal();
-    return () => element?.close();
-  }, []);
+    if (presentation === 'dialog') element?.showModal();
+    else {
+      heading.current?.focus();
+      heading.current?.scrollIntoView?.({ block: 'start' });
+    }
+    return () => {
+      element?.close();
+      if (trigger?.isConnected) trigger.focus({ preventScroll: true });
+    };
+  }, [presentation]);
+  const content = (
+    <>
+      <div className="panel-heading">
+        <h2 ref={heading} id={titleId} tabIndex={-1}>{title}</h2>
+        {!locked && (
+          <button type="button" className="icon-button" aria-label="Close / Đóng" onClick={onClose}>
+            <i className="fa-solid fa-xmark" aria-hidden="true" />
+          </button>
+        )}
+      </div>
+      {presentation === 'inline' ? <div className="expanded-panel-body">{children}</div> : children}
+    </>
+  );
+  if (presentation === 'inline') {
+    return <section className="panel expanded-panel" aria-labelledby={titleId}>{content}</section>;
+  }
   return (
     <dialog
       ref={dialog}
@@ -47,15 +76,7 @@ export function Modal({
         if (!locked) onClose();
       }}
     >
-      <div className="panel-heading">
-        <h2>{title}</h2>
-        {!locked && (
-          <button className="icon-button" aria-label="Close / Đóng" onClick={onClose}>
-            <i className="fa-solid fa-xmark" aria-hidden="true" />
-          </button>
-        )}
-      </div>
-      {children}
+      {content}
     </dialog>
   );
 }

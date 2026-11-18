@@ -271,7 +271,7 @@ export function AvatarEditor({
         </button>
       )}
       {removing && (
-        <Modal title={t('remove')} locked={working} onClose={() => setRemoving(false)}>
+        <Modal presentation="dialog" title={t('remove')} locked={working} onClose={() => setRemoving(false)}>
           <IdentityAlert text={error} />
           <p>{t('removeHelp')}</p>
           <div className="form-actions">

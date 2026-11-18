@@ -330,6 +330,7 @@ from .audit_views import router as audit_views_router
 from .avatars import router as avatars_router
 from .branding import router as branding_router
 from .clans import router as clans_router
+from .community import router as community_router
 from .course_academics import router as academics_router
 from .course_planning import router as planning_router
 from .courses import router as course_router
@@ -349,6 +350,7 @@ from .practice import router as practice_router
 from .profile_support import router as support_router
 from .question_assets import router as question_assets_router
 from .questions import router as questions_router
+from .quests import router as quests_router
 from .recovery import router as recovery_router
 from .reports import router as reports_router
 from .runner_queue_routes import router as runner_queue_router
@@ -391,6 +393,8 @@ app.include_router(avatars_router)
 app.include_router(branding_router)
 app.include_router(support_router)
 app.include_router(team_router)
+app.include_router(quests_router)
+app.include_router(community_router)
 app.include_router(timetable_router)
 app.include_router(taxonomy_router)
 app.include_router(questions_router)

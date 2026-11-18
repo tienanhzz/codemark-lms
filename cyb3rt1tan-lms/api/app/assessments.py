@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException, Query, Request, Response
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from .assessment_dto import AssessmentDraft, AttemptAnswers, GradeDraft
+from .assessment_dto import AssessmentDraft, AttemptAnswers, GradeDraft, TagSelection
 from .auth import DB, Principal, audit
 from .course_access import course_for, instant, lock_actor, permissions
 from .models import (
@@ -25,6 +25,8 @@ from .models import (
     CourseMembership,
     Question,
     QuestionVersion,
+    QuestionVersionTag,
+    TaxonomyTag,
     User,
     now,
 )
@@ -62,6 +64,7 @@ def _json(assessment: Assessment, version: AssessmentVersion | None) -> dict[str
             "attemptLimit": version.attempt_limit,
             "latePenaltyTiers": version.late_penalty,
             "questionItems": version.question_items,
+            "selection": version.selection_criteria or {"mode": "manual"},
             "totalPoints": _total_points(version.question_items),
             "status": version.status,
         },
@@ -138,25 +141,87 @@ def _question_points(question: QuestionVersion) -> float:
     return 1.0
 
 
-def _make_version(
-    db: Session, assessment: Assessment, body: AssessmentDraft, actor_id: str
-) -> AssessmentVersion:
-    _zone(body.timezone)
-    if (body.opensAt is None) != (body.closesAt is None):
-        raise HTTPException(422, "schedule_requires_both_bounds")
-    opens_at: datetime | None
-    closes_at: datetime | None
-    if body.opensAt is not None:
-        if body.opensAt.tzinfo is None or body.closesAt is None or body.closesAt.tzinfo is None:
-            raise HTTPException(422, "explicit_offset_required")
-        opens_at = instant(body.opensAt, body.timezone)
-        closes_at = instant(body.closesAt, body.timezone)
-        if closes_at <= opens_at:
-            raise HTTPException(422, "invalid_schedule")
-    else:
-        opens_at = None
-        closes_at = None
-    ids = body.questionVersionIds
+def _selection_tags(db: Session, selection: TagSelection) -> dict[str, TaxonomyTag]:
+    tags = list(
+        db.scalars(
+            select(TaxonomyTag)
+            .where(TaxonomyTag.scope == "question", TaxonomyTag.id.in_(selection.tagIds))
+            .with_for_update()
+        )
+    )
+    supported_types = {
+        "writing",
+        "sentenceRewriting",
+        "multipleChoice",
+        "multipleSelect",
+        "shortAnswer",
+        "fillInTheBlank",
+        "matching",
+        "ordering",
+        "trueFalseNotGiven",
+        "readingSet",
+        "listeningSet",
+    }
+    if len(tags) != len(selection.tagIds) or any(
+        tag.status != "active"
+        or not tag.selectable
+        or (tag.applicability and not supported_types.intersection(tag.applicability))
+        for tag in tags
+    ):
+        raise HTTPException(422, "assessment_filter_tag_not_applicable")
+    return {tag.id: tag for tag in tags}
+
+
+def _resolve_selection(db: Session, assessment: Assessment, selection: TagSelection) -> list[str]:
+    tags = _selection_tags(db, selection)
+    versions = db.scalars(
+        select(QuestionVersion)
+        .join(Question, Question.id == QuestionVersion.question_id)
+        .where(
+            Question.course_id == assessment.course_id,
+            Question.status == "active",
+            QuestionVersion.status == "published",
+        )
+        .order_by(Question.id, QuestionVersion.version.desc())
+        .with_for_update()
+    )
+    required_use = "practical" if assessment.kind == "assignment" else "exam"
+    seen: set[str] = set()
+    result = []
+    for version in versions:
+        if version.question_id in seen:
+            continue
+        seen.add(version.question_id)
+        if version.question_type == "code" or required_use not in version.usage_types:
+            continue
+        direct_tags = set(
+            db.scalars(
+                select(QuestionVersionTag.tag_id).where(
+                    QuestionVersionTag.question_version_id == version.id,
+                    QuestionVersionTag.tag_scope == "question",
+                    QuestionVersionTag.tag_id.in_(selection.tagIds),
+                )
+            )
+        )
+        applicable_matches = {
+            tag_id
+            for tag_id in direct_tags
+            if not tags[tag_id].applicability or version.question_type in tags[tag_id].applicability
+        }
+        if (selection.match == "any" and applicable_matches) or (
+            selection.match == "all" and applicable_matches == set(selection.tagIds)
+        ):
+            result.append(version.id)
+    if not result:
+        raise HTTPException(422, "assessment_filter_no_matches")
+    if len(result) > 100:
+        raise HTTPException(422, "assessment_filter_too_many_matches")
+    return result
+
+
+def _snapshot_questions(
+    db: Session, assessment: Assessment, ids: list[str]
+) -> list[dict[str, object]]:
     questions = list(db.scalars(select(QuestionVersion).where(QuestionVersion.id.in_(ids))))
     by_id = {item.id: item for item in questions}
     if len(by_id) != len(ids):
@@ -180,6 +245,8 @@ def _make_version(
         if points <= 0:
             raise HTTPException(422, "question_has_no_positive_points")
         snapshot: dict[str, object] = {
+            "position": len(items) + 1,
+            "questionId": question.question_id,
             "questionVersionId": question.id,
             "questionType": question.question_type,
             "title": question.title,
@@ -233,6 +300,31 @@ def _make_version(
                 )
             snapshot["childQuestions"] = children
         items.append(snapshot)
+    return items
+
+
+def _make_version(
+    db: Session, assessment: Assessment, body: AssessmentDraft, actor_id: str
+) -> AssessmentVersion:
+    _zone(body.timezone)
+    if (body.opensAt is None) != (body.closesAt is None):
+        raise HTTPException(422, "schedule_requires_both_bounds")
+    opens_at: datetime | None
+    closes_at: datetime | None
+    if body.opensAt is not None:
+        if body.opensAt.tzinfo is None or body.closesAt is None or body.closesAt.tzinfo is None:
+            raise HTTPException(422, "explicit_offset_required")
+        opens_at = instant(body.opensAt, body.timezone)
+        closes_at = instant(body.closesAt, body.timezone)
+        if closes_at <= opens_at:
+            raise HTTPException(422, "invalid_schedule")
+    else:
+        opens_at = None
+        closes_at = None
+    if isinstance(body.selection, TagSelection):
+        _selection_tags(db, body.selection)
+    ids = body.questionVersionIds
+    items = _snapshot_questions(db, assessment, ids)
     return AssessmentVersion(
         assessment_id=assessment.id,
         version=assessment.current_version,
@@ -245,6 +337,7 @@ def _make_version(
         attempt_limit=body.attemptLimit,
         late_penalty=[tier.model_dump() for tier in body.latePenaltyTiers],
         question_items=items,
+        selection_criteria=body.selection.model_dump() if body.selection else None,
         status="draft",
         created_by=actor_id,
     )
@@ -367,6 +460,7 @@ def revise_assessment(
         current.attempt_limit = next_version.attempt_limit
         current.late_penalty = next_version.late_penalty
         current.question_items = next_version.question_items
+        current.selection_criteria = next_version.selection_criteria
         next_version = current
     else:
         raise HTTPException(409, "assessment_version_not_editable")
@@ -402,7 +496,13 @@ def publish_assessment(
             AssessmentVersion.version == item.current_version,
         )
     )
-    if version is None or version.status != "draft" or not version.question_items:
+    if version is None or version.status != "draft":
+        raise HTTPException(409, "valid_assessment_draft_required")
+    if version.selection_criteria and version.selection_criteria.get("mode") == "tags":
+        selection = TagSelection.model_validate(version.selection_criteria)
+        ids = _resolve_selection(db, item, selection)
+        version.question_items = _snapshot_questions(db, item, ids)
+    if not version.question_items:
         raise HTTPException(409, "valid_assessment_draft_required")
     version.status = "published"
     item.status = "published"
@@ -1096,6 +1196,9 @@ def release_grade(
     )
     db.add(release)
     db.flush()
+    from .quests import record_grade_release
+
+    record_grade_release(db, user, release)
     audit(
         db,
         request,
